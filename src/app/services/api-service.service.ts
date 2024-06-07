@@ -67,15 +67,8 @@ export class ApiServiceService {
   }
 
 
-  loggin(): Observable<any> {
-    const data = {
-      "usuario": "admin",
-      "contrasenia": "admin"
-    }
-    return this.http.post<any>(`${this.apiUrl}:8086/login`, data);
-  }
 
-  logginButton(username: string, password: string): Observable<any> {
+  loggin(username: string, password: string): Observable<any> {
     const data = {
       "usuario": username,
       "contrasenia": password

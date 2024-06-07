@@ -29,6 +29,8 @@ export class AsesoresComponent implements OnInit {
 
   product: Product;
 
+  usuarios
+
   selectedProducts: Product[];
 
   submitted: boolean;

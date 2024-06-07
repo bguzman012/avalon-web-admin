@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { ApiServiceService } from '../../../services/api-service.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment'
+import * as CryptoJS from 'crypto-js';
 
 @Component({
   selector: 'app-login',
@@ -29,13 +31,19 @@ export class LoginComponent {
       const username = this.loginForm.get('username')!.value; // Add '!' here
       const password = this.loginForm.get('password')!.value; // Add '!' here
 
-      this.apiService.logginButton(username, password)
+      this.apiService.loggin(username, password)
         .subscribe(
           (response) => {
+            const credenciales = {
+              username: username,
+              password: password
+            };
             // Handle successful login
-            console.log('Login successful:', response);
+            const credencialesEncriptadas = CryptoJS.AES.encrypt(JSON.stringify(credenciales), environment.secret).toString();
+
+            localStorage.setItem('cred', credencialesEncriptadas);
             localStorage.setItem('isLoggedIn', 'true');
-            this.router.navigate(['/pets/usuarios']);
+            this.router.navigate(['/usuarios/funcionalidades']);
           },
           (error) => {
             // Handle login error

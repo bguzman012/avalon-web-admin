@@ -5,7 +5,7 @@ import { Observable, catchError, tap, throwError } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class ApiServiceService {
+export class UsuariosService {
 
   // private apiUrl = 'http://167.114.68.106';
   private apiUrl = 'http://localhost';
@@ -29,9 +29,5 @@ export class ApiServiceService {
         })
       );
   }
-
-
-  
-  
 
 }
