@@ -1,0 +1,45 @@
+<div class="bg-light min-vh-100 d-flex flex-row align-items-center">
+  <c-container>
+    <c-row class="justify-content-center">
+      <c-col md="8">
+        <c-card-group>
+          <c-card class="p-4">
+            <c-card-body>
+              <form [formGroup]="loginForm" cForm>
+                <h1>Avalon Plus</h1>
+                <p class="text-medium-emphasis">Empresa líder en el conserjería médica integral internacional</p>
+                <c-input-group class="mb-3">
+                  <span cInputGroupText>
+                    <svg cIcon name="cilUser"></svg>
+                  </span>
+                  <input formControlName="username" autoComplete="username" cFormControl placeholder="Username" />
+                </c-input-group>
+                <c-input-group class="mb-4">
+                  <span cInputGroupText>
+                    <svg cIcon name="cilLockLocked"></svg>
+                  </span>
+                  <input formControlName="password" autoComplete="current-password" cFormControl placeholder="Password"
+                    type="password" />
+                </c-input-group>
+                <c-row>
+                  <c-col xs="6">
+                    <button cButton class="px-4" color="primary" (click)="login()">
+                      Login
+                    </button>
+                  </c-col>
+                  <!-- ... otros botones ... -->
+                </c-row>
+              </form>
+            </c-card-body>
+          </c-card>
+          <c-card class="image-card">
+            <c-card-body class="image-body">
+              <img src="https://scontent.fuio13-1.fna.fbcdn.net/v/t39.30808-6/415498724_883105163817441_810391913621876878_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=5f2048&_nc_ohc=cjlHdJHKu4kQ7kNvgG-6Qy8&_nc_ht=scontent.fuio13-1.fna&oh=00_AYBeF_ukH2mduG6oF5XdTUcfCk3T2u8MCNi2NFXCABichA&oe=6667CEEE" alt="SignUp Image"
+                class="img-fluid" />
+            </c-card-body>
+          </c-card>
+        </c-card-group>
+      </c-col>
+    </c-row>
+  </c-container>
+</div>
