@@ -1,6 +1,7 @@
 // En LoginComponent
 import { Component } from '@angular/core';
 import { ApiServiceService } from '../../../services/api-service.service';
+import { AuthService } from '../../../services/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment'
@@ -15,7 +16,7 @@ export class LoginComponent {
 
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private apiService: ApiServiceService, private router: Router) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     if (isLoggedIn == true)
       this.router.navigate(['/pets/usuarios']);
@@ -31,19 +32,10 @@ export class LoginComponent {
       const username = this.loginForm.get('username')!.value; // Add '!' here
       const password = this.loginForm.get('password')!.value; // Add '!' here
 
-      this.apiService.loggin(username, password)
+      this.authService.login(username, password)
         .subscribe(
           (response) => {
-            const credenciales = {
-              username: username,
-              password: password
-            };
-            // Handle successful login
-            const credencialesEncriptadas = CryptoJS.AES.encrypt(JSON.stringify(credenciales), environment.secret).toString();
-
-            localStorage.setItem('cred', credencialesEncriptadas);
-            localStorage.setItem('isLoggedIn', 'true');
-            this.router.navigate(['/usuarios/funcionalidades']);
+            this.router.navigate(['/usuarios']);
           },
           (error) => {
             // Handle login error

@@ -1,24 +1,35 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ProductoComponent } from './producto/producto.component';
+import { AseguradorasComponent } from './aseguradoras/aseguradoras.component';
 
 const routes: Routes = [
   {
     path: '',
     data: {
-      title: 'Productos'
+      breadcrumb: 'Aseguradoras'
     },
     children: [
       {
-        path: 'productos',
-        component: ProductoComponent,
+        path: '',
         data: {
-          title: 'Producto'
-        }
+          breadcrumb: null
+        },
+        component: AseguradorasComponent,
       }
     ]
   }
 ];
+
+// const routes: Routes = [
+//   {
+//     path: '#',
+//     component: AseguradorasComponent,
+//     data: {
+//       title: 'Aseguradoras',
+//       breadcrumb: 'Aseguradoras'
+//     }
+//   }
+// ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

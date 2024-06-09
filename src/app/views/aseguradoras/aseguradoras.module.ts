@@ -14,7 +14,7 @@ import {
 
 
 import { AseguradorasRoutingModule } from './aseguradoras-routing.module';
-import { ProductoComponent } from './producto/producto.component';
+import { AseguradorasComponent} from './aseguradoras/aseguradoras.component'
 
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
@@ -34,12 +34,14 @@ import {RadioButtonModule} from 'primeng/radiobutton';
 import {InputNumberModule} from 'primeng/inputnumber';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { BlockUIModule } from 'primeng/blockui';
 import { MessageService } from 'primeng/api';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 
 @NgModule({
   declarations: [
-    ProductoComponent
+    AseguradorasComponent
   ],
   imports: [
     CommonModule,
@@ -61,6 +63,8 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
     CalendarModule,
 		SliderModule,
 		DialogModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
 		MultiSelectModule,
 		ContextMenuModule,
 		DropdownModule,

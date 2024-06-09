@@ -13,7 +13,6 @@ import {
 
 
 import { UsuariosRoutingModule } from './usuarios-routing.module';
-import { UsuariosComponent } from './usuarios/usuarios.component';
 import { AsesoresComponent } from './asesores/asesores.component';
 import { FuncionalidadesComponent } from './funcionalidades/funcionalidades.component';
 
@@ -27,7 +26,10 @@ import {DialogModule} from 'primeng/dialog';
 import {ButtonModule} from 'primeng/button';
 import {DropdownModule} from 'primeng/dropdown';
 import {ProgressBarModule} from 'primeng/progressbar';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import {InputTextModule} from 'primeng/inputtext';
+import {AutoCompleteModule} from 'primeng/autocomplete';
 import { CardModule } from 'primeng/card';
 import {FileUploadModule} from 'primeng/fileupload';
 import {ToolbarModule} from 'primeng/toolbar';
@@ -36,14 +38,15 @@ import {RadioButtonModule} from 'primeng/radiobutton';
 import {InputNumberModule} from 'primeng/inputnumber';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { BlockUIModule } from 'primeng/blockui';
 import { MessageService } from 'primeng/api';
 import { DataViewModule } from 'primeng/dataview';
 import {PanelModule} from 'primeng/panel';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 
 @NgModule({
   declarations: [
-    UsuariosComponent,
     FuncionalidadesComponent,
     AsesoresComponent
   ],
@@ -60,10 +63,12 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
     ButtonGroupModule,
     DropdownModule,
     AlertModule,
+    AutoCompleteModule,
     TableModule,
     SharedModule,
     ListGroupModule,
-
+    InputGroupModule,
+    InputGroupAddonModule,
     DataViewModule,
     TableModule,
     CalendarModule,
@@ -75,11 +80,13 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 		ButtonModule,
 		ToastModule,
     CardModule,
+    BlockUIModule,
     InputTextModule,
     ProgressBarModule,
     FileUploadModule,
     ToolbarModule,
     RatingModule,
+    ProgressSpinnerModule,
     FormsModule,
     RadioButtonModule,
     InputNumberModule,

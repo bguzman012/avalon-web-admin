@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-funcionalidades',
@@ -14,7 +15,11 @@ export class FuncionalidadesComponent implements OnInit {
     { title: 'Productos', icon: 'pi pi-box', description: 'Gestión de productos.' },
     // Agrega más elementos si es necesario
   ];
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {}
+
+  redirigirMenu(redireccion){
+    this.router.navigate([`/usuarios/${redireccion}`]);
+  }
 }
