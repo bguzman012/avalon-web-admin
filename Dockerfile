@@ -28,8 +28,7 @@ COPY --from=build /app/dist/web-avalon /usr/share/nginx/html
 # Copia tu configuración personalizada de Nginx
 COPY nginx.conf /etc/nginx/conf.d
 
-# Expone el puerto 80
-EXPOSE 80
+EXPOSE 9999
 
 # Comando para iniciar el servidor nginx
 CMD ["nginx", "-g", "daemon off;"]
