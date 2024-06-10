@@ -1,0 +1,14 @@
+.custom-field {
+    width: 100%;
+    box-sizing: border-box; /* Para incluir el padding y el border en el ancho total */
+  }
+  
+  .custom-field label,
+  .custom-field input,
+  .custom-field textarea {
+    width: 100%;
+  }
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+  }
