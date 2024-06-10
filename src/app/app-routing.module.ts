@@ -39,6 +39,10 @@ const routes: Routes = [
         path: 'aseguradoras',
         loadChildren: () =>
           import('./views/aseguradoras/aseguradoras.module').then((m) => m.AseguradorasModule)
+      }, {
+        path: 'notificaciones',
+        loadChildren: () =>
+          import('./views/notificaciones/notificaciones.module').then((m) => m.NotificacionesModule)
       },
       
       // {

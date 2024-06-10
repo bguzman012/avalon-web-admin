@@ -12,6 +12,7 @@ import { environment } from '../../environments/environment'
 export class AuthService {
   private apiUrl = `${environment.api_base}:8086`;
   private tokenKey = 'token_key';
+  private idKey= 'info_ad';
   private credenciales = 'cred';
   private secretKey = environment.secret; // Deberías almacenar esta clave de forma segura
 
@@ -20,16 +21,16 @@ export class AuthService {
   login(username: string, password: string): Observable<string> {
     const data = { usuario: username, contrasenia: password };
     return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(
-      map(response => response.token),
-      tap(token => this.setCredencials(token, username, password))
+      map(response => response),
+      tap(response => this.setCredencials(response.token, response.id, username, password))
     );
   }
 
   refreshToken(): Observable<string> {
     const data = this.getCredencials();
     return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(
-      map(response => response.token),
-      tap(token => this.setCredencials(token, data.username, data.password))
+      map(response => response),
+      tap(response => this.setCredencials(response.token, response.id, data.username, data.password))
     );
   }
 
@@ -51,8 +52,10 @@ export class AuthService {
     return null;
   }
 
-  setCredencials(token: string, username: string, password: string): void {
+  setCredencials(token: string, id: number, username: string, password: string): void {
     const encryptedToken = CryptoJS.AES.encrypt(token, this.secretKey).toString();
+    const encryptedId = CryptoJS.AES.encrypt(String(id), this.secretKey).toString();
+    
     const credenciales = {
       username: username,
       password: password
@@ -61,6 +64,7 @@ export class AuthService {
 
     localStorage.setItem(this.credenciales, credencialesEncriptadas);
     localStorage.setItem(this.tokenKey, encryptedToken);
+    localStorage.setItem(this.idKey, encryptedId);
   }
 
   clearToken(): void {  

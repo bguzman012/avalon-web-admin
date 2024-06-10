@@ -6,7 +6,7 @@
         </ng-template>
 
         <ng-template pTemplate="right">
-            <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
+            <button pButton pRipple label="Nuevo Cliente" icon="pi pi-plus" class="p-button-success p-mr-2"
                 (click)="openNew()"></button>
         </ng-template>
     </p-toolbar>
@@ -18,7 +18,7 @@
         [showCurrentPageReport]="true">
         <ng-template pTemplate="caption">
             <div class="p-d-flex p-ai-center p-jc-between">
-                <h5 class="p-m-0">Administrar Asesores</h5>
+                <h5 class="p-m-0">Administrar Clientes por Asesor</h5>
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
                     <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..." />
@@ -66,7 +66,7 @@
     </p-table>
 </div>
 
-<p-dialog [(visible)]="usuarioDialog" [style]="{width: '900px'}" header="Asesor Detalle" [modal]="true"
+<p-dialog [(visible)]="usuarioDialog" [style]="{width: '900px'}" header="Detalle de Cliente" [modal]="true"
     styleClass="p-fluid">
     <ng-template pTemplate="content">
         <div class="p-field">
@@ -94,15 +94,6 @@
             <label class="p-mb-3">Nombre Usuario</label>
             <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
         </div>
-        <div class="p-field">
-            <span class="p-fluid">
-                <label class="p-mb-3">Aseguradoras</label>
-                <p-autoComplete [(ngModel)]="selectedAseguradoras" [suggestions]="filteredAseguradoras"
-                    (completeMethod)="filterAseguradoras($event)" field="nombre" [multiple]="true"  [appendTo]="'body'">
-                </p-autoComplete>
-            </span>
-        </div>
-
 
         <p-blockUI [blocked]="loading">
             <div class="p-field" *ngIf="loading">

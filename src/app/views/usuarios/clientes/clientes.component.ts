@@ -8,8 +8,8 @@ import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
 
 @Component({
-  selector: 'asesores',
-  templateUrl: './asesores.component.html',
+  selector: 'clientes',
+  templateUrl: './clientes.component.html',
   styles: [`
   :host ::ng-deep .p-dialog .product-image {
       width: 150px;
@@ -17,16 +17,16 @@ import { FilterService } from "primeng/api";
       display: block;
   }
 `],
-  styleUrls: ['./asesores.component.scss'],
+  styleUrls: ['./clientes.component.scss'],
 })
 
-export class AsesoresComponent implements OnInit {
+export class ClientesComponent implements OnInit {
   usuarioDialog: boolean;
   usuarios: any[];
   selectedUsuarios: any[];
   submitted: boolean;
   usuario: any;
-  ROL_ASESOR_ID = 2
+  ROL_CLIENTE_ID = 3
   ESTADO_ACTIVO = 'A'
   loading: boolean = false;
   rolId
@@ -119,13 +119,13 @@ export class AsesoresComponent implements OnInit {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id
         await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario);
-        this.saveUsuariosAseguradoras(this.usuario.id)
+        // this.saveUsuariosAseguradoras(this.usuario.id)
       } else {
-        this.usuario.rolId = this.ROL_ASESOR_ID;
+        this.usuario.rolId = this.ROL_CLIENTE_ID;
         this.usuario.estado = 'A';
         this.usuario.contrasenia = environment.pass_default;
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario);
-        this.saveUsuariosAseguradoras(usuarioSaved.id)
+        // this.saveUsuariosAseguradoras(usuarioSaved.id)
       }
       this.refrescarListado(this.ESTADO_ACTIVO)
       this.usuarioDialog = false;
@@ -138,7 +138,7 @@ export class AsesoresComponent implements OnInit {
   }
 
   async refrescarListado(estado) {
-    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_ASESOR_ID, estado);
+    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_CLIENTE_ID, estado);
   }
 
   async filterAseguradoras(event) {

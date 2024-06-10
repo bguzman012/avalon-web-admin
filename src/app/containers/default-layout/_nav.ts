@@ -11,6 +11,12 @@ export const navItems: INavData[] = [
   name: 'Aseguradoras',
   url: '/aseguradoras',
   iconComponent: { }
-},
+  
+},{
+  name: 'Notificaciones',
+  url: '/notificaciones',
+  iconComponent: { }
+  
+}
 ];
 

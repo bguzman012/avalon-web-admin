@@ -1,4 +1,9 @@
 <div class="bg-light min-vh-100 d-flex flex-row align-items-center">
+  <p-blockUI [blocked]="loading">
+    <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</p-blockUI>
   <c-container>
     <c-row class="justify-content-center">
       <c-col md="8">
@@ -21,6 +26,7 @@
                   <input formControlName="password" autoComplete="current-password" cFormControl placeholder="Password"
                     type="password" />
                 </c-input-group>
+                <span *ngIf="loginError" class="text-danger">{{ loginErrorMessage }}</span>
                 <c-row>
                   <c-col xs="6">
                     <button cButton class="px-4" color="primary" (click)="login()">

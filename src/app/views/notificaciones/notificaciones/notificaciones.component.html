@@ -1,0 +1,106 @@
+<!-- src/app/components/notificaciones/notificaciones.component.html -->
+<p-toast></p-toast>
+
+<div class="card">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="right">
+      <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
+              (click)="openNew()"></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table #dt [value]="notificaciones" [rows]="10" [paginator]="true"
+           [globalFilterFields]="['asunto', 'mensaje', 'usuarioAseguradorId', 'tipoNotificacionId']"
+           [(selection)]="selectedNotificaciones" [rowHover]="true" dataKey="id"
+           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+           [showCurrentPageReport]="true">
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <h5 class="p-m-0">Administrar Notificaciones</h5>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..."/>
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="asunto">Asunto <p-sortIcon field="asunto"></p-sortIcon></th>
+        <th pSortableColumn="mensaje">Mensaje <p-sortIcon field="mensaje"></p-sortIcon></th>
+        <th pSortableColumn="usuarioAseguradorId">Usuario Asegurador <p-sortIcon field="usuarioAseguradorId"></p-sortIcon></th>
+        <th pSortableColumn="tipoNotificacionId">Tipo Notificación <p-sortIcon field="tipoNotificacionId"></p-sortIcon></th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-notificacion>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="notificacion"></p-tableCheckbox>
+        </td>
+        <td>{{notificacion.asunto}}</td>
+        <td>{{notificacion.mensaje}}</td>
+        <td>{{notificacion.usuarioAseguradorId}}</td>
+        <td>{{notificacion.tipoNotificacionId}}</td>
+        <td>
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+                  (click)="editNotificacion(notificacion)"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                  (click)="deleteNotificacion(notificacion)"></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{notificaciones ? notificaciones.length : 0 }} registros.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog [(visible)]="notificacionDialog" [style]="{width: '600px'}" header="Detalle de Notificación" [modal]="true"
+          styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <label for="asunto">Asunto</label>
+      <input type="text" pInputText id="asunto" [(ngModel)]="notificacion.asunto" required autofocus/>
+      <small class="p-invalid" *ngIf="submitted && !notificacion.asunto">El asunto es requerido.</small>
+    </div>
+    <div class="p-field">
+      <label for="mensaje">Mensaje</label>
+      <textarea id="mensaje" pInputTextarea [(ngModel)]="notificacion.mensaje" required rows="3" cols="20"></textarea>
+      <small class="p-invalid" *ngIf="submitted && !notificacion.mensaje">El mensaje es requerido.</small>
+    </div>
+    <div class="p-field">
+      <label for="usuarioAseguradorId">Usuario Asegurador</label>
+      <input type="text" pInputText id="usuarioAseguradorId" [(ngModel)]="notificacion.usuarioAseguradorId" required/>
+      <small class="p-invalid" *ngIf="submitted && !notificacion.usuarioAsegur      adorId">El usuario asegurador es requerido.</small>
+    </div>
+
+    <div class="p-field">
+        <span class="p-fluid">
+            <label class="p-mb-3">Tipo de Notificacion</label>
+            <p-dropdown [options]="tipos_notificaciones" [(ngModel)]="selectedTipoNotificacion" placeholder="Seleccion un tipo de notificacion" optionLabel="descripcion" [showClear]="true" [appendTo]="'body'"></p-dropdown>
+            <small class="p-invalid" *ngIf="submitted && !selectedTipoNotificacion">El tipo de notificación es requerido.</small>
+        </span>
+    </div>
+
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+            (click)="hideDialog()"></button>
+    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
+            (click)="saveNotificacion()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+

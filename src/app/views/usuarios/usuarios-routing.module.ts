@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { FuncionalidadesComponent } from './funcionalidades/funcionalidades.component';
 import { AsesoresComponent } from './asesores/asesores.component';
+import { ClientesComponent } from './clientes/clientes.component';
 
 const routes: Routes = [
   {
@@ -32,6 +33,21 @@ const routes: Routes = [
           }
         ],
       },
+      {
+        path: 'clientes',
+        data: {
+          breadcrumb: 'Clientes'
+        },
+        children: [
+          {
+            path: '',
+            data: {
+              breadcrumb: null
+            },
+            component: ClientesComponent,
+          }
+        ],
+      }
     ]
   }
 ];

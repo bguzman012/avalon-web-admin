@@ -9,6 +9,8 @@ import { Page500Component } from './page500/page500.component';
 import { ButtonModule, CardModule, FormModule, GridModule } from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BlockUIModule } from 'primeng/blockui';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 
 @NgModule({
@@ -27,7 +29,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     GridModule,
     IconModule,
     FormModule,
-    FormModule
+    FormModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+		
   ]
 })
 export class PagesModule {
