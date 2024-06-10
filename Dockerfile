@@ -23,7 +23,7 @@ FROM nginx:alpine
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copia los archivos construidos desde el contenedor de compilación
-COPY --from=build /app/dist/avalon-web-admin /usr/share/nginx/html
+COPY --from=build /app/dist/web-avalon /usr/share/nginx/html
 
 # Copia tu configuración personalizada de Nginx
 COPY nginx.conf /etc/nginx/conf.d
