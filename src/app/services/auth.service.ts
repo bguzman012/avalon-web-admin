@@ -43,6 +43,16 @@ export class AuthService {
     return null;
   }
 
+  getId(): string | null {
+    const encryptedId = localStorage.getItem(this.idKey);
+    if (encryptedId) {
+      const bytes = CryptoJS.AES.decrypt(encryptedId, this.secretKey);
+      return bytes.toString(CryptoJS.enc.Utf8);
+    }
+    return null;
+  }
+
+
   getCredencials(): any | null {
     const encryptedCredentials = localStorage.getItem(this.credenciales);
     if (encryptedCredentials) {
@@ -70,4 +80,16 @@ export class AuthService {
   clearToken(): void {  
     localStorage.removeItem(this.tokenKey);
   }
+
+  async obtenerUsuarioLoggeado(): Promise<any> {
+    try {
+      const usuario = await this.http.get<any>(`${this.apiUrl}/usuarios/${this.getId()}`).toPromise();
+      console.log('Resultado de roles:', usuario);
+      return usuario;
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      throw error; // Puedes personalizar esto según tus necesidades
+    }
+  }
+
 }

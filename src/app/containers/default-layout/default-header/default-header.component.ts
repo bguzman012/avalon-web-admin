@@ -20,6 +20,10 @@ export class DefaultHeaderComponent extends HeaderComponent {
     super();
   }
 
+  redirigirMenu(){
+    this.router.navigate([`/usuarios/edit-personal-info`]);
+  }
+
   cerrarSesion() {
     // Aquí puedes realizar las acciones necesarias para cerrar la sesión, como limpiar el token, redirigir a la página de inicio de sesión, etc.
     console.log('Cerrando sesión...');

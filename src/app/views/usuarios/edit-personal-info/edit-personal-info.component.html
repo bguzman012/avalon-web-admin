@@ -1,0 +1,66 @@
+
+   <p-toast></p-toast>
+
+   <p-card header="Editar Perfil" *ngIf="usuario">
+    <ng-template pTemplate="header"> </ng-template>
+    <ng-template pTemplate="content">
+      <div class="p-field custom-field">
+        <label for="nombres">Nombres</label>
+        <input
+          type="text"
+          pInputText
+          id="nombres"
+          [(ngModel)]="usuario.nombres"
+          required
+          autofocus
+        />
+        <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombres is required.</small>
+      </div>
+      
+      <div class="p-field custom-field">
+        <label for="apellidos">Apellidos</label>
+        <input
+        type="text"
+        pInputText
+        id="apellidos"
+        [(ngModel)]="usuario.apellidos"
+        required
+        autofocus
+      />
+      </div>
+      
+      <div class="p-field custom-field">
+        <label class="p-mb-3">Correo Electrónico</label>
+        <input type="text" pInputText [(ngModel)]="usuario.correoElectronico" />
+      </div>
+      
+      <div class="p-field custom-field">
+        <label class="p-mb-3">Número Teléfono</label>
+        <input type="text" pInputText [(ngModel)]="usuario.numeroTelefono" />
+      </div>
+      
+      <div class="p-field custom-field">
+        <label class="p-mb-3">Nombre Usuario</label>
+        <input type="text" pInputText readonly [(ngModel)]="usuario.nombreUsuario" />
+      </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="button-container">
+        <p-button
+          pButton
+          pRipple
+          label="Guardar"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="saveUsuario()"
+        ></p-button>
+        </div>
+      </ng-template>
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </p-blockUI>
+
+  </p-card>
+  

@@ -67,8 +67,7 @@ export class NotificacionesService {
 
   async eliminarNotificacion(notificacionId: number): Promise<any> {
     try {
-      const response = await this.http.patch<any>(`${this.apiUrl}/notificaciones/${notificacionId}`, { estado: 'I' }).toPromise();
-      return response;
+      await this.http.delete<any>(`${this.apiUrl}/notificaciones/${notificacionId}`).toPromise();
     } catch (error) {
       console.error('Error al eliminar notificación:', error);
       throw error;

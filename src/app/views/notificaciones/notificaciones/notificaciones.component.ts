@@ -61,6 +61,7 @@ export class NotificacionesComponent implements OnInit {
 
   editNotificacion(notificacion: any) {
     this.notificacion = { ...notificacion };
+    this.selectedTipoNotificacion = this.notificacion.tipoNotificacion
     this.notificacionDialog = true;
   }
 
@@ -94,9 +95,10 @@ export class NotificacionesComponent implements OnInit {
 
     try {
       if (this.notificacion.id) {
+        this.notificacion.tipoNotificacionId = this.selectedTipoNotificacion.id
         await this.notificacionesService.actualizarNotificacion(this.notificacion.id, this.notificacion);
       } else {
-        console.log(this.selectedTipoNotificacion)
+        this.notificacion.tipoNotificacionId = this.selectedTipoNotificacion.id
         await this.notificacionesService.guardarNotificacion(this.notificacion);
       }
       this.refrescarListado();

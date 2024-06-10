@@ -30,7 +30,7 @@
         </th>
         <th pSortableColumn="asunto">Asunto <p-sortIcon field="asunto"></p-sortIcon></th>
         <th pSortableColumn="mensaje">Mensaje <p-sortIcon field="mensaje"></p-sortIcon></th>
-        <th pSortableColumn="usuarioAseguradorId">Usuario Asegurador <p-sortIcon field="usuarioAseguradorId"></p-sortIcon></th>
+        <!-- <th pSortableColumn="usuarioAseguradorId">Usuario Asegurador <p-sortIcon field="usuarioAseguradorId"></p-sortIcon></th> -->
         <th pSortableColumn="tipoNotificacionId">Tipo Notificación <p-sortIcon field="tipoNotificacionId"></p-sortIcon></th>
         <th></th>
       </tr>
@@ -42,8 +42,8 @@
         </td>
         <td>{{notificacion.asunto}}</td>
         <td>{{notificacion.mensaje}}</td>
-        <td>{{notificacion.usuarioAseguradorId}}</td>
-        <td>{{notificacion.tipoNotificacionId}}</td>
+        <!-- <td>{{notificacion.usuarioAseguradorId}}</td> -->
+        <td>{{notificacion.tipoNotificacion.descripcion}}</td>
         <td>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
                   (click)="editNotificacion(notificacion)"></button>
@@ -73,11 +73,11 @@
       <textarea id="mensaje" pInputTextarea [(ngModel)]="notificacion.mensaje" required rows="3" cols="20"></textarea>
       <small class="p-invalid" *ngIf="submitted && !notificacion.mensaje">El mensaje es requerido.</small>
     </div>
-    <div class="p-field">
+    <!-- <div class="p-field">
       <label for="usuarioAseguradorId">Usuario Asegurador</label>
       <input type="text" pInputText id="usuarioAseguradorId" [(ngModel)]="notificacion.usuarioAseguradorId" required/>
       <small class="p-invalid" *ngIf="submitted && !notificacion.usuarioAsegur      adorId">El usuario asegurador es requerido.</small>
-    </div>
+    </div> -->
 
     <div class="p-field">
         <span class="p-fluid">

@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FuncionalidadesComponent } from './funcionalidades/funcionalidades.component';
 import { AsesoresComponent } from './asesores/asesores.component';
 import { ClientesComponent } from './clientes/clientes.component';
+import { EditPersonalInfoComponent } from './edit-personal-info/edit-personal-info.component';
 
 const routes: Routes = [
   {
@@ -45,6 +46,21 @@ const routes: Routes = [
               breadcrumb: null
             },
             component: ClientesComponent,
+          }
+        ],
+      },
+      {
+        path: 'edit-personal-info',
+        data: {
+          breadcrumb: 'Editar perfil'
+        },
+        children: [
+          {
+            path: '',
+            data: {
+              breadcrumb: null
+            },
+            component: EditPersonalInfoComponent,
           }
         ],
       }

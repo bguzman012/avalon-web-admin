@@ -45,17 +45,18 @@ import {PanelModule} from 'primeng/panel';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ClientesComponent } from './clientes/clientes.component';
+import { EditPersonalInfoComponent } from './edit-personal-info/edit-personal-info.component';
 
 @NgModule({
   declarations: [
     FuncionalidadesComponent,
     AsesoresComponent,
-    ClientesComponent
+    ClientesComponent,
+    EditPersonalInfoComponent
   ],
   imports: [
     CommonModule,
     UsuariosRoutingModule,
-    CardModule,
     FormModule,
     PanelModule,
     GridModule,
