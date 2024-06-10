@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Construye la aplicación para producción
-RUN npm run build -- --configuration=production
+RUN npm run build
 
 # Usa una imagen más ligera para la implementación
 FROM nginx:alpine
