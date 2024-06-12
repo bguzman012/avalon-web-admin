@@ -47,7 +47,6 @@ export class NotificacionesComponent implements OnInit {
       header: 'Confirm',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        // Implementar lógica para eliminar notificaciones seleccionadas
         this.selectedNotificaciones = [];
         this.messageService.add({
           severity: 'success',

@@ -1,0 +1,86 @@
+<p-toast></p-toast>
+
+<div class="card">
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <button pButton pRipple label="Nueva" icon="pi pi-plus" class="p-button-success p-mr-2" (click)="openNew()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="clientesMembresia" [rows]="10" [paginator]="true" [globalFilterFields]="['cliente', 'membresia', 'aseguradora']"
+        [(selection)]="selectedClientesMembresia" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h5 class="p-m-0">Administrar Clientes Membresías</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text"  (input)="filterGlobal($event, dt)" placeholder="Buscar..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="cliente">Cliente <p-sortIcon field="cliente"></p-sortIcon></th>
+                <th pSortableColumn="membresia">Membresía <p-sortIcon field="membresia"></p-sortIcon></th>
+                <th pSortableColumn="aseguradora">Aseguradora <p-sortIcon field="aseguradora"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-clienteMembresia>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="clienteMembresia"></p-tableCheckbox>
+                </td>
+                <td>{{clienteMembresia.cliente}}</td>
+                <td>{{clienteMembresia.membresia}}</td>
+                <td>{{clienteMembresia.aseguradora}}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2" (click)="editClienteMembresia(clienteMembresia)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteClienteMembresia(clienteMembresia)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                En total existen {{clientesMembresia ? clientesMembresia.length : 0 }} registros.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="clienteMembresiaDialog" [style]="{width: '500px'}" header="Detalle de Cliente Membresía" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="cliente">Cliente</label>
+            <input type="text" pInputText id="cliente" [(ngModel)]="clienteMembresia.cliente" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !clienteMembresia.cliente">Cliente es requerido.</small>
+        </div>
+        <div class="p-field">
+            <label for="membresia">Membresía</label>
+            <input type="text" pInputText id="membresia" [(ngModel)]="clienteMembresia.membresia" />
+        </div>
+        <div class="p-field">
+            <label for="aseguradora">Aseguradora</label>
+            <input type="text" pInputText id="aseguradora" [(ngModel)]="clienteMembresia.aseguradora" required />
+            <small class="p-invalid" *ngIf="submitted && !clienteMembresia.aseguradora">Aseguradora es requerido.</small>
+        </div>
+        <p-blockUI [blocked]="loading">
+            <div class="p-field" *ngIf="loading">
+                <p-progressSpinner></p-progressSpinner>
+            </div>
+        </p-blockUI>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveClienteMembresia()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

@@ -119,18 +119,19 @@ export class AsesoresComponent implements OnInit {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id
         await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario);
-        this.saveUsuariosAseguradoras(this.usuario.id)
+        await this.saveUsuariosAseguradoras(this.usuario.id)
       } else {
         this.usuario.rolId = this.ROL_ASESOR_ID;
         this.usuario.estado = 'A';
         this.usuario.contrasenia = environment.pass_default;
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario);
-        this.saveUsuariosAseguradoras(usuarioSaved.id)
+        await this.saveUsuariosAseguradoras(usuarioSaved.id)
       }
       this.refrescarListado(this.ESTADO_ACTIVO)
       this.usuarioDialog = false;
       this.usuario = {};
       this.filteredAseguradoras = []
+      this.loading = false;
       this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
     } finally {
       this.loading = false; // Ocultar spinner
@@ -167,7 +168,7 @@ export class AsesoresComponent implements OnInit {
     return usuariosAseguradorasIds
   }
   async saveUsuariosAseguradoras(usuarioId) {
-    let usuariosAseguradorasIds = this.armarSelectedAseguradorasData(usuarioId)
+    let usuariosAseguradorasIds = await this.armarSelectedAseguradorasData(usuarioId)
 
     if (!this.usuario.id)
       await this.usuariosAseguradorasService.guardarUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds });

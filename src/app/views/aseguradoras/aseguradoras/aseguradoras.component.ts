@@ -3,6 +3,7 @@ import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { environment } from '../../../../environments/environment';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'aseguradoras',
@@ -29,7 +30,8 @@ export class AseguradorasComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private aseguradorasService: AseguradorasService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -95,5 +97,9 @@ export class AseguradorasComponent implements OnInit {
 
   async refrescarListado(estado){
     this.aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado(estado);
+  }
+
+  redirectToMembresiasPage(aseguradora: any) {
+    this.router.navigate(['aseguradoras/membresias'], { queryParams: { aseguradoraId: aseguradora.id } });
   }
 }

@@ -38,10 +38,15 @@ import { BlockUIModule } from 'primeng/blockui';
 import { MessageService } from 'primeng/api';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { MembresiasComponent } from './membresias/membresias.component';
+import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+
 
 @NgModule({
   declarations: [
-    AseguradorasComponent
+    AseguradorasComponent,
+    MembresiasComponent,
+    ClientesMembresiasComponent
   ],
   imports: [
     CommonModule,
