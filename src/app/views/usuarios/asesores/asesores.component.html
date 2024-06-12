@@ -76,8 +76,8 @@
         </div>
         <div class="p-field">
             <label for="apellidos">Apellidos</label>
-            <textarea id="apellidos" pInputTextarea [(ngModel)]="usuario.apellidos" required rows="3"
-                cols="20"></textarea>
+            <input type="text" pInputText id="apellidos" [(ngModel)]="usuario.apellidos" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !usuario.apellidos">Nombres is required.</small>
         </div>
 
         <div class="p-field">

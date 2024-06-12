@@ -1,8 +1,11 @@
 <div class="card-container">
-  <p-card class="card-custom">
+  <p-card class="card-custom" *ngIf="user.rol.id == ROL_ADMINISTRADOR">
     <a class="menu-content" (click)="redirigirMenu('asesores')">ASESORES</a>
   </p-card>
-  <p-card class="card-custom">
+  <p-card class="card-custom"  *ngIf="user.rol.id == ROL_ADMINISTRADOR ||  user.rol.id == ROL_ASESOR">
     <a class="menu-content" (click)="redirigirMenu('clientes')">CLIENTES</a>
+  </p-card>
+  <p-card class="card-custom"  *ngIf="user.rol.id == ROL_ADMINISTRADOR">
+    <a class="menu-content" (click)="redirigirMenu('brokers')">BROKERS</a>
   </p-card>
 </div>

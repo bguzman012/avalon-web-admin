@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '../../../services/auth-service';
 
 import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { UsuariosAseguradorasService } from '../../../services/usuarios-aseguradoras-service';

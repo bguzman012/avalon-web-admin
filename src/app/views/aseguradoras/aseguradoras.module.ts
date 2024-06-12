@@ -40,6 +40,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MembresiasComponent } from './membresias/membresias.component';
 import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 
 
 @NgModule({
@@ -63,7 +64,8 @@ import { ClientesMembresiasComponent } from './clientes-membresias/clientes-memb
     TableModule,
     SharedModule,
     ListGroupModule,
-
+    AutoCompleteModule,
+    
     TableModule,
     CalendarModule,
 		SliderModule,

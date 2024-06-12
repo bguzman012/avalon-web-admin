@@ -6,16 +6,16 @@ import { ButtonModule, CardModule, FormModule, GridModule, TableModule, Utilitie
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from '../../../icons/icon-subset';
 import { DocsComponentsModule } from '../../../../components';
-import { AseguradorasComponent } from './aseguradoras.component';
+import { BrokersComponent } from './brokers.component';
 
-describe('AseguradorasComponent', () => {
-  let component: AseguradorasComponent;
-  let fixture: ComponentFixture<AseguradorasComponent>;
+describe('BrokersComponent', () => {
+  let component: BrokersComponent;
+  let fixture: ComponentFixture<BrokersComponent>;
   let iconSetService: IconSetService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AseguradorasComponent],
+      declarations: [BrokersComponent],
       imports: [CardModule, GridModule, FormsModule, FormModule, ButtonModule, DocsComponentsModule, RouterTestingModule,
         TableModule, UtilitiesModule],
       providers: [IconSetService]
@@ -27,7 +27,7 @@ describe('AseguradorasComponent', () => {
     iconSetService = TestBed.inject(IconSetService);
     iconSetService.icons = { ...iconSubset };
 
-    fixture = TestBed.createComponent(AseguradorasComponent);
+    fixture = TestBed.createComponent(BrokersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

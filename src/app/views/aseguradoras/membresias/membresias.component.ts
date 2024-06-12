@@ -4,21 +4,23 @@ import { MessageService } from 'primeng/api';
 import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { MembresiasService } from '../../../services/membresias-service';
 import { environment } from '../../../../environments/environment';
-import { ActivatedRoute, Router} from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
   selector: 'app-membresias',
   templateUrl: './membresias.component.html',
-  styles: [`
-  :host ::ng-deep .p-dialog .product-image {
-      width: 150px;
-      margin: 0 auto 2rem auto;
-      display: block;
-  }
-`],
+  styles: [
+    `
+      :host ::ng-deep .p-dialog .product-image {
+        width: 150px;
+        margin: 0 auto 2rem auto;
+        display: block;
+      }
+    `,
+  ],
   styleUrls: ['./membresias.component.scss'],
 })
-
 export class MembresiasComponent implements OnInit {
   membresiaDialog: boolean;
   membresias: any[];
@@ -26,9 +28,13 @@ export class MembresiasComponent implements OnInit {
   submitted: boolean;
   membresia: any;
   loading: boolean = false;
-  aseguradoraId
+  aseguradoraId;
+  aseguradora;
   aseguradoras: any[]; // Lista de aseguradoras para el dropdown
   ESTADO_ACTIVO = 'A';
+  filteredAseguradoras;
+  ROL_ADMINISTRADOR_ID = 1
+  activarCreate = false
 
   constructor(
     private messageService: MessageService,
@@ -36,13 +42,34 @@ export class MembresiasComponent implements OnInit {
     private aseguradorasService: AseguradorasService,
     private confirmationService: ConfirmationService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
-    this.aseguradoraId = +await this.getRouteParams('aseguradoraId');
+    this.loading = true
+    let user = await this.authService.obtenerUsuarioLoggeado()
+    if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.activarCreate = true
+
+    this.aseguradoraId = +(await this.getRouteParams('aseguradoraId'));
+    if (!this.aseguradoraId)
+      this.aseguradoraId = localStorage.getItem('aseguradoraId');
+
     this.refrescarListado(this.ESTADO_ACTIVO);
-    this.aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado(this.ESTADO_ACTIVO); // Obtener lista de aseguradoras
+    this.aseguradoras =
+      await this.aseguradorasService.obtenerAseguradorasByEstado(
+        this.ESTADO_ACTIVO
+      ); // Obtener lista de aseguradoras
+
+    if (this.aseguradoraId) {
+      this.aseguradoras = this.aseguradoras.filter(
+        (aseguradora) => aseguradora.id == this.aseguradoraId
+      );
+      this.aseguradora = this.aseguradoras.find(
+        (aseguradora) => aseguradora.id == this.aseguradoraId
+      );
+    }
+    this.loading = false
   }
 
   filterGlobal(event: Event, dt: any) {
@@ -62,7 +89,8 @@ export class MembresiasComponent implements OnInit {
 
   async deleteMembresia(membresia: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar la membresía ' + membresia.nombres + '?',
+      message:
+        'Estás seguro de eliminar la membresía ' + membresia.nombres + '?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
@@ -88,35 +116,63 @@ export class MembresiasComponent implements OnInit {
     this.loading = true; // Mostrar spinner
     try {
       if (this.membresia.id) {
-        this.membresia.aseguradoraId = this.membresia.aseguradoraId.id
-        await this.membresiasService.actualizarMembresia(this.membresia.id, this.membresia);
+        this.membresia.aseguradoraId = this.aseguradora.id;
+        console.log(this.membresia);
+        await this.membresiasService.actualizarMembresia(
+          this.membresia.id,
+          this.membresia
+        );
       } else {
-        console.log(this.membresia)
-        this.membresia.aseguradoraId = this.membresia.aseguradoraId.id
+        this.membresia.aseguradoraId = this.aseguradora.id;
         await this.membresiasService.guardarMembresia(this.membresia);
       }
       this.refrescarListado(this.ESTADO_ACTIVO);
       this.membresiaDialog = false;
       this.membresia = {};
-      this.messageService.add({severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito'});
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Enhorabuena!',
+        detail: 'Operación ejecutada con éxito',
+      });
     } finally {
       this.loading = false; // Ocultar spinner
     }
   }
 
   async refrescarListado(estado: string) {
-    this.aseguradoraId = +await this.getRouteParams('aseguradoraId');
-    this.membresias = await this.membresiasService.obtenerMembresiasByAseguradora(this.aseguradoraId); // Obtener lista de aseguradoras
+    console.log(this.aseguradoraId)
+    this.membresias =
+      await this.membresiasService.obtenerMembresiasByAseguradora(
+        this.aseguradoraId
+      ); // Obtener lista de aseguradoras
   }
 
   private getRouteParams(param: string): Promise<string> {
     return new Promise((resolve) => {
-      this.route.queryParams.subscribe(params => resolve(params[param]));
+      this.route.queryParams.subscribe((params) => resolve(params[param]));
     });
   }
 
   redirectToMembresiasPage(membresia: any) {
-    this.router.navigate(['aseguradoras/membresias/clientes'], { queryParams: { membresiaId: membresia.id } });
+    localStorage.setItem("membresiaId", membresia.id);
+    this.router.navigate(['aseguradoras/membresias/clientes'], {
+      queryParams: {
+        membresiaId: membresia.id,
+        aseguradoraId: this.aseguradoraId,
+      },
+    });
   }
 
+  filterAseguradora(event) {
+    let filtered: any[] = [];
+    let query = event.query;
+    for (let i = 0; i < this.aseguradoras.length; i++) {
+      let aseguradora = this.aseguradoras[i];
+      if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(aseguradora);
+      }
+    }
+
+    this.filteredAseguradoras = filtered;
+  }
 }

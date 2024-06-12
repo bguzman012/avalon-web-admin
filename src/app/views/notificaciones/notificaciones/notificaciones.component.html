@@ -3,6 +3,7 @@
 
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left"> </ng-template>
     <ng-template pTemplate="right">
       <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
               (click)="openNew()"></button>
@@ -10,7 +11,7 @@
   </p-toolbar>
 
   <p-table #dt [value]="notificaciones" [rows]="10" [paginator]="true"
-           [globalFilterFields]="['asunto', 'mensaje', 'usuarioAseguradorId', 'tipoNotificacionId']"
+           [globalFilterFields]="['asunto', 'mensaje', 'usuarioAseguradorId', 'tipoNotificacionId', 'usuarioEnvia']"
            [(selection)]="selectedNotificaciones" [rowHover]="true" dataKey="id"
            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
            [showCurrentPageReport]="true">
@@ -30,6 +31,8 @@
         </th>
         <th pSortableColumn="asunto">Asunto <p-sortIcon field="asunto"></p-sortIcon></th>
         <th pSortableColumn="mensaje">Mensaje <p-sortIcon field="mensaje"></p-sortIcon></th>
+        <th pSortableColumn="usuarioEnvia">Usuario envía<p-sortIcon field="usuarioEnvia"></p-sortIcon></th>
+        <th pSortableColumn="respuesta">Respuesta<p-sortIcon field="respuesta"></p-sortIcon></th>
         <!-- <th pSortableColumn="usuarioAseguradorId">Usuario Asegurador <p-sortIcon field="usuarioAseguradorId"></p-sortIcon></th> -->
         <th pSortableColumn="tipoNotificacionId">Tipo Notificación <p-sortIcon field="tipoNotificacionId"></p-sortIcon></th>
         <th></th>
@@ -42,6 +45,8 @@
         </td>
         <td>{{notificacion.asunto}}</td>
         <td>{{notificacion.mensaje}}</td>
+        <td>{{notificacion.usuarioEnvia}}</td>
+        <td>{{notificacion.respuesta}}</td>
         <!-- <td>{{notificacion.usuarioAseguradorId}}</td> -->
         <td>{{notificacion.tipoNotificacion.descripcion}}</td>
         <td>
@@ -78,7 +83,15 @@
       <input type="text" pInputText id="usuarioAseguradorId" [(ngModel)]="notificacion.usuarioAseguradorId" required/>
       <small class="p-invalid" *ngIf="submitted && !notificacion.usuarioAsegur      adorId">El usuario asegurador es requerido.</small>
     </div> -->
+    <div class="p-field" *ngIf="notificacion">
+      <label for="usuarioEnvia">Usuario envía</label>
+      <input type="text" pInputText id="usuarioEnvia" [(ngModel)]="notificacion.usuarioEnvia" readonly/>
+    </div>
 
+    <div class="p-field" *ngIf="notificacion">
+      <label for="respuesta">Respuesta</label>
+      <input type="text" pInputText id="respuesta" [(ngModel)]="notificacion.respuesta" readonly/>
+    </div>
     <div class="p-field">
         <span class="p-fluid">
             <label class="p-mb-3">Tipo de Notificacion</label>

@@ -1,8 +1,9 @@
 // src/app/components/notificaciones/notificaciones.component.ts
 import { Component, OnInit } from '@angular/core';
-import { NotificacionesService } from '../../../services/notificaciones.service';
+import { NotificacionesService } from '../../../services/notificaciones-service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
   selector: 'app-notificaciones',
@@ -16,24 +17,25 @@ export class NotificacionesComponent implements OnInit {
   submitted: boolean;
   notificacion: any;
   loading: boolean = false;
-  tipos_notificaciones
-  selectedTipoNotificacion
+  tipos_notificaciones;
+  selectedTipoNotificacion;
 
   constructor(
     private notificacionesService: NotificacionesService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
-  ) { }
+    private confirmationService: ConfirmationService,
+    private authService: AuthService
+  ) {}
 
   async ngOnInit() {
-    this.tipos_notificaciones = await this.notificacionesService.obtenerTiposNotificacion();
+    this.tipos_notificaciones =
+      await this.notificacionesService.obtenerTiposNotificacion();
     this.refrescarListado();
   }
 
   filterGlobal(event: Event, dt: any) {
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
-
 
   openNew() {
     this.notificacion = {};
@@ -60,7 +62,7 @@ export class NotificacionesComponent implements OnInit {
 
   editNotificacion(notificacion: any) {
     this.notificacion = { ...notificacion };
-    this.selectedTipoNotificacion = this.notificacion.tipoNotificacion
+    this.selectedTipoNotificacion = this.notificacion.tipoNotificacion;
     this.notificacionDialog = true;
   }
 
@@ -94,22 +96,32 @@ export class NotificacionesComponent implements OnInit {
 
     try {
       if (this.notificacion.id) {
-        this.notificacion.tipoNotificacionId = this.selectedTipoNotificacion.id
-        await this.notificacionesService.actualizarNotificacion(this.notificacion.id, this.notificacion);
+        this.notificacion.tipoNotificacionId = this.selectedTipoNotificacion.id;
+        await this.notificacionesService.actualizarNotificacion(
+          this.notificacion.id,
+          this.notificacion
+        );
       } else {
-        this.notificacion.tipoNotificacionId = this.selectedTipoNotificacion.id
+        this.notificacion.tipoNotificacionId = this.selectedTipoNotificacion.id;
+        let user = await this.authService.obtenerUsuarioLoggeado()
+        this.notificacion.usuarioEnvia = user.nombreUsuario
         await this.notificacionesService.guardarNotificacion(this.notificacion);
       }
       this.refrescarListado();
       this.notificacionDialog = false;
       this.notificacion = {};
-      this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Enhorabuena!',
+        detail: 'Operación ejecutada con éxito',
+      });
     } finally {
       this.loading = false; // Ocultar spinner
     }
   }
 
   async refrescarListado() {
-    this.notificaciones = await this.notificacionesService.obtenerNotificaciones();
+    this.notificaciones =
+      await this.notificacionesService.obtenerNotificaciones();
   }
 }

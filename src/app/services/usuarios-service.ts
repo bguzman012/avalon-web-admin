@@ -1,8 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, tap, throwError } from 'rxjs';
-import { AttachToken } from '../decorators/attach-token.decorator';
-import { ApiServiceService } from './api-service.service';
 import { environment } from '../../environments/environment'
 
 @Injectable({
@@ -50,6 +48,16 @@ export class UsuariosService {
     async eliminarUsuario(usuarioId: number): Promise<any> {
       try {
         const response = await this.http.patch<any>(`${this.apiUrl}/usuarios/${usuarioId}`, { estado: 'I', contrasenia: null }).toPromise();
+        return response;
+      } catch (error) {
+        console.error('Error al eliminar usuario:', error);
+        throw error;
+      }
+    }
+
+    async partiallyUpdateUsuario(usuarioId: number, estado: String): Promise<any> {
+      try {
+        const response = await this.http.patch<any>(`${this.apiUrl}/usuarios/${usuarioId}`, { estado: estado, contrasenia: null }).toPromise();
         return response;
       } catch (error) {
         console.error('Error al eliminar usuario:', error);

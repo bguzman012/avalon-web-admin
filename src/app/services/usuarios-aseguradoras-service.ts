@@ -34,4 +34,15 @@ export class UsuariosAseguradorasService {
       }
     }  
 
+    async obtenerUsuariosPorAseguradoraAndRolAndEstado(aseguradoraId: number, rolId: number, estado: string): Promise<any[]> {
+      try {
+        const usuarios = await this.http.get<any[]>(`${this.apiUrl}/aseguradoras/${aseguradoraId}/usuarioAseguradoras?estado=${estado}&rolId=${rolId} `).toPromise();
+        console.log('Resultado de usuarios por aseguradora y rol:', usuarios);
+        return usuarios;
+      } catch (error) {
+        console.error('Error en la solicitud:', error);
+        throw error; // Puedes personalizar esto según tus necesidades
+      }
+    }
+
 }

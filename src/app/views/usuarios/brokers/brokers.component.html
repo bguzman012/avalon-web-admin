@@ -6,7 +6,7 @@
         </ng-template>
 
         <ng-template pTemplate="right">
-            <button pButton pRipple label="Nuevo Cliente" icon="pi pi-plus" class="p-button-success p-mr-2"
+            <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
                 (click)="openNew()"></button>
         </ng-template>
     </p-toolbar>
@@ -18,7 +18,7 @@
         [showCurrentPageReport]="true">
         <ng-template pTemplate="caption">
             <div class="p-d-flex p-ai-center p-jc-between">
-                <h5 class="p-m-0">Administrar Clientes</h5>
+                <h5 class="p-m-0">Administrar Brokers</h5>
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
                     <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..." />
@@ -37,15 +37,12 @@
                 <th pSortableColumn="numeroTelefono">Número Teléfono <p-sortIcon field="numeroTelefono"></p-sortIcon>
                 </th>
                 <th pSortableColumn="nombreUsuario">Nombre Usuario <p-sortIcon field="nombreUsuario"></p-sortIcon></th>
-                <th pSortableColumn="estado">Estado <p-sortIcon field="estado"></p-sortIcon></th>
-                
                 <th></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-usuario>
             <tr>
-                <td>
-                    <p-tableCheckbox [value]="usuario"></p-tableCheckbox>
+                <td >               <p-tableCheckbox [value]="usuario"></p-tableCheckbox>
                 </td>
                 <td>{{usuario.nombres}}</td>
                 <td>{{usuario.apellidos}}</td>
@@ -53,11 +50,6 @@
                 <td>{{usuario.numeroTelefono}}</td>
                 <td>{{usuario.nombreUsuario}}</td>
                 <td>
-                    {{ getEstadoLabel(usuario.estado) }}
-                  </td>
-                <td>
-                    <button *ngIf="validarEnable && usuario.estado == 'P'" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success p-mr-2"
-                    (click)="activar(usuario)"></button>
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
                         (click)="editUsuario(usuario)"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
@@ -73,7 +65,7 @@
     </p-table>
 </div>
 
-<p-dialog [(visible)]="usuarioDialog" [style]="{width: '900px'}" header="Detalle de Cliente" [modal]="true"
+<p-dialog [(visible)]="usuarioDialog" [style]="{width: '900px'}" header="Broker Detalle" [modal]="true"
     styleClass="p-fluid">
     <ng-template pTemplate="content">
         <div class="p-field">
@@ -101,13 +93,20 @@
             <label class="p-mb-3">Nombre Usuario</label>
             <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
         </div>
+        <div class="p-field">
+            <span class="p-fluid">
+                <label class="p-mb-3">Aseguradoras</label>
+                <p-autoComplete [(ngModel)]="selectedAseguradoras" [suggestions]="filteredAseguradoras"
+                    (completeMethod)="filterAseguradoras($event)" field="nombre" [multiple]="true" [appendTo]="'body'">
+                </p-autoComplete>
+            </span>
+        </div>
 
         <p-blockUI [blocked]="loading">
             <div class="p-field" *ngIf="loading">
                 <p-progressSpinner></p-progressSpinner>
             </div>
         </p-blockUI>
-
     </ng-template>
 
     <ng-template pTemplate="footer">
@@ -119,3 +118,4 @@
 </p-dialog>
 
 <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+

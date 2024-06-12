@@ -1,7 +1,6 @@
 // En LoginComponent
 import { Component } from '@angular/core';
-import { ApiServiceService } from '../../../services/api-service.service';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '../../../services/auth-service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';

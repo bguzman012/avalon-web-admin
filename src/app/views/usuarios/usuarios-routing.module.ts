@@ -4,6 +4,7 @@ import { FuncionalidadesComponent } from './funcionalidades/funcionalidades.comp
 import { AsesoresComponent } from './asesores/asesores.component';
 import { ClientesComponent } from './clientes/clientes.component';
 import { EditPersonalInfoComponent } from './edit-personal-info/edit-personal-info.component';
+import { BrokersComponent } from './brokers/brokers.component';
 
 const routes: Routes = [
   {
@@ -46,6 +47,21 @@ const routes: Routes = [
               breadcrumb: null
             },
             component: ClientesComponent,
+          }
+        ],
+      },
+      {
+        path: 'brokers',
+        data: {
+          breadcrumb: 'Brokers'
+        },
+        children: [
+          {
+            path: '',
+            data: {
+              breadcrumb: null
+            },
+            component: BrokersComponent,
           }
         ],
       },

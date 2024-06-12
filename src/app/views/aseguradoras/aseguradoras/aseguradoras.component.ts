@@ -4,6 +4,7 @@ import { MessageService } from 'primeng/api';
 import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
   selector: 'aseguradoras',
@@ -26,16 +27,23 @@ export class AseguradorasComponent implements OnInit {
   aseguradora: any;
   loading: boolean = false;
   ESTADO_ACTIVO = 'A'
+  ROL_ADMINISTRADOR_ID = 1
+  activarCreate = false
 
   constructor(
     private messageService: MessageService,
     private aseguradorasService: AseguradorasService,
     private confirmationService: ConfirmationService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
+    this.loading = true
     this.refrescarListado(this.ESTADO_ACTIVO);
+    let user = await this.authService.obtenerUsuarioLoggeado()
+    if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.activarCreate = true
+    this.loading = false
   }
 
   filterGlobal(event: Event, dt: any) {
@@ -100,6 +108,7 @@ export class AseguradorasComponent implements OnInit {
   }
 
   redirectToMembresiasPage(aseguradora: any) {
+    localStorage.setItem("aseguradoraId", aseguradora.id);
     this.router.navigate(['aseguradoras/membresias'], { queryParams: { aseguradoraId: aseguradora.id } });
   }
 }
