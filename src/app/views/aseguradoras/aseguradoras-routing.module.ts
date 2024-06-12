@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AseguradorasComponent } from './aseguradoras/aseguradoras.component';
+import { MembresiasComponent } from './membresias/membresias.component';
+import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 
 const routes: Routes = [
   {
@@ -15,6 +17,35 @@ const routes: Routes = [
           breadcrumb: null
         },
         component: AseguradorasComponent,
+      },
+      {
+        path: 'membresias',
+        data: {
+          breadcrumb: 'Membresías'
+        },
+        children: [
+          {
+            path: '',
+            data: {
+              breadcrumb: null
+            },
+            component: MembresiasComponent,
+          },{
+            path: 'clientes',
+            data: {
+              breadcrumb: 'Clientes'
+            },
+            children: [
+              {
+                path: '',
+                data: {
+                  breadcrumb: null
+                },
+                component: ClientesMembresiasComponent,
+              }
+            ],
+          }
+        ],
       }
     ]
   }

@@ -15,6 +15,7 @@ export class UsuariosAseguradorasService {
   
     async guardarUsuariosAseguradoras(usuarioAseguradoraData: any): Promise<any> {
       try {
+        console.log(usuarioAseguradoraData)
         const response = await this.http.post<any>(`${this.apiUrl}/usuarioAseguradoras`, usuarioAseguradoraData).toPromise();
         return response;
       } catch (error) {

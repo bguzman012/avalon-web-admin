@@ -33,7 +33,7 @@
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-aseguradora>
-            <tr>
+            <tr (click)="redirectToMembresiasPage(aseguradora)">
                 <td>
                     <p-tableCheckbox [value]="aseguradora"></p-tableCheckbox>
                 </td>
