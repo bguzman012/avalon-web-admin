@@ -4,7 +4,7 @@
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left"> </ng-template>
 
-    <ng-template pTemplate="right" >
+    <ng-template pTemplate="right">
       <button
         pButton
         pRipple
@@ -12,18 +12,17 @@
         icon="pi pi-plus"
         class="p-button-success p-mr-2"
         (click)="openNew()"
-        [disabled]="!activarCreate"
       ></button>
     </ng-template>
   </p-toolbar>
 
   <p-table
     #dt
-    [value]="membresias"
+    [value]="usuariosMembresiasUsuAseguradora"
     [rows]="10"
     [paginator]="true"
-    [globalFilterFields]="['nombres', 'detalle', 'estado']"
-    [(selection)]="selectedMembresias"
+    [globalFilterFields]="['usuario.nombreUsuario', 'membresia.nombres', 'asesor.usuario.nombreUsuario']"
+    [(selection)]="selectedClientesMembresia"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
@@ -31,7 +30,7 @@
   >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
-        <h5 class="p-m-0">Administrar Membresías</h5>
+        <h5 class="p-m-0">Administrar Clientes Membresías</h5>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
@@ -48,48 +47,49 @@
         <th style="width: 3rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
-        <th pSortableColumn="nombres">
-          Nombres <p-sortIcon field="nombres"></p-sortIcon>
+        <th pSortableColumn="cliente">
+          Cliente <p-sortIcon field="cliente"></p-sortIcon>
         </th>
-        <th pSortableColumn="detalle">
-          Detalle <p-sortIcon field="detalle"></p-sortIcon>
+        <th pSortableColumn="membresia">
+          Membresía <p-sortIcon field="membresia"></p-sortIcon>
         </th>
-        <th pSortableColumn="aseguradora">
-          Aseguradora <p-sortIcon field="aseguradora"></p-sortIcon>
-        </th>
+        <th pSortableColumn="asesor">
+            Asesor <p-sortIcon field="asesor"></p-sortIcon>
+          </th>
         <th></th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-membresia>
-      <tr (click)="redirectToMembresiasPage(membresia)">
+    <ng-template pTemplate="body" let-clienteMembresia>
+      <tr>
         <td>
-          <p-tableCheckbox [value]="membresia"></p-tableCheckbox>
+          <p-tableCheckbox [value]="usuariosMembresiasUsuAseguradora"></p-tableCheckbox>
         </td>
-        <td>{{ membresia.nombres }}</td>
-        <td>{{ membresia.detalle }}</td>
-        <td>{{ membresia.aseguradora.nombre }}</td>
+        <td>{{ clienteMembresia.usuario.nombreUsuario }}</td>
+        <td>{{ clienteMembresia.membresia.nombres }}</td>
+        <td>{{ clienteMembresia.asesor.usuario.nombreUsuario  }}</td>
+        
         <td>
           <button
             pButton
             pRipple
             icon="pi pi-pencil"
             class="p-button-rounded p-button-success p-mr-2"
-            (click)="editMembresia(membresia); $event.stopPropagation()"
+            (click)="editClienteMembresia(clienteMembresia)"
           ></button>
           <button
             pButton
             pRipple
             icon="pi pi-trash"
-            [disabled]="!activarCreate"
             class="p-button-rounded p-button-warning"
-            (click)="deleteMembresia(membresia); $event.stopPropagation()"
+            (click)="deleteClienteMembresia(clienteMembresia)"
           ></button>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="summary">
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{ membresias ? membresias.length : 0 }} registros.
+        En total existen
+        {{ usuariosMembresiasUsuAseguradora ? usuariosMembresiasUsuAseguradora.length : 0 }} registros.
       </div>
     </ng-template>
     <p-blockUI [blocked]="loading">
@@ -101,55 +101,63 @@
 </div>
 
 <p-dialog
-  [(visible)]="membresiaDialog"
+  [(visible)]="clienteMembresiaDialog"
   [style]="{ width: '500px' }"
-  header="Membresía Detalle"
+  header="Detalle de Cliente Membresía"
   [modal]="true"
   styleClass="p-fluid"
 >
   <ng-template pTemplate="content">
     <div class="p-field">
-        <label for="aseguradoraId">Aseguradora</label>
-        <p-autoComplete
-          [(ngModel)]="aseguradora"
-          [showEmptyMessage]="true"
-          [suggestions]="filteredAseguradoras"
-          (completeMethod)="filterAseguradora($event)"
-          field="nombre"
-          [disabled]="aseguradora"
-          [minLength]="1"
-          [appendTo]="'body'"
-        ></p-autoComplete>
-        <!-- 
-              <p-dropdown [options]="aseguradoras" [(ngModel)]="membresia.aseguradoraId" optionLabel="nombre" [showClear]="true" [appendTo]="'body'" required></p-dropdown> -->
-        <small class="p-invalid" *ngIf="submitted && !aseguradora"
-          >Aseguradora es requerido.</small
-        >
-    <div class="p-field">
-      <label for="nombres">Nombres</label>
-      <input
-        type="text"
-        pInputText
-        id="nombres"
-        [(ngModel)]="membresia.nombres"
+      <label for="membresiaId">Membresia</label>
+      <p-autoComplete
+        [(ngModel)]="membresia"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredMembresias"
+        (completeMethod)="filterMembresia($event)"
+        [disabled]="membresia"
+        field="nombres"
+        [minLength]="1"
+        [appendTo]="'body'"
         required
-        autofocus
-      />
-      <small class="p-invalid" *ngIf="submitted && !membresia.nombres"
-        >Nombres es requerido.</small
+      ></p-autoComplete>
+      <small class="p-invalid" *ngIf="submitted && !membresia"
+        >Membresia es requerido.</small
+      >
+    </div>
+
+    <div class="p-field">
+      <label for="clienteId">Cliente</label>
+      <p-autoComplete
+        [(ngModel)]="cliente"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredClientes"
+        (completeMethod)="filterClientes($event)"
+        field="nombreUsuario"
+        [minLength]="1"
+        [appendTo]="'body'"
+        required
+      ></p-autoComplete>
+      <small class="p-invalid" *ngIf="submitted && !cliente"
+        >Cliente es requerido.</small
       >
     </div>
     <div class="p-field">
-      <label for="detalle">Detalle</label>
-      <input
-        type="text"
-        pInputText
-        id="detalle"
-        [(ngModel)]="membresia.detalle"
-      />
-    </div>
-
-    </div>
+        <label for="asesoresId">Asesor</label>
+        <p-autoComplete
+          [(ngModel)]="asesor"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredAsesores"
+          (completeMethod)="filterAsesores($event)"
+          field="usuario.nombreUsuario"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required
+        ></p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !asesor"
+          >Asesor es requerido.</small
+        >
+      </div>
     <p-blockUI [blocked]="loading">
       <div class="p-field" *ngIf="loading">
         <p-progressSpinner></p-progressSpinner>
@@ -163,17 +171,15 @@
       label="Cancelar"
       icon="pi pi-times"
       class="p-button-text"
-      [disabled]="!activarCreate"
       (click)="hideDialog()"
     ></button>
     <button
       pButton
       pRipple
       label="Guardar"
-      [disabled]="!activarCreate"
       icon="pi pi-check"
       class="p-button-text"
-      (click)="saveMembresia()"
+      (click)="saveClienteMembresia()"
     ></button>
   </ng-template>
 </p-dialog>

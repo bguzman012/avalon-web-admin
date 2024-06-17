@@ -28,6 +28,8 @@ export class AseguradorasComponent implements OnInit {
   loading: boolean = false;
   ESTADO_ACTIVO = 'A'
   ROL_ADMINISTRADOR_ID = 1
+  TIPO_EMPRESA_ID = 2
+  
   activarCreate = false
 
   constructor(
@@ -92,6 +94,7 @@ export class AseguradorasComponent implements OnInit {
       if (this.aseguradora.id) {
         await this.aseguradorasService.actualizarAseguradora(this.aseguradora.id, this.aseguradora);
       } else {
+        this.aseguradora.tipoAseguradoraId = this.TIPO_EMPRESA_ID
         await this.aseguradorasService.guardarAseguradora(this.aseguradora);
       }
       this.refrescarListado(this.ESTADO_ACTIVO);
@@ -104,11 +107,12 @@ export class AseguradorasComponent implements OnInit {
   }
 
   async refrescarListado(estado){
-    this.aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado(estado);
+    this.aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstadoAndTipoAseguradora(
+      estado, this.TIPO_EMPRESA_ID);
   }
 
   redirectToMembresiasPage(aseguradora: any) {
     localStorage.setItem("aseguradoraId", aseguradora.id);
-    this.router.navigate(['aseguradoras/membresias'], { queryParams: { aseguradoraId: aseguradora.id } });
+    this.router.navigate(['brokers/agentes'], { queryParams: { aseguradoraId: aseguradora.id } });
   }
 }

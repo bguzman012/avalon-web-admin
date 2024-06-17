@@ -1,0 +1,114 @@
+<p-toast></p-toast>
+
+<div class="card">
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
+                (click)="openNew()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="usuarios" [rows]="10" [paginator]="true"
+        [globalFilterFields]="['nombres','apellidos','correoElectronico','numeroTelefono','nombreUsuario']"
+        [(selection)]="selectedUsuarios" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h5 class="p-m-0">Administrar Asesores</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="nombres">Nombres <p-sortIcon field="nombres"></p-sortIcon></th>
+                <th pSortableColumn="apellidos">Apellidos <p-sortIcon field="apellidos"></p-sortIcon></th>
+                <th pSortableColumn="correoElectronico">Correo Electrónico <p-sortIcon
+                        field="correoElectronico"></p-sortIcon></th>
+                <th pSortableColumn="numeroTelefono">Número Teléfono <p-sortIcon field="numeroTelefono"></p-sortIcon>
+                </th>
+                <th pSortableColumn="nombreUsuario">Nombre Usuario <p-sortIcon field="nombreUsuario"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-usuario>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="usuario"></p-tableCheckbox>
+                </td>
+                <td>{{usuario.nombres}}</td>
+                <td>{{usuario.apellidos}}</td>
+                <td>{{usuario.correoElectronico}}</td>
+                <td>{{usuario.numeroTelefono}}</td>
+                <td>{{usuario.nombreUsuario}}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+                        (click)="editUsuario(usuario)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                        (click)="deleteUsuario(usuario)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                En total existen {{usuarios ? usuarios.length : 0 }} registros.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="usuarioDialog" [style]="{width: '900px'}" header="Asesor Detalle" [modal]="true"
+    styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="nombres">Nombres</label>
+            <input type="text" pInputText id="nombres" [(ngModel)]="usuario.nombres" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombres is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="apellidos">Apellidos</label>
+            <input type="text" pInputText id="apellidos" [(ngModel)]="usuario.apellidos" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !usuario.apellidos">Nombres is required.</small>
+        </div>
+
+        <div class="p-field">
+            <label class="p-mb-3">Correo Electrónico</label>
+            <input type="text" pInputText [(ngModel)]="usuario.correoElectronico" />
+        </div>
+
+        <div class="p-field">
+            <label class="p-mb-3">Número Teléfono</label>
+            <input type="text" pInputText [(ngModel)]="usuario.numeroTelefono" />
+        </div>
+
+        <div class="p-field">
+            <label class="p-mb-3">Nombre Usuario</label>
+            <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
+        </div>
+
+        <p-blockUI [blocked]="loading">
+            <div class="p-field" *ngIf="loading">
+                <p-progressSpinner></p-progressSpinner>
+            </div>
+        </p-blockUI>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+            (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
+            (click)="saveUsuario()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

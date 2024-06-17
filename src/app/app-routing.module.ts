@@ -36,10 +36,31 @@ const routes: Routes = [
           import('./views/usuarios/usuarios.module').then((m) => m.UsuariosModule)
       },
       {
-        path: 'aseguradoras',
+        path: 'brokers',
         loadChildren: () =>
-          import('./views/aseguradoras/aseguradoras.module').then((m) => m.AseguradorasModule)
-      }, {
+          import('./views/brokers/brokers.module').then((m) => m.BrokersModule)
+      },
+      {
+        path: 'membresias',
+        loadChildren: () =>
+          import('./views/membresias/membresias.module').then((m) => m.MembresiasModule)
+      },
+      {
+        path: 'asesores',
+        loadChildren: () =>
+          import('./views/asesores/asesores.module').then((m) => m.AsesoresModule)
+      },
+      {
+        path: 'clientes',
+        loadChildren: () =>
+          import('./views/clientes/clientes.module').then((m) => m.ClientesModule)
+      },
+      // {
+      //   path: 'aseguradoras',
+      //   loadChildren: () =>
+      //     import('./views/aseguradoras/aseguradoras.module').then((m) => m.AseguradorasModule)
+      // }, 
+      {
         path: 'notificaciones',
         loadChildren: () =>
           import('./views/notificaciones/notificaciones.module').then((m) => m.NotificacionesModule)

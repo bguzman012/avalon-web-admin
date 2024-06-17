@@ -13,8 +13,7 @@ import {
 } from '@coreui/angular';
 
 
-import { AseguradorasRoutingModule } from './aseguradoras-routing.module';
-import { AseguradorasComponent} from './aseguradoras/aseguradoras.component'
+import { MembresiasRoutingModule } from './membresias-routing.module';
 
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
@@ -39,19 +38,18 @@ import { MessageService } from 'primeng/api';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MembresiasComponent } from './membresias/membresias.component';
-import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
 @NgModule({
   declarations: [
-    AseguradorasComponent,
     MembresiasComponent,
     ClientesMembresiasComponent
   ],
   imports: [
     CommonModule,
-    AseguradorasRoutingModule,
+    MembresiasRoutingModule,
     CardModule,
     FormModule,
     GridModule,
@@ -89,5 +87,5 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
     InputTextareaModule,
   ]
 })
-export class AseguradorasModule {
+export class MembresiasModule {
 }

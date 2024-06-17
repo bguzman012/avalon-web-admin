@@ -51,24 +51,8 @@ export class MembresiasComponent implements OnInit {
     let user = await this.authService.obtenerUsuarioLoggeado()
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.activarCreate = true
 
-    this.aseguradoraId = +(await this.getRouteParams('aseguradoraId'));
-    if (!this.aseguradoraId)
-      this.aseguradoraId = localStorage.getItem('aseguradoraId');
-
     this.refrescarListado(this.ESTADO_ACTIVO);
-    this.aseguradoras =
-      await this.aseguradorasService.obtenerAseguradorasByEstado(
-        this.ESTADO_ACTIVO
-      ); // Obtener lista de aseguradoras
-
-    if (this.aseguradoraId) {
-      this.aseguradoras = this.aseguradoras.filter(
-        (aseguradora) => aseguradora.id == this.aseguradoraId
-      );
-      this.aseguradora = this.aseguradoras.find(
-        (aseguradora) => aseguradora.id == this.aseguradoraId
-      );
-    }
+  
     this.loading = false
   }
 
@@ -116,14 +100,11 @@ export class MembresiasComponent implements OnInit {
     this.loading = true; // Mostrar spinner
     try {
       if (this.membresia.id) {
-        this.membresia.aseguradoraId = this.aseguradora.id;
-        console.log(this.membresia);
         await this.membresiasService.actualizarMembresia(
           this.membresia.id,
           this.membresia
         );
       } else {
-        this.membresia.aseguradoraId = this.aseguradora.id;
         await this.membresiasService.guardarMembresia(this.membresia);
       }
       this.refrescarListado(this.ESTADO_ACTIVO);
@@ -140,10 +121,9 @@ export class MembresiasComponent implements OnInit {
   }
 
   async refrescarListado(estado: string) {
-    console.log(this.aseguradoraId)
     this.membresias =
-      await this.membresiasService.obtenerMembresiasByAseguradora(
-        this.aseguradoraId
+      await this.membresiasService.obtenerMembresiasByEstado(
+        this.ESTADO_ACTIVO
       ); // Obtener lista de aseguradoras
   }
 
@@ -155,7 +135,7 @@ export class MembresiasComponent implements OnInit {
 
   redirectToMembresiasPage(membresia: any) {
     localStorage.setItem("membresiaId", membresia.id);
-    this.router.navigate(['aseguradoras/membresias/clientes'], {
+    this.router.navigate(['membresias/clientes'], {
       queryParams: {
         membresiaId: membresia.id,
         aseguradoraId: this.aseguradoraId,

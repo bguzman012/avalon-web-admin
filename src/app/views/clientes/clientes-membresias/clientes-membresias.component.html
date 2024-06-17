@@ -1,7 +1,6 @@
 <p-toast></p-toast>
 
 <div class="card">
-    
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left"> </ng-template>
 
@@ -11,7 +10,6 @@
         pRipple
         label="Nueva"
         icon="pi pi-plus"
-        [disabled]="!activarCreate"
         class="p-button-success p-mr-2"
         (click)="openNew()"
       ></button>
@@ -20,11 +18,11 @@
 
   <p-table
     #dt
-    [value]="aseguradoras"
+    [value]="usuariosMembresiasUsuAseguradora"
     [rows]="10"
     [paginator]="true"
-    [globalFilterFields]="['nombre', 'correoElectronico']"
-    [(selection)]="selectedAseguradoras"
+    [globalFilterFields]="['usuario.nombreUsuario', 'membresia.nombres', 'asesor.usuario.nombreUsuario']"
+    [(selection)]="selectedClientesMembresia"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
@@ -32,7 +30,7 @@
   >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
-        <h5 class="p-m-0">Administrar Aseguradoras</h5>
+        <h5 class="p-m-0">Administrar Clientes Membresías</h5>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
@@ -49,45 +47,49 @@
         <th style="width: 3rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
-        <th pSortableColumn="nombre">
-          Nombre <p-sortIcon field="nombre"></p-sortIcon>
+        <th pSortableColumn="cliente">
+          Cliente <p-sortIcon field="cliente"></p-sortIcon>
         </th>
-        <th pSortableColumn="correoElectronico">
-          Correo Electrónico <p-sortIcon field="correoElectronico"></p-sortIcon>
+        <th pSortableColumn="membresia">
+          Membresía <p-sortIcon field="membresia"></p-sortIcon>
         </th>
+        <th pSortableColumn="asesor">
+            Asesor <p-sortIcon field="asesor"></p-sortIcon>
+          </th>
         <th></th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-aseguradora>
-      <tr (click)="redirectToMembresiasPage(aseguradora)">
+    <ng-template pTemplate="body" let-clienteMembresia>
+      <tr>
         <td>
-          <p-tableCheckbox [value]="aseguradora"></p-tableCheckbox>
+          <p-tableCheckbox [value]="usuariosMembresiasUsuAseguradora"></p-tableCheckbox>
         </td>
-        <td>{{ aseguradora.nombre }}</td>
-        <td>{{ aseguradora.correoElectronico }}</td>
+        <td>{{ clienteMembresia.usuario.nombreUsuario }}</td>
+        <td>{{ clienteMembresia.membresia.nombres }}</td>
+        <td>{{ clienteMembresia.asesor.usuario.nombreUsuario  }}</td>
+        
         <td>
           <button
             pButton
             pRipple
             icon="pi pi-pencil"
             class="p-button-rounded p-button-success p-mr-2"
-            (click)="editAseguradora(aseguradora); $event.stopPropagation()"
+            (click)="editClienteMembresia(clienteMembresia)"
           ></button>
           <button
             pButton
             pRipple
-            [disabled]="!activarCreate"
             icon="pi pi-trash"
             class="p-button-rounded p-button-warning"
-            (click)="deleteAseguradora(aseguradora); $event.stopPropagation()"
+            (click)="deleteClienteMembresia(clienteMembresia)"
           ></button>
         </td>
       </tr>
     </ng-template>
-    
     <ng-template pTemplate="summary">
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{ aseguradoras ? aseguradoras.length : 0 }} registros.
+        En total existen
+        {{ usuariosMembresiasUsuAseguradora ? usuariosMembresiasUsuAseguradora.length : 0 }} registros.
       </div>
     </ng-template>
     <p-blockUI [blocked]="loading">
@@ -99,50 +101,69 @@
 </div>
 
 <p-dialog
-  [(visible)]="aseguradoraDialog"
+  [(visible)]="clienteMembresiaDialog"
   [style]="{ width: '500px' }"
-  header="Aseguradora Detalle"
+  header="Detalle de Cliente Membresía"
   [modal]="true"
   styleClass="p-fluid"
 >
   <ng-template pTemplate="content">
     <div class="p-field">
-      <label for="nombre">Nombre</label>
-      <input
-        type="text"
-        pInputText
-        id="nombre"
-        [(ngModel)]="aseguradora.nombre"
+      <label for="membresiaId">Membresia</label>
+      <p-autoComplete
+        [(ngModel)]="membresia"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredMembresias"
+        (completeMethod)="filterMembresia($event)"
+        [disabled]="membresia"
+        field="nombres"
+        [minLength]="1"
+        [appendTo]="'body'"
         required
-        autofocus
-      />
-      <small class="p-invalid" *ngIf="submitted && !aseguradora.nombre"
-        >Nombre es requerido.</small
-      >
-    </div>
-    <div class="p-field">
-      <label for="correoElectronico">Correo Electrónico</label>
-      <input
-        type="text"
-        pInputText
-        id="correoElectronico"
-        [(ngModel)]="aseguradora.correoElectronico"
-        required
-      />
-      <small
-        class="p-invalid"
-        *ngIf="submitted && !aseguradora.correoElectronico"
-        >Correo Electrónico es requerido.</small
+      ></p-autoComplete>
+      <small class="p-invalid" *ngIf="submitted && !membresia"
+        >Membresia es requerido.</small
       >
     </div>
 
+    <div class="p-field">
+      <label for="clienteId">Cliente</label>
+      <p-autoComplete
+        [(ngModel)]="cliente"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredClientes"
+        (completeMethod)="filterClientes($event)"
+        field="nombreUsuario"
+        [minLength]="1"
+        [appendTo]="'body'"
+        required
+      ></p-autoComplete>
+      <small class="p-invalid" *ngIf="submitted && !cliente"
+        >Cliente es requerido.</small
+      >
+    </div>
+    <div class="p-field">
+        <label for="asesoresId">Asesor</label>
+        <p-autoComplete
+          [(ngModel)]="asesor"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredAsesores"
+          (completeMethod)="filterAsesores($event)"
+          field="usuario.nombreUsuario"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required
+        ></p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !asesor"
+          >Asesor es requerido.</small
+        >
+      </div>
     <p-blockUI [blocked]="loading">
       <div class="p-field" *ngIf="loading">
         <p-progressSpinner></p-progressSpinner>
       </div>
     </p-blockUI>
   </ng-template>
-
   <ng-template pTemplate="footer">
     <button
       pButton
@@ -150,7 +171,6 @@
       label="Cancelar"
       icon="pi pi-times"
       class="p-button-text"
-      [disabled]="!activarCreate"
       (click)="hideDialog()"
     ></button>
     <button
@@ -159,8 +179,7 @@
       label="Guardar"
       icon="pi pi-check"
       class="p-button-text"
-      [disabled]="!activarCreate"
-      (click)="saveAseguradora()"
+      (click)="saveClienteMembresia()"
     ></button>
   </ng-template>
 </p-dialog>

@@ -32,6 +32,7 @@ export class ClientesComponent implements OnInit {
 
   ESTADO_ACTIVO = 'A'
   ESTADO_BUSQUEDA = 'T'
+  TIPO_EMPRESA_ID = 1
   loading: boolean = false;
   rolId
   validarEnable = false
@@ -183,7 +184,7 @@ export class ClientesComponent implements OnInit {
     let filtered: any[] = [];
     let query = event.query;
 
-    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado('A')
+    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstadoAndTipoAseguradora('A', this.TIPO_EMPRESA_ID)
 
     for (let i = 0; i < aseguradoras.length; i++) {
       let aseguradora = aseguradoras[i];

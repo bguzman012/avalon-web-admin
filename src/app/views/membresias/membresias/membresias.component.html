@@ -1,0 +1,173 @@
+<p-toast></p-toast>
+
+<div class="card">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left"> </ng-template>
+
+    <ng-template pTemplate="right" >
+      <button
+        pButton
+        pRipple
+        label="Nueva"
+        icon="pi pi-plus"
+        class="p-button-success p-mr-2"
+        (click)="openNew()"
+        [disabled]="!activarCreate"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="membresias"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['nombres', 'detalle', 'estado']"
+    [(selection)]="selectedMembresias"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    [showCurrentPageReport]="true"
+  >
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <h5 class="p-m-0">Administrar Membresías</h5>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="filterGlobal($event, dt)"
+            placeholder="Buscar..."
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="nombres">
+          Nombres <p-sortIcon field="nombres"></p-sortIcon>
+        </th>
+        <th pSortableColumn="detalle">
+          Detalle <p-sortIcon field="detalle"></p-sortIcon>
+        </th>
+        <th pSortableColumn="vigenciaMeses">
+          Vigencia <p-sortIcon field="vigenciaMeses"></p-sortIcon>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-membresia>
+      <tr (click)="redirectToMembresiasPage(membresia)">
+        <td>
+          <p-tableCheckbox [value]="membresia"></p-tableCheckbox>
+        </td>
+        <td>{{ membresia.nombres }}</td>
+        <td>{{ membresia.detalle }}</td>
+        <td>{{ membresia.vigenciaMeses }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success p-mr-2"
+            (click)="editMembresia(membresia); $event.stopPropagation()"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            [disabled]="!activarCreate"
+            class="p-button-rounded p-button-warning"
+            (click)="deleteMembresia(membresia); $event.stopPropagation()"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{ membresias ? membresias.length : 0 }} registros.
+      </div>
+    </ng-template>
+    <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="membresiaDialog"
+  [style]="{ width: '500px' }"
+  header="Membresía Detalle"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    
+    <div class="p-field">
+      <label for="nombres">Nombres</label>
+      <input
+        type="text"
+        pInputText
+        id="nombres"
+        [(ngModel)]="membresia.nombres"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !membresia.nombres"
+        >Nombres es requerido.</small
+      >
+    </div>
+    <div class="p-field">
+      <label for="detalle">Detalle</label>
+      <input
+        type="text"
+        pInputText
+        id="detalle"
+        [(ngModel)]="membresia.detalle"
+      />
+    </div>
+    
+    <div class="p-field">
+      <label for="vigenciaMeses">Vigencia (meses)</label>
+      <input
+        type="number"
+        pInputText
+        id="vigenciaMeses"
+        [(ngModel)]="membresia.vigenciaMeses"
+      />
+    </div>
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-text"
+      [disabled]="!activarCreate"
+      (click)="hideDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Guardar"
+      [disabled]="!activarCreate"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveMembresia()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

@@ -23,18 +23,6 @@ export class MembresiasService {
     }
   }
 
-  
-  async obtenerMembresiasByAseguradora(aseguradoraId: number): Promise<any[]> {
-    try {
-      const aseguradoras = await this.http.get<any[]>(`${this.apiUrl}/aseguradoras/${aseguradoraId}/membresias`).toPromise();
-      console.log('Resultado de aseguradoras:', aseguradoras);
-      return aseguradoras;
-    } catch (error) {
-      console.error('Error en la solicitud:', error);
-      throw error; // Puedes personalizar esto según tus necesidades
-    }
-  }
-
   async guardarMembresia(membresiaData: any): Promise<any> {
     try {
       const response = await this.http.post<any>(`${this.apiUrl}/membresias`, membresiaData).toPromise();

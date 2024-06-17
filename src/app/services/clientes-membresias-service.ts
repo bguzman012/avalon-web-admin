@@ -45,6 +45,17 @@ export class ClientesMembresiasService {
     }
   }
 
+  async obtenerUsuariosMembresiaByUsuarioId(usuarioId: number): Promise<any[]> {
+    try {
+      const usuarios = await this.http.get<any[]>(`${this.apiUrl}/usuarios/${usuarioId}/usuarioMembresias`).toPromise();
+      console.log('Resultado de usuarios por usuario membresia:', usuarios);
+      return usuarios;
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      throw error; // Puedes personalizar esto según tus necesidades
+    }
+  }
+
   async guardarClienteMembresia(usuarioMembresiaData: any): Promise<any> {
     try {
       const response = await this.http.post<any>(`${this.apiUrl}/usuarioMembresias`, usuarioMembresiaData).toPromise();

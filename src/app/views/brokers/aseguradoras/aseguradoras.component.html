@@ -1,0 +1,168 @@
+<p-toast></p-toast>
+
+<div class="card">
+    
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left"> </ng-template>
+
+    <ng-template pTemplate="right">
+      <button
+        pButton
+        pRipple
+        label="Nueva"
+        icon="pi pi-plus"
+        [disabled]="!activarCreate"
+        class="p-button-success p-mr-2"
+        (click)="openNew()"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="aseguradoras"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['nombre', 'correoElectronico']"
+    [(selection)]="selectedAseguradoras"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    [showCurrentPageReport]="true"
+  >
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <h5 class="p-m-0">Administrar Brokers</h5>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="filterGlobal($event, dt)"
+            placeholder="Buscar..."
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="nombre">
+          Nombre <p-sortIcon field="nombre"></p-sortIcon>
+        </th>
+        <th pSortableColumn="correoElectronico">
+          Correo Electrónico <p-sortIcon field="correoElectronico"></p-sortIcon>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-aseguradora>
+      <tr (click)="redirectToMembresiasPage(aseguradora)">
+        <td>
+          <p-tableCheckbox [value]="aseguradora"></p-tableCheckbox>
+        </td>
+        <td>{{ aseguradora.nombre }}</td>
+        <td>{{ aseguradora.correoElectronico }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success p-mr-2"
+            (click)="editAseguradora(aseguradora); $event.stopPropagation()"
+          ></button>
+          <button
+            pButton
+            pRipple
+            [disabled]="!activarCreate"
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            (click)="deleteAseguradora(aseguradora); $event.stopPropagation()"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="summary">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{ aseguradoras ? aseguradoras.length : 0 }} registros.
+      </div>
+    </ng-template>
+    <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="aseguradoraDialog"
+  [style]="{ width: '500px' }"
+  header="Broker Detalle"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <label for="nombre">Nombre</label>
+      <input
+        type="text"
+        pInputText
+        id="nombre"
+        [(ngModel)]="aseguradora.nombre"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !aseguradora.nombre"
+        >Nombre es requerido.</small
+      >
+    </div>
+    <div class="p-field">
+      <label for="correoElectronico">Correo Electrónico</label>
+      <input
+        type="text"
+        pInputText
+        id="correoElectronico"
+        [(ngModel)]="aseguradora.correoElectronico"
+        required
+      />
+      <small
+        class="p-invalid"
+        *ngIf="submitted && !aseguradora.correoElectronico"
+        >Correo Electrónico es requerido.</small
+      >
+    </div>
+
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-text"
+      [disabled]="!activarCreate"
+      (click)="hideDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Guardar"
+      icon="pi pi-check"
+      class="p-button-text"
+      [disabled]="!activarCreate"
+      (click)="saveAseguradora()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

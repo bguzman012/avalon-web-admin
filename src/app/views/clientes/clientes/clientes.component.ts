@@ -6,10 +6,12 @@ import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { UsuariosAseguradorasService } from '../../../services/usuarios-aseguradoras-service';
 import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
+import { AuthService } from 'src/app/services/auth-service';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'asesores',
-  templateUrl: './asesores.component.html',
+  selector: 'clientes',
+  templateUrl: './clientes.component.html',
   styles: [`
   :host ::ng-deep .p-dialog .product-image {
       width: 150px;
@@ -17,20 +19,24 @@ import { FilterService } from "primeng/api";
       display: block;
   }
 `],
-  styleUrls: ['./asesores.component.scss'],
+  styleUrls: ['./clientes.component.scss'],
 })
 
-export class AsesoresComponent implements OnInit {
+export class ClientesComponent implements OnInit {
   usuarioDialog: boolean;
   usuarios: any[];
   selectedUsuarios: any[];
   submitted: boolean;
   usuario: any;
-  ROL_ASESOR_ID = 2
+  ROL_CLIENTE_ID = 3
+  ROL_ADMINISTRADOR_ID = 1
+
   ESTADO_ACTIVO = 'A'
-  loading: boolean = false;
+  ESTADO_BUSQUEDA = 'T'
   TIPO_EMPRESA_ID = 1
+  loading: boolean = false;
   rolId
+  validarEnable = false
   filteredAseguradoras
   selectedAseguradoras
 
@@ -40,14 +46,17 @@ export class AsesoresComponent implements OnInit {
     private usuariosAseguradorasService: UsuariosAseguradorasService,
     private confirmationService: ConfirmationService,
     private aseguradorasService: AseguradorasService,
-    private filterService: FilterService
-
+    private filterService: FilterService,
+    private router: Router,    
+    private authService: AuthService
+  
   ) { }
 
   async ngOnInit() {
-    console.log(environment.production);
-    this.refrescarListado(this.ESTADO_ACTIVO)
-    console.log(this.usuarios);
+    this.refrescarListado(this.ESTADO_BUSQUEDA)
+    let user = await this.authService.obtenerUsuarioLoggeado()
+    if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true
+        
   }
 
   filterGlobal(event: Event, dt: any) {
@@ -86,6 +95,37 @@ export class AsesoresComponent implements OnInit {
     this.usuarioDialog = true;
     // Implementar lógica para editar un usuario
   }
+  getEstadoLabel(estado: string): string {
+    switch (estado) {
+      case 'I':
+        return 'Inhabilitado';
+      case 'P':
+        return 'Pendiente';
+      case 'A':
+        return 'Activo';
+      default:
+        return '';
+    }
+  }
+  
+  async activar(usuario: any) {
+    this.confirmationService.confirm({
+      message: 'Estás seguro de activar el usuario ' + usuario.nombres + ' ' + usuario.apellidos + '?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: async () => {
+        await this.usuariosService.partiallyUpdateUsuario(usuario.id, "A");
+        this.refrescarListado(this.ESTADO_BUSQUEDA)
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Enhorabuena!',
+          detail: 'Usario habilitado exitosamente',
+          life: 3000,
+        });
+      },
+    })
+  }
 
   async deleteUsuario(usuario: any) {
     this.confirmationService.confirm({
@@ -94,7 +134,7 @@ export class AsesoresComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         await this.usuariosService.eliminarUsuario(usuario.id);
-        this.refrescarListado(this.ESTADO_ACTIVO)
+        this.refrescarListado(this.ESTADO_BUSQUEDA)
 
         this.messageService.add({
           severity: 'success',
@@ -112,6 +152,15 @@ export class AsesoresComponent implements OnInit {
     this.submitted = false;
   }
 
+  redirectToMembresiasPage(usuario: any) {
+    localStorage.setItem("clienteId", usuario.id);
+    this.router.navigate(['clientes/membresias'], {
+      queryParams: {
+        clienteId: usuario.id,
+      },
+    });
+  }
+
   async saveUsuario() {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
@@ -120,19 +169,18 @@ export class AsesoresComponent implements OnInit {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id
         await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario);
-        await this.saveUsuariosAseguradoras(this.usuario.id)
+        // this.saveUsuariosAseguradoras(this.usuario.id)
       } else {
-        this.usuario.rolId = this.ROL_ASESOR_ID;
-        this.usuario.estado = 'A';
+        this.usuario.rolId = this.ROL_CLIENTE_ID;
+        this.usuario.estado = 'P';
         this.usuario.contrasenia = environment.pass_default;
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario);
-        await this.saveUsuariosAseguradoras(usuarioSaved.id)
+        // this.saveUsuariosAseguradoras(usuarioSaved.id)
       }
-      this.refrescarListado(this.ESTADO_ACTIVO)
+      this.refrescarListado(this.ESTADO_BUSQUEDA)
       this.usuarioDialog = false;
       this.usuario = {};
       this.filteredAseguradoras = []
-      this.loading = false;
       this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
     } finally {
       this.loading = false; // Ocultar spinner
@@ -140,7 +188,7 @@ export class AsesoresComponent implements OnInit {
   }
 
   async refrescarListado(estado) {
-    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_ASESOR_ID, estado);
+    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_CLIENTE_ID, estado);
   }
 
   async filterAseguradoras(event) {
@@ -169,7 +217,7 @@ export class AsesoresComponent implements OnInit {
     return usuariosAseguradorasIds
   }
   async saveUsuariosAseguradoras(usuarioId) {
-    let usuariosAseguradorasIds = await this.armarSelectedAseguradorasData(usuarioId)
+    let usuariosAseguradorasIds = this.armarSelectedAseguradorasData(usuarioId)
 
     if (!this.usuario.id)
       await this.usuariosAseguradorasService.guardarUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds });
