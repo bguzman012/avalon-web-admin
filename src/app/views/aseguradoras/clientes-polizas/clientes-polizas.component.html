@@ -1,0 +1,150 @@
+<p-toast></p-toast>
+
+<div class="card">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left"> </ng-template>
+    <ng-template pTemplate="right">
+      <button pButton pRipple label="Nueva" icon="pi pi-plus" class="p-button-success p-mr-2"
+        (click)="openNew()"></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table #dt [value]="clientePolizas" [rows]="10" [paginator]="true" [globalFilterFields]="['poliza.nombre', 'cliente.nombreUsuario', 'asesor.nombreUsuario', 'agente.nombreUsuario']"
+    [(selection)]="selectedClientesPolizas" [rowHover]="true" dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" [showCurrentPageReport]="true">
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <h5 class="p-m-0">Administrar Pólizas de Clientes</h5>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..." />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="poliza.nombre">
+          Poliza <p-sortIcon field="poliza.nombre"></p-sortIcon>
+        </th>
+        <th pSortableColumn="cliente.nombreUsuario">
+          Cliente <p-sortIcon field="cliente.nombreUsuario"></p-sortIcon>
+        </th>
+        <th pSortableColumn="asesor.nombreUsuario">
+          Asesor <p-sortIcon field="asesor.nombreUsuario"></p-sortIcon>
+        </th>
+        <th pSortableColumn="agente.nombreUsuario">
+          Agente <p-sortIcon field="agente.nombreUsuario"></p-sortIcon>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-clientePolizas>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="clientePolizas"></p-tableCheckbox>
+        </td>
+        <td>{{ clientePolizas.poliza.nombre }}</td>
+        <td>{{ clientePolizas.cliente.nombreUsuario }}</td>
+        <td>{{ clientePolizas.asesor.nombreUsuario }}</td>
+        <td>{{ clientePolizas.agente.nombreUsuario }}</td>
+        <td>
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+            (click)="editPoliza(clientePolizas)"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+            (click)="deletePoliza(clientePolizas)"></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{ clientePolizas ? clientePolizas.length : 0 }} registros.
+      </div>
+    </ng-template>
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+  </p-table>
+</div>
+
+<p-dialog [(visible)]="polizaDialog" [style]="{ width: '500px' }" header="Detalle de Póliza" [modal]="true"
+  styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <label for="asesoresId">Poliza</label>
+      <p-autoComplete
+        [(ngModel)]="poliza"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredPolizas"
+        (completeMethod)="filterPolizas($event)"
+        field="nombre"
+        [minLength]="1"
+        [appendTo]="'body'"
+        required
+      ></p-autoComplete>
+      <small class="p-invalid" *ngIf="submitted && !poliza"
+        >Poliza es requerido.</small
+      >
+    </div>
+  <div class="p-field">
+    <label for="asesoresId">Cliente</label>
+    <p-autoComplete
+      [(ngModel)]="cliente"
+      [showEmptyMessage]="true"
+      [suggestions]="filteredClientes"
+      (completeMethod)="filterClientes($event)"
+      field="nombreUsuario"
+      [minLength]="1"
+      [appendTo]="'body'"
+      required
+    ></p-autoComplete>
+    <small class="p-invalid" *ngIf="submitted && !cliente"
+      >Cliente es requerido.</small
+    >
+  </div>
+
+  <div class="p-field">
+    <label for="asesoresId">Asesor</label>
+    <p-autoComplete
+      [(ngModel)]="asesor"
+      [showEmptyMessage]="true"
+      [suggestions]="filteredAsesores"
+      (completeMethod)="filterAsesores($event)"
+      [disabled]="user.rol.id == ROL_ASESOR_ID"
+      field="nombreUsuario"
+      [minLength]="1"
+      [appendTo]="'body'"
+      required
+    ></p-autoComplete>
+    <small class="p-invalid" *ngIf="submitted && !asesor"
+      >Asesor es requerido.</small
+    >
+  </div>
+
+  <div class="p-field">
+    <label for="asesoresId">Agente</label>
+    <p-autoComplete
+      [(ngModel)]="broker"
+      [showEmptyMessage]="true"
+      [suggestions]="filteredBrokers"
+      (completeMethod)="filterBrokers($event)"
+      field="nombreUsuario"
+      [minLength]="1"
+      [appendTo]="'body'"
+      required
+    ></p-autoComplete>
+    <small class="p-invalid" *ngIf="submitted && !broker"
+      >Agente es requerido.</small
+    >
+  </div>
+
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="savePoliza()"></button>
+  </ng-template>
+</p-dialog>

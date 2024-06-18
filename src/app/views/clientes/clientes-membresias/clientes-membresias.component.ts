@@ -9,6 +9,7 @@ import { environment } from '../../../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsuariosService } from 'src/app/services/usuarios-service';
 import { UsuariosAseguradorasService } from 'src/app/services/usuarios-aseguradoras-service';
+import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
   selector: 'app-clientes-membresias',
@@ -63,6 +64,8 @@ export class ClientesMembresiasComponent implements OnInit {
   filteredAsesores;
   filteredBrokers;
 
+  user
+
   constructor(
     private messageService: MessageService,
     // private clientesMembresiaService: ClientesMembresiaService,
@@ -73,9 +76,10 @@ export class ClientesMembresiasComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private usuarioAseguradoraService: UsuariosAseguradorasService,
     private route: ActivatedRoute,
+    private authService: AuthService,
     private router: Router,
     private usuarioAseguradorUsuarioMembresiasService: UsuarioAseguradorUsuarioMembresiasService
-  ) {}
+  ) { }
 
   async ngOnInit() {
     this.loading = true
@@ -84,34 +88,11 @@ export class ClientesMembresiasComponent implements OnInit {
     if (!this.clienteId)
       this.clienteId = localStorage.getItem('clienteId');
 
-      this.refrescarListado(this.ESTADO_ACTIVO);
-      this.loading = false
+    this.user = await this.authService.obtenerUsuarioLoggeado()
 
-  }
+    this.refrescarListado(this.ESTADO_ACTIVO);
+    this.loading = false
 
-  armarDataUsuMembresiaUsuAseguradora(usuariosMembresiasUsuAseguradoraTmp) {
-    let usuariosAseguradoraUsuariosMembresia = [];
-    for (
-      let index = 0;
-      index < usuariosMembresiasUsuAseguradoraTmp.length;
-      index++
-    ) {
-      const element = usuariosMembresiasUsuAseguradoraTmp[index];
-      let usuAsegUsuMembAsesor = element.usuAseguradoraUsuMembresiaList.find(
-        (objeto) =>
-          objeto.usuarioAseguradora.usuario.rol.id == this.ROL_ASESOR_ID
-      );
-
-      let asesorAseguradora = usuAsegUsuMembAsesor.usuarioAseguradora;
-
-      usuariosAseguradoraUsuariosMembresia.push({
-        usuario: element.usuario,
-        aseguradora: element.aseguradora,
-        membresia: element.membresia,
-        asesor: asesorAseguradora,
-      });
-    }
-    return usuariosAseguradoraUsuariosMembresia;
   }
 
   filterGlobal(event: Event, dt: any) {
@@ -121,7 +102,7 @@ export class ClientesMembresiasComponent implements OnInit {
   async openNew() {
     this.clienteMembresia = {};
     this.loading = true
-    
+
     this.clientes = await this.usuarioService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO
@@ -138,17 +119,18 @@ export class ClientesMembresiasComponent implements OnInit {
         this.ESTADO_ACTIVO
       );
 
-      console.log(this.membresias)
-
     if (this.membresiaId) {
       this.membresia = this.membresias.find(
         (membresia) => membresia.id == this.membresiaId
       );
     }
-    console.log(this.membresia)
 
     this.cliente = null;
     this.asesor = null;
+
+    console.log(this.user)
+    if (this.user.rol.id == this.ROL_ASESOR_ID) this.asesor = this.user
+
 
     this.submitted = false;
     this.clienteMembresiaDialog = true;
@@ -159,12 +141,10 @@ export class ClientesMembresiasComponent implements OnInit {
   editClienteMembresia(clienteMembresia: any) {
     this.clienteMembresia = { ...clienteMembresia };
     this.clienteMembresiaDialog = true;
-    this.aseguradora = this.clienteMembresia.aseguradora;
     this.membresia = this.clienteMembresia.membresia;
     this.cliente = this.clienteMembresia.usuario;
     this.asesor = this.clienteMembresia.asesor;
 
-    console.log(this.clienteMembresia.asesor.usuario)
   }
 
   async deleteClienteMembresia(clienteMembresia: any) {
@@ -199,11 +179,10 @@ export class ClientesMembresiasComponent implements OnInit {
       } else {
         this.clienteMembresia.membresiaId = this.membresia.id;
         this.clienteMembresia.usuarioId = this.cliente.id;
-        let usuarioMembresia =
-          await this.clientesMembresiasService.guardarClienteMembresia(
-            this.clienteMembresia
-          );
-        await this.guardarUsuaSegUsuMemb(usuarioMembresia.id);
+        this.clienteMembresia.asesorId = this.asesor.id;
+        await this.clientesMembresiasService.guardarClienteMembresia(
+          this.clienteMembresia
+        );
       }
 
       this.refrescarListado(this.ESTADO_ACTIVO);
@@ -220,16 +199,11 @@ export class ClientesMembresiasComponent implements OnInit {
   }
 
   async refrescarListado(estado: string) {
-    let usuariosMembresiasUsuAseguradoraTmp =
-    await this.clientesMembresiasService.obtenerUsuariosMembresiaByUsuarioId(
-      this.clienteId
-    );
+    this.usuariosMembresiasUsuAseguradora =
+      await this.clientesMembresiasService.obtenerUsuariosMembresiaByUsuarioId(
+        this.clienteId
+      );
 
-  this.usuariosMembresiasUsuAseguradora =
-    this.armarDataUsuMembresiaUsuAseguradora(
-      usuariosMembresiasUsuAseguradoraTmp
-    );
-    // this.clientesMembresia = await this.clientesMembresiaService.obtenerClientesMembresiaByAseguradora(this.aseguradoraId); // Obtener lista de clientes membresía
   }
 
   private getRouteParams(param: string): Promise<string> {
@@ -294,6 +268,7 @@ export class ClientesMembresiasComponent implements OnInit {
     }
 
     this.filteredAsesores = filtered;
+    console.log(this.filteredAsesores)
   }
 
   async guardarUsuaSegUsuMemb(usuarioMembresiaId) {
@@ -301,11 +276,7 @@ export class ClientesMembresiasComponent implements OnInit {
       usuarioAseguradoraId: this.asesor.id,
       usuarioMembresiaId: usuarioMembresiaId,
     };
-
-    let brokerAsegUsuMemb = {
-      usuarioAseguradoraId: this.broker.id,
-      usuarioMembresiaId: usuarioMembresiaId,
-    };
+    console.log(asesorAsegUsuMemb)
 
     await this.usuarioAseguradorUsuarioMembresiasService.guardarUsuAsegUsuMemb(
       asesorAsegUsuMemb

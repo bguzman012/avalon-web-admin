@@ -7,12 +7,12 @@ export const navItemsAdmin: INavData[] = [
 //     url: '/usuarios',
 //     iconComponent: { }
 //  },
-//  {
-//   name: 'Aseguradoras',
-//   url: '/aseguradoras',
-//   iconComponent: { }
+{
+  name: 'Aseguradoras',
+  url: '/aseguradoras',
+  iconComponent: { }
   
-// },
+},
 {
   name: 'Membresias',
   url: '/membresias',

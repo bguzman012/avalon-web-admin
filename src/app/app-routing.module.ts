@@ -55,6 +55,11 @@ const routes: Routes = [
         loadChildren: () =>
           import('./views/clientes/clientes.module').then((m) => m.ClientesModule)
       },
+      {
+        path: 'aseguradoras',
+        loadChildren: () =>
+          import('./views/aseguradoras/aseguradoras.module').then((m) => m.AseguradorasModule)
+      },
       // {
       //   path: 'aseguradoras',
       //   loadChildren: () =>
