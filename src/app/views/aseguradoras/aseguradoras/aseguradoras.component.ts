@@ -107,8 +107,7 @@ export class AseguradorasComponent implements OnInit {
   }
 
   async refrescarListado(estado){
-    this.aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstadoAndTipoAseguradora(
-      estado, this.TIPO_EMPRESA_ID);
+    this.aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado(estado);
   }
 
   redirectToMembresiasPage(aseguradora: any) {

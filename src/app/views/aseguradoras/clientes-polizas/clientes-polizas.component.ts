@@ -96,10 +96,7 @@ export class ClientesPolizasComponent implements OnInit {
     this.polizas = await this.polizasService.obtenerPolizasByAseguradora(this.aseguradoraId);
 
     this.aseguradoras =
-      await this.aseguradorasService.obtenerAseguradorasByEstadoAndTipoAseguradora(
-        this.ESTADO_ACTIVO,
-        this.TIPO_EMPRESA_ID
-      );
+      await this.aseguradorasService.obtenerAseguradorasByEstado(this.ESTADO_ACTIVO);
 
     this.clientes =
       await this.usuariosService.obtenerUsuariosPorRolAndEstado(

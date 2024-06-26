@@ -14,9 +14,9 @@ export class AseguradorasService {
   constructor(
     private http: HttpClient) { }
   
-    async obtenerAseguradorasByEstadoAndTipoAseguradora(estado: string, tipoEmpresaId: number): Promise<any[]> {
+    async obtenerAseguradorasByEstado(estado: string): Promise<any[]> {
       try {
-        const aseguradoras = await this.http.get<any[]>(`${this.apiUrl}/aseguradoras?estado=${estado}&tipoEmpresaId=${tipoEmpresaId}`).toPromise();
+        const aseguradoras = await this.http.get<any[]>(`${this.apiUrl}/aseguradoras?estado=${estado}`).toPromise();
         console.log('Resultado de aseguradoras:', aseguradoras);
         return aseguradoras;
       } catch (error) {

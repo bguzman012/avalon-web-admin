@@ -32,7 +32,7 @@ export class ClientesComponent implements OnInit {
   ROL_ADMINISTRADOR_ID = 1
 
   ESTADO_ACTIVO = 'A'
-  ESTADO_BUSQUEDA = 'T'
+  ESTADO_BUSQUEDA = ''
   TIPO_EMPRESA_ID = 1
   loading: boolean = false;
   rolId
@@ -114,7 +114,7 @@ export class ClientesComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
-        await this.usuariosService.partiallyUpdateUsuario(usuario.id, "A");
+        await this.usuariosService.partiallyUpdateUsuario(usuario.id, "A", this.ROL_CLIENTE_ID);
         this.refrescarListado(this.ESTADO_BUSQUEDA)
 
         this.messageService.add({
@@ -133,7 +133,7 @@ export class ClientesComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
-        await this.usuariosService.eliminarUsuario(usuario.id);
+        await this.usuariosService.eliminarUsuario(usuario.id, this.ROL_CLIENTE_ID);
         this.refrescarListado(this.ESTADO_BUSQUEDA)
 
         this.messageService.add({
@@ -168,13 +168,13 @@ export class ClientesComponent implements OnInit {
     try {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id
-        await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario);
+        await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario, this.ROL_CLIENTE_ID);
         // this.saveUsuariosAseguradoras(this.usuario.id)
       } else {
         this.usuario.rolId = this.ROL_CLIENTE_ID;
         this.usuario.estado = 'P';
         this.usuario.contrasenia = environment.pass_default;
-        let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario);
+        let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_CLIENTE_ID);
         // this.saveUsuariosAseguradoras(usuarioSaved.id)
       }
       this.refrescarListado(this.ESTADO_BUSQUEDA)
@@ -195,7 +195,7 @@ export class ClientesComponent implements OnInit {
     let filtered: any[] = [];
     let query = event.query;
 
-    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstadoAndTipoAseguradora('A', this.TIPO_EMPRESA_ID)
+    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado('A')
 
     for (let i = 0; i < aseguradoras.length; i++) {
       let aseguradora = aseguradoras[i];

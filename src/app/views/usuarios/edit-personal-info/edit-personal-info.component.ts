@@ -38,7 +38,7 @@ export class EditPersonalInfoComponent implements OnInit {
 
   async saveUsuario(){
     this.loading = true
-    await this.usuariosService.actualizarUsuario(this.usuario.id, this.armarData());
+    await this.usuariosService.actualizarUsuario(this.usuario.id, this.armarData(), this.usuario.rol.id);
     this.loading = false
     this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
   }

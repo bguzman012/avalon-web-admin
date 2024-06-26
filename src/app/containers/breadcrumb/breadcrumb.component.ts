@@ -23,7 +23,6 @@ export class BreadcrumbComponent implements OnInit {
 
   private createBreadcrumbs(route: ActivatedRoute, url: string = '#', breadcrumbs: MenuItem[] = []): MenuItem[] {
     const children: ActivatedRoute[] = route.children;
-    console.log(route)
 
     if (children.length === 0) {
       return breadcrumbs;

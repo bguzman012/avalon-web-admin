@@ -91,7 +91,7 @@ export class BrokersComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
-        await this.usuariosService.eliminarUsuario(usuario.id);
+        await this.usuariosService.eliminarUsuario(usuario.id, this.ROL_BROKER_ID);
         await this.refrescarListado(this.ESTADO_ACTIVO);
 
         this.messageService.add({
@@ -117,13 +117,13 @@ export class BrokersComponent implements OnInit {
     try {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id;
-        await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario);
+        await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario, this.ROL_BROKER_ID);
         await this.saveUsuariosAseguradoras(this.usuario.id);
       } else {
         this.usuario.rolId = this.ROL_BROKER_ID;
         this.usuario.estado = 'A';
         this.usuario.contrasenia = environment.pass_default;
-        let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario);
+        let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_BROKER_ID);
         await this.saveUsuariosAseguradoras(usuarioSaved.id);
       }
       await this.refrescarListado(this.ESTADO_ACTIVO);
@@ -144,7 +144,7 @@ export class BrokersComponent implements OnInit {
     let filtered: any[] = [];
     let query = event.query;
 
-    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstadoAndTipoAseguradora('A', this.TIPO_EMPRESA_ID);
+    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado('A');
 
     for (let i = 0; i < aseguradoras.length; i++) {
       let aseguradora = aseguradoras[i];

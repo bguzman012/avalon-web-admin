@@ -71,9 +71,8 @@ export class PolizasComponent implements OnInit {
     this.poliza = {};
     this.submitted = false;
     this.aseguradoras =
-      await this.aseguradorasService.obtenerAseguradorasByEstadoAndTipoAseguradora(
-        this.ESTADO_ACTIVO,
-        this.TIPO_EMPRESA_ID
+      await this.aseguradorasService.obtenerAseguradorasByEstado(
+        this.ESTADO_ACTIVO
       );
 
       if (this.aseguradoraId)
