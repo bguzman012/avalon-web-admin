@@ -138,6 +138,15 @@ export class ClientesMembresiasComponent implements OnInit {
 
   }
 
+  calcularFechaFin() {
+    if (this.membresia && this.clienteMembresia.fechaInicio) {
+        const fechaInicio = new Date(this.clienteMembresia.fechaInicio);
+        const vigenciaMeses = this.membresia.vigenciaMeses;
+        const fechaFin = new Date(fechaInicio.setMonth(fechaInicio.getMonth() + vigenciaMeses));
+        this.clienteMembresia.fechaFin = fechaFin;
+    }
+  }
+
   editClienteMembresia(clienteMembresia: any) {
     this.clienteMembresia = { ...clienteMembresia };
     this.clienteMembresiaDialog = true;

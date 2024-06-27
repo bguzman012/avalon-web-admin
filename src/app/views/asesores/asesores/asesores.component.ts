@@ -29,7 +29,6 @@ export class AsesoresComponent implements OnInit {
   ROL_ASESOR_ID = 2
   ESTADO_ACTIVO = 'A'
   loading: boolean = false;
-  TIPO_EMPRESA_ID = 1
   rolId
   filteredAseguradoras
   selectedAseguradoras
@@ -120,13 +119,11 @@ export class AsesoresComponent implements OnInit {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id
         await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario, this.ROL_ASESOR_ID);
-        await this.saveUsuariosAseguradoras(this.usuario.id)
       } else {
         this.usuario.rolId = this.ROL_ASESOR_ID;
         this.usuario.estado = 'A';
         this.usuario.contrasenia = environment.pass_default;
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_ASESOR_ID);
-        await this.saveUsuariosAseguradoras(usuarioSaved.id)
       }
       this.refrescarListado(this.ESTADO_ACTIVO)
       this.usuarioDialog = false;
@@ -143,37 +140,4 @@ export class AsesoresComponent implements OnInit {
     this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_ASESOR_ID, estado);
   }
 
-  async filterAseguradoras(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-
-    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado('A')
-
-    for (let i = 0; i < aseguradoras.length; i++) {
-      let aseguradora = aseguradoras[i];
-      if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(aseguradora);
-      }
-    }
-
-    this.filteredAseguradoras = filtered;
-  }
-
-  async armarSelectedAseguradorasData(usuarioId) {
-    let usuariosAseguradorasIds = []
-    console.log(this.selectedAseguradoras)
-    for (let index = 0; index < this.selectedAseguradoras.length; index++) {
-      const aseguradora = this.selectedAseguradoras[index];
-      usuariosAseguradorasIds.push({ aseguradoraId: aseguradora.id, usuarioId: usuarioId })
-    }
-    return usuariosAseguradorasIds
-  }
-  async saveUsuariosAseguradoras(usuarioId) {
-    let usuariosAseguradorasIds = await this.armarSelectedAseguradorasData(usuarioId)
-
-    if (!this.usuario.id)
-      await this.usuariosAseguradorasService.guardarUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds });
-    else
-      await this.usuariosAseguradorasService.updateUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds }, usuarioId);
-  }
 }

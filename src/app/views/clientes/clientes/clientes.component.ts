@@ -56,7 +56,6 @@ export class ClientesComponent implements OnInit {
     this.refrescarListado(this.ESTADO_BUSQUEDA)
     let user = await this.authService.obtenerUsuarioLoggeado()
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true
-        
   }
 
   filterGlobal(event: Event, dt: any) {

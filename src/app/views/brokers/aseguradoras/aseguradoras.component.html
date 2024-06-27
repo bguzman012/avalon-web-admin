@@ -20,11 +20,11 @@
 
   <p-table
     #dt
-    [value]="aseguradoras"
+    [value]="brokers"
     [rows]="10"
     [paginator]="true"
     [globalFilterFields]="['nombre', 'correoElectronico']"
-    [(selection)]="selectedAseguradoras"
+    [(selection)]="selectedBrokers"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
@@ -58,20 +58,20 @@
         <th></th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-aseguradora>
-      <tr (click)="redirectToMembresiasPage(aseguradora)">
+    <ng-template pTemplate="body" let-broker>
+      <tr (click)="redirectToAgentesPage(broker)">
         <td>
-          <p-tableCheckbox [value]="aseguradora"></p-tableCheckbox>
+          <p-tableCheckbox [value]="broker"></p-tableCheckbox>
         </td>
-        <td>{{ aseguradora.nombre }}</td>
-        <td>{{ aseguradora.correoElectronico }}</td>
+        <td>{{ broker.nombre }}</td>
+        <td>{{ broker.correoElectronico }}</td>
         <td>
           <button
             pButton
             pRipple
             icon="pi pi-pencil"
             class="p-button-rounded p-button-success p-mr-2"
-            (click)="editAseguradora(aseguradora); $event.stopPropagation()"
+            (click)="editBroker(broker); $event.stopPropagation()"
           ></button>
           <button
             pButton
@@ -79,7 +79,7 @@
             [disabled]="!activarCreate"
             icon="pi pi-trash"
             class="p-button-rounded p-button-warning"
-            (click)="deleteAseguradora(aseguradora); $event.stopPropagation()"
+            (click)="deleteBroker(broker); $event.stopPropagation()"
           ></button>
         </td>
       </tr>
@@ -87,7 +87,7 @@
     
     <ng-template pTemplate="summary">
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{ aseguradoras ? aseguradoras.length : 0 }} registros.
+        En total existen {{ brokers ? brokers.length : 0 }} registros.
       </div>
     </ng-template>
     <p-blockUI [blocked]="loading">
@@ -99,7 +99,7 @@
 </div>
 
 <p-dialog
-  [(visible)]="aseguradoraDialog"
+  [(visible)]="brokerDialog"
   [style]="{ width: '500px' }"
   header="Broker Detalle"
   [modal]="true"
@@ -112,11 +112,11 @@
         type="text"
         pInputText
         id="nombre"
-        [(ngModel)]="aseguradora.nombre"
+        [(ngModel)]="broker.nombre"
         required
         autofocus
       />
-      <small class="p-invalid" *ngIf="submitted && !aseguradora.nombre"
+      <small class="p-invalid" *ngIf="submitted && !broker.nombre"
         >Nombre es requerido.</small
       >
     </div>
@@ -126,12 +126,12 @@
         type="text"
         pInputText
         id="correoElectronico"
-        [(ngModel)]="aseguradora.correoElectronico"
+        [(ngModel)]="broker.correoElectronico"
         required
       />
       <small
         class="p-invalid"
-        *ngIf="submitted && !aseguradora.correoElectronico"
+        *ngIf="submitted && !broker.correoElectronico"
         >Correo Electrónico es requerido.</small
       >
     </div>
@@ -160,7 +160,7 @@
       icon="pi pi-check"
       class="p-button-text"
       [disabled]="!activarCreate"
-      (click)="saveAseguradora()"
+      (click)="saveBroker()"
     ></button>
   </ng-template>
 </p-dialog>

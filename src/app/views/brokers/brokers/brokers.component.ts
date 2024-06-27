@@ -6,6 +6,8 @@ import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { UsuariosAseguradorasService } from '../../../services/usuarios-aseguradoras-service';
 import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
+import { BrokersService } from 'src/app/services/brokers-service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'brokers',
@@ -28,33 +30,49 @@ export class BrokersComponent implements OnInit {
   usuario: any;
   ROL_BROKER_ID = 4;
   ESTADO_ACTIVO = 'A';
-  TIPO_EMPRESA_ID = 2
   loading: boolean = false;
-  filteredAseguradoras: any[];
-  selectedAseguradoras: any[];
+  filteredBrokers: any[];
+  selectedBrokers: any[];
+  brokers: any[];
+  broker
+  brokerId
 
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
     private usuariosAseguradorasService: UsuariosAseguradorasService,
     private confirmationService: ConfirmationService,
-    private aseguradorasService: AseguradorasService,
+    private brokersService: BrokersService,
+    private route: ActivatedRoute,
     private filterService: FilterService
   ) { }
 
   async ngOnInit() {
-    console.log(environment.production);
+    this.brokerId = +(await this.getRouteParams('brokerId'));
+
+    if (!this.brokerId)
+      this.brokerId = localStorage.getItem('brokerId');
+
     await this.refrescarListado(this.ESTADO_ACTIVO);
-    console.log(this.usuarios);
+  }
+
+  private getRouteParams(param: string): Promise<string> {
+    return new Promise((resolve) => {
+      this.route.queryParams.subscribe((params) => resolve(params[param]));
+    });
   }
 
   filterGlobal(event: Event, dt: any) {
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  openNew() {
+  async openNew() {
     this.usuario = {};
     this.submitted = false;
+    this.brokers =
+      await this.brokersService.obtenerBrokersByEstado(this.ESTADO_ACTIVO);
+    
+    this.broker = this.brokers.find(x => x.id === this.brokerId)
     this.usuarioDialog = true;
   }
 
@@ -79,15 +97,18 @@ export class BrokersComponent implements OnInit {
   async editUsuario(usuario: any) {
     this.usuario = { ...usuario };
     this.usuario.rolId = this.usuario.rol.id;
-    this.selectedAseguradoras = await this.aseguradorasService.obtenerAseguradorasByUsuarioAndEstado(this.usuario.id, 'A');
-    console.log(this.selectedAseguradoras);
+    this.brokers =
+      await this.brokersService.obtenerBrokersByEstado(this.ESTADO_ACTIVO);
+    this.broker = this.brokers.find(x => x.id === this.usuario.broker.id)
+    // this.selectedBrokers = await this.aseguradorasService.obtenerAseguradorasByUsuarioAndEstado(this.usuario.id, 'A');
+    // console.log(this.selectedAseguradoras);
     this.usuarioDialog = true;
     // Implementar lógica para editar un usuario
   }
 
   async deleteUsuario(usuario: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de inhabilitar el broker ' + usuario.nombres + ' ' + usuario.apellidos + '?',
+      message: 'Estás seguro de inhabilitar el agente ' + usuario.nombres + ' ' + usuario.apellidos + '?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
@@ -106,30 +127,27 @@ export class BrokersComponent implements OnInit {
 
   hideDialog() {
     this.usuarioDialog = false;
-    this.selectedAseguradoras = [];
     this.submitted = false;
   }
 
   async saveUsuario() {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
-    console.log(this.selectedAseguradoras);
     try {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id;
+        this.usuario.brokerId = this.broker.id;
         await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario, this.ROL_BROKER_ID);
-        await this.saveUsuariosAseguradoras(this.usuario.id);
       } else {
         this.usuario.rolId = this.ROL_BROKER_ID;
         this.usuario.estado = 'A';
         this.usuario.contrasenia = environment.pass_default;
-        let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_BROKER_ID);
-        await this.saveUsuariosAseguradoras(usuarioSaved.id);
+        this.usuario.brokerId = this.broker.id
+        await this.usuariosService.guardarUsuario(this.usuario, this.ROL_BROKER_ID);
       }
       await this.refrescarListado(this.ESTADO_ACTIVO);
       this.usuarioDialog = false;
       this.usuario = {};
-      this.filteredAseguradoras = [];
       this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
     } finally {
       this.loading = false; // Ocultar spinner
@@ -140,38 +158,18 @@ export class BrokersComponent implements OnInit {
     this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_BROKER_ID, estado);
   }
 
-  async filterAseguradoras(event: any) {
+  
+  filterBrokers(event) {
     let filtered: any[] = [];
     let query = event.query;
-
-    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado('A');
-
-    for (let i = 0; i < aseguradoras.length; i++) {
-      let aseguradora = aseguradoras[i];
+    for (let i = 0; i < this.brokers.length; i++) {
+      let aseguradora = this.brokers[i];
       if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
         filtered.push(aseguradora);
       }
     }
 
-    this.filteredAseguradoras = filtered;
+    this.filteredBrokers = filtered;
   }
 
-  async armarSelectedAseguradorasData(usuarioId: number) {
-    let usuariosAseguradorasIds: any[] = [];
-    console.log(this.selectedAseguradoras);
-    for (let index = 0; index < this.selectedAseguradoras.length; index++) {
-      const aseguradora = this.selectedAseguradoras[index];
-      usuariosAseguradorasIds.push({ aseguradoraId: aseguradora.id, usuarioId: usuarioId });
-    }
-    return usuariosAseguradorasIds;
-  }
-
-  async saveUsuariosAseguradoras(usuarioId: number) {
-    let usuariosAseguradorasIds = await this.armarSelectedAseguradorasData(usuarioId);
-
-    if (!this.usuario.id)
-      await this.usuariosAseguradorasService.guardarUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds });
-    else
-      await this.usuariosAseguradorasService.updateUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds }, usuarioId);
-  }
 }

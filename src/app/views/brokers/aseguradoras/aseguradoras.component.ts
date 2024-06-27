@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
-import { AseguradorasService } from '../../../services/aseguradoras-service';
+import { BrokersService } from '../../../services/brokers-service';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth-service';
@@ -20,11 +20,11 @@ import { AuthService } from 'src/app/services/auth-service';
 })
 
 export class AseguradorasComponent implements OnInit {
-  aseguradoraDialog: boolean;
-  aseguradoras: any[];
-  selectedAseguradoras: any[];
+  brokerDialog: boolean;
+  brokers: any[];
+  selectedBrokers: any[];
   submitted: boolean;
-  aseguradora: any;
+  broker: any;
   loading: boolean = false;
   ESTADO_ACTIVO = 'A'
   ROL_ADMINISTRADOR_ID = 1
@@ -34,7 +34,7 @@ export class AseguradorasComponent implements OnInit {
 
   constructor(
     private messageService: MessageService,
-    private aseguradorasService: AseguradorasService,
+    private brokersService: BrokersService,
     private confirmationService: ConfirmationService,
     private router: Router,
     private authService: AuthService
@@ -53,23 +53,23 @@ export class AseguradorasComponent implements OnInit {
   }
 
   openNew() {
-    this.aseguradora = {};
+    this.broker = {};
     this.submitted = false;
-    this.aseguradoraDialog = true;
+    this.brokerDialog = true;
   }
   
-  editAseguradora(aseguradora: any) {
-    this.aseguradora = { ...aseguradora };
-    this.aseguradoraDialog = true;
+  editBroker(broker: any) {
+    this.broker = { ...broker };
+    this.brokerDialog = true;
   }
 
-  async deleteAseguradora(aseguradora: any) {
+  async deleteBroker(broker: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar la aseguradora ' + aseguradora.nombre + '?',
+      message: 'Estás seguro de eliminar el broker ' + broker.nombre + '?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async  () => {
-        await this.aseguradorasService.eliminarAseguradora(aseguradora.id);
+        await this.brokersService.eliminarBroker(broker.id);
         this.refrescarListado(this.ESTADO_ACTIVO);
 
         this.messageService.add({
@@ -83,23 +83,22 @@ export class AseguradorasComponent implements OnInit {
   }
 
   hideDialog() {
-    this.aseguradoraDialog = false;
+    this.brokerDialog = false;
     this.submitted = false;
   }
   
-  async saveAseguradora() {
+  async saveBroker() {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
     try {
-      if (this.aseguradora.id) {
-        await this.aseguradorasService.actualizarAseguradora(this.aseguradora.id, this.aseguradora);
+      if (this.broker.id) {
+        await this.brokersService.actualizarBroker(this.broker.id, this.broker);
       } else {
-        this.aseguradora.tipoAseguradoraId = this.TIPO_EMPRESA_ID
-        await this.aseguradorasService.guardarAseguradora(this.aseguradora);
+        await this.brokersService.guardarBroker(this.broker);
       }
       this.refrescarListado(this.ESTADO_ACTIVO);
-      this.aseguradoraDialog = false;
-      this.aseguradora = {};
+      this.brokerDialog = false;
+      this.broker = {};
       this.messageService.add({severity:'success', summary:'Enhorabuena!', detail:'Operación ejecutada con éxito'});
     } finally {
       this.loading = false; // Ocultar spinner
@@ -107,12 +106,11 @@ export class AseguradorasComponent implements OnInit {
   }
 
   async refrescarListado(estado){
-    this.aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado(
-      estado);
+    this.brokers = await this.brokersService.obtenerBrokersByEstado(estado);
   }
 
-  redirectToMembresiasPage(aseguradora: any) {
-    localStorage.setItem("aseguradoraId", aseguradora.id);
-    this.router.navigate(['brokers/agentes'], { queryParams: { aseguradoraId: aseguradora.id } });
+  redirectToAgentesPage(broker: any) {
+    localStorage.setItem("brokerId", broker.id);
+    this.router.navigate(['brokers/agentes'], { queryParams: { brokerId: broker.id } });
   }
 }

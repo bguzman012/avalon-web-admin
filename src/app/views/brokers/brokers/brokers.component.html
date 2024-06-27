@@ -94,13 +94,21 @@
             <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
         </div>
         <div class="p-field">
-            <span class="p-fluid">
-                <label class="p-mb-3">Aseguradora</label>
-                <p-autoComplete [(ngModel)]="selectedAseguradoras" [suggestions]="filteredAseguradoras"
-                    (completeMethod)="filterAseguradoras($event)" field="nombre" [multiple]="true" [appendTo]="'body'">
-                </p-autoComplete>
-            </span>
-        </div>
+            <label for="brokerId">Broker</label>
+            <p-autoComplete
+              [(ngModel)]="broker"
+              [showEmptyMessage]="true"
+              [suggestions]="filteredBrokers"
+              (completeMethod)="filterBrokers($event)"
+              field="nombre"
+              [minLength]="1"
+              [appendTo]="'body'"
+              required
+            ></p-autoComplete>
+            <small class="p-invalid" *ngIf="submitted && !broker"
+              >Broker es requerido.</small
+            >
+          </div>
 
         <p-blockUI [blocked]="loading">
             <div class="p-field" *ngIf="loading">
