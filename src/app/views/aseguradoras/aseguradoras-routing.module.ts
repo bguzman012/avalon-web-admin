@@ -45,6 +45,22 @@ const routes: Routes = [
                 component: ClientesPolizasComponent,
               },
             ]
+          },
+          ,
+          {
+            path: 'coberturas',
+            data: {
+              breadcrumb: 'Coberturas'
+            },
+            children: [
+              {
+                path: '',
+                data: {
+                  breadcrumb: null
+                },
+                component: ClientesPolizasComponent,
+              },
+            ]
           }
         ]
       }
