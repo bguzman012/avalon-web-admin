@@ -20,36 +20,38 @@ export class ClientesPolizasComponent implements OnInit {
   submitted: boolean;
   loading: boolean = false;
   user: any;
-  polizaCliente: any
+  polizaCliente: any;
 
   polizas: any[];
   filteredPolizas;
-  poliza
+  poliza;
 
   aseguradoras: any[];
   filteredAseguradoras;
-  aseguradora
+  aseguradora;
 
   clientes: any[];
   filteredClientes;
-  cliente
+  cliente;
 
   asesores: any[];
   filteredAsesores;
-  asesor
+  asesor;
 
   brokers: any[];
   filteredBrokers;
-  broker
+  broker;
 
   ESTADO_ACTIVO = 'A';
-  TIPO_EMPRESA_ID = 1
-  aseguradoraId
-  polizaId
+  TIPO_EMPRESA_ID = 1;
+  aseguradoraId;
+  polizaId;
 
   ROL_ASESOR_ID = 2;
   ROL_CLIENTE_ID = 3;
   ROL_BROKER_ID = 4;
+
+  vigenciaMeses
 
   constructor(
     private messageService: MessageService,
@@ -61,7 +63,7 @@ export class ClientesPolizasComponent implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {}
 
   async ngOnInit() {
     this.loading = true;
@@ -69,14 +71,12 @@ export class ClientesPolizasComponent implements OnInit {
 
     this.polizaId = +(await this.getRouteParams('polizaId'));
 
-    if (!this.polizaId)
-      this.polizaId = localStorage.getItem('polizaId');
+    if (!this.polizaId) this.polizaId = localStorage.getItem('polizaId');
 
     this.aseguradoraId = +(await this.getRouteParams('aseguradoraId'));
 
     if (!this.aseguradoraId)
       this.aseguradoraId = localStorage.getItem('aseguradoraId');
-
 
     this.refrescarListado();
     this.loading = false;
@@ -88,51 +88,67 @@ export class ClientesPolizasComponent implements OnInit {
     });
   }
 
+  async prepareData() {
+    this.polizas = await this.polizasService.obtenerPolizasByAseguradora(
+      this.aseguradoraId
+    );
+
+    this.aseguradoras =
+      await this.aseguradorasService.obtenerAseguradorasByEstado(
+        this.ESTADO_ACTIVO
+      );
+
+    this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO
+    );
+
+    this.asesores = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_ASESOR_ID,
+      this.ESTADO_ACTIVO
+    );
+
+    this.brokers = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_BROKER_ID,
+      this.ESTADO_ACTIVO
+    );
+  }
+
   async openNew() {
     this.polizaCliente = {};
     this.submitted = false;
-    this.loading = true
+    this.loading = true;
+    this.polizaCliente.fechaInicio = new Date();
 
-    this.polizas = await this.polizasService.obtenerPolizasByAseguradora(this.aseguradoraId);
+    await this.prepareData();
 
-    this.aseguradoras =
-      await this.aseguradorasService.obtenerAseguradorasByEstado(this.ESTADO_ACTIVO);
+    if (this.polizaId)
+      this.poliza = this.polizas.find((x) => x.id == this.polizaId);
 
-    this.clientes =
-      await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-        this.ROL_CLIENTE_ID,
-        this.ESTADO_ACTIVO
-      );
+    console.log(this.poliza)
+    this.vigenciaMeses = this.poliza.vigenciaMeses;
+    if (this.user.rol.id == this.ROL_ASESOR_ID) this.asesor = this.user;
 
-    this.asesores =
-      await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-        this.ROL_ASESOR_ID,
-        this.ESTADO_ACTIVO
-      );
-
-    this.brokers =
-      await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-        this.ROL_BROKER_ID,
-        this.ESTADO_ACTIVO
-      );
-
-      if (this.polizaId)
-        this.poliza = this.polizas.find(x => x.id == this.polizaId);
-
-      if (this.user.rol.id == this.ROL_ASESOR_ID) this.asesor = this.user
-
-
-    this.loading = false
+    this.calcularFechaFin()
+    this.loading = false;
     this.polizaDialog = true;
   }
-
 
   filterGlobal(event: Event, dt: any) {
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  editPoliza(poliza: any) {
+  async editPoliza(poliza: any) {
     this.polizaCliente = { ...poliza };
+    this.polizaCliente.fechaInicio = new Date(this.polizaCliente.fechaInicio + 'T23:59:00Z');
+    this.polizaCliente.fechaFin = new Date(this.polizaCliente.fechaFin + 'T23:59:00Z');
+    await this.prepareData();
+
+    this.poliza = this.polizaCliente.poliza
+    this.cliente = this.polizaCliente.cliente
+    this.asesor = this.polizaCliente.asesor
+    this.broker = this.polizaCliente.agente
+    this.vigenciaMeses = this.polizaCliente.poliza.vigenciaMeses;
     this.polizaDialog = true;
   }
 
@@ -167,7 +183,9 @@ export class ClientesPolizasComponent implements OnInit {
     let query = event.query;
     for (let i = 0; i < this.asesores.length; i++) {
       let asesor = this.asesores[i];
-      if (asesor.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+      if (
+        asesor.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
+      ) {
         filtered.push(asesor);
       }
     }
@@ -175,13 +193,14 @@ export class ClientesPolizasComponent implements OnInit {
     this.filteredAsesores = filtered;
   }
 
-
   filterClientes(event) {
     let filtered: any[] = [];
     let query = event.query;
     for (let i = 0; i < this.clientes.length; i++) {
       let cliente = this.clientes[i];
-      if (cliente.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+      if (
+        cliente.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
+      ) {
         filtered.push(cliente);
       }
     }
@@ -194,7 +213,9 @@ export class ClientesPolizasComponent implements OnInit {
     let query = event.query;
     for (let i = 0; i < this.brokers.length; i++) {
       let broker = this.brokers[i];
-      if (broker.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+      if (
+        broker.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
+      ) {
         filtered.push(broker);
       }
     }
@@ -204,11 +225,16 @@ export class ClientesPolizasComponent implements OnInit {
 
   async deletePoliza(polizaCliente: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar la póliza ' + polizaCliente.poliza.nombre + '?',
+      message:
+        'Estás seguro de eliminar la póliza ' +
+        polizaCliente.poliza.nombre +
+        '?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
-        await this.clientesPolizasService.eliminarClientePoliza(polizaCliente.id);
+        await this.clientesPolizasService.eliminarClientePoliza(
+          polizaCliente.id
+        );
         this.refrescarListado();
         this.messageService.add({
           severity: 'success',
@@ -218,6 +244,21 @@ export class ClientesPolizasComponent implements OnInit {
         });
       },
     });
+  }
+
+  calcularFechaFin() {
+    if (this.poliza.vigenciaMeses) {
+      this.vigenciaMeses = `${this.poliza.vigenciaMeses} ${this.poliza.vigenciaMeses > 1 ? 'meses' : 'mes'}`;
+    } else {
+      this.vigenciaMeses = undefined;
+    }
+
+    if (this.poliza.vigenciaMeses && this.polizaCliente.fechaInicio) {
+        const fechaInicio = new Date(this.polizaCliente.fechaInicio);
+        const vigenciaMeses = this.poliza.vigenciaMeses;
+        const fechaFin = new Date(fechaInicio.setMonth(fechaInicio.getMonth() + vigenciaMeses));
+        this.polizaCliente.fechaFin = fechaFin;
+    }
   }
 
   hideDialog() {
@@ -231,17 +272,22 @@ export class ClientesPolizasComponent implements OnInit {
 
     try {
       if (this.polizaCliente.id) {
-        this.polizaCliente.clienteId = this.cliente.id
-        this.polizaCliente.asesorId = this.asesor.id
-        this.polizaCliente.agenteId = this.broker.id
-        this.polizaCliente.polizaId = this.poliza.id
-        await this.clientesPolizasService.actualizarClientePoliza(this.polizaCliente.id, this.polizaCliente);
+        this.polizaCliente.clienteId = this.cliente.id;
+        this.polizaCliente.asesorId = this.asesor.id;
+        this.polizaCliente.agenteId = this.broker.id;
+        this.polizaCliente.polizaId = this.poliza.id;
+        await this.clientesPolizasService.actualizarClientePoliza(
+          this.polizaCliente.id,
+          this.polizaCliente
+        );
       } else {
-        this.polizaCliente.clienteId = this.cliente.id
-        this.polizaCliente.asesorId = this.asesor.id
-        this.polizaCliente.agenteId = this.broker.id
-        this.polizaCliente.polizaId = this.poliza.id
-        await this.clientesPolizasService.crearClientePoliza(this.polizaCliente);
+        this.polizaCliente.clienteId = this.cliente.id;
+        this.polizaCliente.asesorId = this.asesor.id;
+        this.polizaCliente.agenteId = this.broker.id;
+        this.polizaCliente.polizaId = this.poliza.id;
+        await this.clientesPolizasService.crearClientePoliza(
+          this.polizaCliente
+        );
       }
 
       this.refrescarListado();
@@ -258,6 +304,9 @@ export class ClientesPolizasComponent implements OnInit {
   }
 
   async refrescarListado() {
-    this.clientePolizas = await this.clientesPolizasService.obtenerClientesPolizasPorPoliza(this.polizaId);
+    this.clientePolizas =
+      await this.clientesPolizasService.obtenerClientesPolizasPorPoliza(
+        this.polizaId
+      );
   }
 }

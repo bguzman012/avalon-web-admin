@@ -52,9 +52,9 @@
         <td>{{ poliza.aseguradora.nombre }}</td>
         <td>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
-            (click)="editPoliza(poliza)"></button>
+            (click)="editPoliza(poliza); $event.stopPropagation()"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
-            (click)="deletePoliza(poliza)"></button>
+            (click)="deletePoliza(poliza); $event.stopPropagation()"></button>
         </td>
       </tr>
     </ng-template>
@@ -97,6 +97,7 @@
       (completeMethod)="filterAseguradoras($event)"
       field="nombre"
       [minLength]="1"
+      [readonly] = "aseguradoraId"
       [appendTo]="'body'"
       required
     ></p-autoComplete>

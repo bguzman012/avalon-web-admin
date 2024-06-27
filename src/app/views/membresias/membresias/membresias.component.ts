@@ -143,6 +143,15 @@ export class MembresiasComponent implements OnInit {
     });
   }
 
+  redirectToBeneficiosPage(membresia: any) {
+    localStorage.setItem("membresiaId", membresia.id);
+    this.router.navigate(['membresias/beneficios'], {
+      queryParams: {
+        membresiaId: membresia.id
+      },
+    });
+  }
+
   filterAseguradora(event) {
     let filtered: any[] = [];
     let query = event.query;

@@ -40,12 +40,14 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MembresiasComponent } from './membresias/membresias.component';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+import { BeneficiosComponent } from './beneficios/beneficios.component';
 
 
 @NgModule({
   declarations: [
     MembresiasComponent,
-    ClientesMembresiasComponent
+    ClientesMembresiasComponent,
+    BeneficiosComponent
   ],
   imports: [
     CommonModule,

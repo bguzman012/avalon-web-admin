@@ -51,12 +51,6 @@ export class PolizasComponent implements OnInit {
     if (!this.aseguradoraId)
       this.aseguradoraId = localStorage.getItem('aseguradoraId');
 
-    this.polizaId = +(await this.getRouteParams('polizaId'));
-
-    if (!this.polizaId)
-      this.polizaId = localStorage.getItem('polizaId');
-
-
     this.refrescarListado();
     this.loading = false;
   }
@@ -86,8 +80,16 @@ export class PolizasComponent implements OnInit {
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  editPoliza(poliza: any) {
+  async editPoliza(poliza: any) {
     this.poliza = { ...poliza };
+    this.aseguradoras =
+    await this.aseguradorasService.obtenerAseguradorasByEstado(
+      this.ESTADO_ACTIVO
+    );
+
+    if (this.aseguradoraId)
+      this.aseguradora = this.aseguradoras.find(x => x.id == this.aseguradoraId);
+
     this.polizaDialog = true;
   }
 

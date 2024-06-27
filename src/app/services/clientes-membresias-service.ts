@@ -36,9 +36,9 @@ export class ClientesMembresiasService {
   // }
   async obtenerUsuariosMembresiaByMebresiaId(membresiaId: number): Promise<any[]> {
     try {
-      const usuarios = await this.http.get<any[]>(`${this.apiUrl}/membresias/${membresiaId}/clienteMembresias`).toPromise();
-      console.log('Resultado de usuarios por usuario membresia:', usuarios);
-      return usuarios;
+      const clientes = await this.http.get<any[]>(`${this.apiUrl}/membresias/${membresiaId}/clienteMembresias`).toPromise();
+      console.log('Resultado de clientes por usuario membresia:', clientes);
+      return clientes;
     } catch (error) {
       console.error('Error en la solicitud:', error);
       throw error; // Puedes personalizar esto según tus necesidades
@@ -47,9 +47,9 @@ export class ClientesMembresiasService {
 
   async obtenerUsuariosMembresiaByUsuarioId(usuarioId: number): Promise<any[]> {
     try {
-      const usuarios = await this.http.get<any[]>(`${this.apiUrl}/usuarios/${usuarioId}/clienteMembresias`).toPromise();
-      console.log('Resultado de usuarios por usuario membresia:', usuarios);
-      return usuarios;
+      const clientes = await this.http.get<any[]>(`${this.apiUrl}/clientes/${usuarioId}/clienteMembresias`).toPromise();
+      console.log('Resultado de clientes por usuario membresia:', clientes);
+      return clientes;
     } catch (error) {
       console.error('Error en la solicitud:', error);
       throw error; // Puedes personalizar esto según tus necesidades
@@ -59,6 +59,16 @@ export class ClientesMembresiasService {
   async guardarClienteMembresia(usuarioMembresiaData: any): Promise<any> {
     try {
       const response = await this.http.post<any>(`${this.apiUrl}/clienteMembresias`, usuarioMembresiaData).toPromise();
+      return response;
+    } catch (error) {
+      console.error('Error al guardar membresía:', error);
+      throw error;
+    }
+  }
+
+  async actualizarClienteMembresia(idUsuarioMembresia: number, usuarioMembresiaData: any): Promise<any> {
+    try {
+      const response = await this.http.put<any>(`${this.apiUrl}/clienteMembresias/${idUsuarioMembresia}`, usuarioMembresiaData).toPromise();
       return response;
     } catch (error) {
       console.error('Error al guardar membresía:', error);

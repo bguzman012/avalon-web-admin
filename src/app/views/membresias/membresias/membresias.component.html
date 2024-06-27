@@ -4,7 +4,7 @@
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left"> </ng-template>
 
-    <ng-template pTemplate="right" >
+    <ng-template pTemplate="right">
       <button
         pButton
         pRipple
@@ -72,6 +72,12 @@
           <button
             pButton
             pRipple
+            class="p-button-rounded p-button-primary p-mr-2"
+            (click)="redirectToBeneficiosPage(membresia); $event.stopPropagation()"
+          >Beneficios</button>
+          <button
+            pButton
+            pRipple
             icon="pi pi-pencil"
             class="p-button-rounded p-button-success p-mr-2"
             (click)="editMembresia(membresia); $event.stopPropagation()"
@@ -93,10 +99,10 @@
       </div>
     </ng-template>
     <p-blockUI [blocked]="loading">
-        <div class="p-field" *ngIf="loading">
-          <p-progressSpinner></p-progressSpinner>
-        </div>
-      </p-blockUI>
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
   </p-table>
 </div>
 
@@ -108,7 +114,6 @@
   styleClass="p-fluid"
 >
   <ng-template pTemplate="content">
-    
     <div class="p-field">
       <label for="nombres">Nombres</label>
       <input
@@ -132,7 +137,7 @@
         [(ngModel)]="membresia.detalle"
       />
     </div>
-    
+
     <div class="p-field">
       <label for="vigenciaMeses">Vigencia (meses)</label>
       <input

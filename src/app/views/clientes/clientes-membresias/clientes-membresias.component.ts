@@ -50,7 +50,7 @@ export class ClientesMembresiasComponent implements OnInit {
   clientes: any[];
   asesores: any[];
   brokers: any[];
-  usuariosMembresiasUsuAseguradora: any[];
+  clienteMembresias: any[];
 
   ESTADO_ACTIVO = 'A';
 
@@ -63,6 +63,8 @@ export class ClientesMembresiasComponent implements OnInit {
   filteredClientes;
   filteredAsesores;
   filteredBrokers;
+
+  vigenciaMeses
 
   user
 
@@ -99,14 +101,11 @@ export class ClientesMembresiasComponent implements OnInit {
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  async openNew() {
-    this.clienteMembresia = {};
-    this.loading = true
-
+  async prepareData(){
     this.clientes = await this.usuarioService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO
-    ); // Obtener lista de aseguradoras
+    );
 
     this.asesores =
       await this.usuarioService.obtenerUsuariosPorRolAndEstado(
@@ -119,19 +118,24 @@ export class ClientesMembresiasComponent implements OnInit {
         this.ESTADO_ACTIVO
       );
 
-    if (this.membresiaId) {
-      this.membresia = this.membresias.find(
-        (membresia) => membresia.id == this.membresiaId
-      );
-    }
+  }
 
-    this.cliente = null;
+  async openNew() {
+    this.clienteMembresia = {};
+    this.loading = true
+
+    this.clienteMembresia.fechaInicio = new Date();
+
+    await this.prepareData()
+
+    this.cliente = this.clientes.find(x => x.id === this.clienteId)
     this.asesor = null;
+    this.membresia = null;
+    this.vigenciaMeses = undefined;
 
-    console.log(this.user)
     if (this.user.rol.id == this.ROL_ASESOR_ID) this.asesor = this.user
 
-
+    this.calcularFechaFin()
     this.submitted = false;
     this.clienteMembresiaDialog = true;
     this.loading = false
@@ -139,7 +143,13 @@ export class ClientesMembresiasComponent implements OnInit {
   }
 
   calcularFechaFin() {
-    if (this.membresia && this.clienteMembresia.fechaInicio) {
+    if (this.membresia.vigenciaMeses) {
+      this.vigenciaMeses = `${this.membresia.vigenciaMeses} ${this.membresia.vigenciaMeses > 1 ? 'meses' : 'mes'}`;
+    } else {
+      this.vigenciaMeses = undefined;
+    }
+
+    if (this.membresia.vigenciaMeses && this.clienteMembresia.fechaInicio) {
         const fechaInicio = new Date(this.clienteMembresia.fechaInicio);
         const vigenciaMeses = this.membresia.vigenciaMeses;
         const fechaFin = new Date(fechaInicio.setMonth(fechaInicio.getMonth() + vigenciaMeses));
@@ -147,13 +157,17 @@ export class ClientesMembresiasComponent implements OnInit {
     }
   }
 
-  editClienteMembresia(clienteMembresia: any) {
+  async editClienteMembresia(clienteMembresia: any) {
     this.clienteMembresia = { ...clienteMembresia };
-    this.clienteMembresiaDialog = true;
-    this.membresia = this.clienteMembresia.membresia;
-    this.cliente = this.clienteMembresia.usuario;
-    this.asesor = this.clienteMembresia.asesor;
+    this.clienteMembresia.fechaInicio = new Date(this.clienteMembresia.fechaInicio + 'T23:59:00Z');
+    this.clienteMembresia.fechaFin = new Date(this.clienteMembresia.fechaFin + 'T23:59:00Z');
 
+    await this.prepareData()
+    this.membresia = this.clienteMembresia.membresia;
+    this.cliente = this.clienteMembresia.cliente;
+    this.asesor = this.clienteMembresia.asesor;
+    this.vigenciaMeses = this.membresia.vigenciaMeses;
+    this.clienteMembresiaDialog = true;
   }
 
   async deleteClienteMembresia(clienteMembresia: any) {
@@ -184,11 +198,23 @@ export class ClientesMembresiasComponent implements OnInit {
     this.loading = true; // Mostrar spinner
     try {
       if (this.clienteMembresia.id) {
+        let clienteMembresiaToUpdate = {
+          membresiaId: this.membresia.id,
+          clienteId: this.cliente.id,
+          asesorId: this.asesor.id,
+          fechaInicio: this.clienteMembresia.fechaInicio,
+          fechaFin: this.clienteMembresia.fechaFin
+        }
+        
+        await this.clientesMembresiasService.actualizarClienteMembresia(
+          this.clienteMembresia.id, clienteMembresiaToUpdate
+        );
         // await this.guardarClienteMembresia.actualizarClienteMembresia(this.clienteMembresia.id, this.clienteMembresia);
       } else {
         this.clienteMembresia.membresiaId = this.membresia.id;
-        this.clienteMembresia.usuarioId = this.cliente.id;
+        this.clienteMembresia.clienteId = this.cliente.id;
         this.clienteMembresia.asesorId = this.asesor.id;
+        console.log(this.clienteMembresia)
         await this.clientesMembresiasService.guardarClienteMembresia(
           this.clienteMembresia
         );
@@ -208,7 +234,7 @@ export class ClientesMembresiasComponent implements OnInit {
   }
 
   async refrescarListado(estado: string) {
-    this.usuariosMembresiasUsuAseguradora =
+    this.clienteMembresias =
       await this.clientesMembresiasService.obtenerUsuariosMembresiaByUsuarioId(
         this.clienteId
       );
