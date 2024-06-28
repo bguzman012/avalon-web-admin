@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AseguradorasComponent } from './aseguradoras/aseguradoras.component';
 import { PolizasComponent } from './polizas/polizas.component';
 import { ClientesPolizasComponent } from './clientes-polizas/clientes-polizas.component';
+import { CoberturasComponent } from './coberturas/coberturas.component';
 
 const routes: Routes = [
   {
@@ -45,7 +46,7 @@ const routes: Routes = [
                 component: ClientesPolizasComponent,
               },
             ]
-          },
+          }
           ,
           {
             path: 'coberturas',
@@ -58,7 +59,7 @@ const routes: Routes = [
                 data: {
                   breadcrumb: null
                 },
-                component: ClientesPolizasComponent,
+                component: CoberturasComponent,
               },
             ]
           }

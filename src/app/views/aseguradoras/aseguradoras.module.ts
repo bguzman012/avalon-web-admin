@@ -40,7 +40,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { AseguradorasComponent } from './aseguradoras/aseguradoras.component';
 import { PolizasComponent } from './polizas/polizas.component';
 import { ClientesPolizasComponent } from './clientes-polizas/clientes-polizas.component';
-
+import { CoberturasComponent } from './coberturas/coberturas.component';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 // import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 
@@ -49,7 +49,8 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
   declarations: [
     AseguradorasComponent,
     PolizasComponent,
-    ClientesPolizasComponent
+    ClientesPolizasComponent,
+    CoberturasComponent
   ],
   imports: [
     CommonModule,

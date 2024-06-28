@@ -51,6 +51,12 @@
         <td>{{ poliza.vigenciaMeses }}</td>
         <td>{{ poliza.aseguradora.nombre }}</td>
         <td>
+          <button
+            pButton
+            pRipple
+            class="p-button-rounded p-button-primary p-mr-2"
+            (click)="redirectToCoberturasPage(poliza); $event.stopPropagation()"
+          >Coberturas</button>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
             (click)="editPoliza(poliza); $event.stopPropagation()"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"

@@ -61,6 +61,19 @@ export class PolizasComponent implements OnInit {
     });
   }
 
+  
+  redirectToCoberturasPage(poliza: any) {
+    localStorage.setItem("polizaId", poliza.id);
+    localStorage.setItem("aseguradoraId", poliza.aseguradora.id);
+
+    this.router.navigate(['aseguradoras/polizas/coberturas'], {
+      queryParams: {
+        polizaId: poliza.id,
+        aseguradoraId:  poliza.aseguradora.id
+      },
+    });
+  }
+
   async openNew() {
     this.poliza = {};
     this.submitted = false;

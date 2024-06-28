@@ -18,11 +18,11 @@
 
   <p-table
     #dt
-    [value]="beneficios"
+    [value]="coberturas"
     [rows]="10"
     [paginator]="true"
     [globalFilterFields]="['nombre', 'descripcion']"
-    [(selection)]="selectedBeneficios"
+    [(selection)]="selectedCoberturas"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
@@ -30,7 +30,7 @@
   >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
-        <h5 class="p-m-0">Administrar Beneficios</h5>
+        <h5 class="p-m-0">Administrar Coberturas</h5>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
@@ -52,126 +52,125 @@
         </th>
         <th pSortableColumn="descripcion">
           Descripción <p-sortIcon field="descripcion"></p-sortIcon>
-            </th>
-            <th></th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-beneficio>
-          <tr>
-            <td>
-              <p-tableCheckbox [value]="beneficio"></p-tableCheckbox>
-            </td>
-            <td>{{ beneficio.nombre }}</td>
-            <td>{{ beneficio.descripcion }}</td>
-            <td>
-              <button
-                pButton
-                pRipple
-                icon="pi pi-pencil"
-                class="p-button-rounded p-button-success p-mr-2"
-                (click)="editBeneficio(beneficio); $event.stopPropagation()"
-              ></button>
-              <button
-                pButton
-                pRipple
-                [disabled]="!activarCreate"
-                icon="pi pi-trash"
-                class="p-button-rounded p-button-warning"
-                (click)="deleteBeneficio(beneficio); $event.stopPropagation()"
-              ></button>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="summary">
-          <div class="p-d-flex p-ai-center p-jc-between">
-            En total existen {{ beneficios ? beneficios.length : 0 }} registros.
-          </div>
-        </ng-template>
-        <p-blockUI [blocked]="loading">
-          <div class="p-field" *ngIf="loading">
-            <p-progressSpinner></p-progressSpinner>
-          </div>
-        </p-blockUI>
-      </p-table>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-cobertura>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="cobertura"></p-tableCheckbox>
+        </td>
+        <td>{{ cobertura.nombre }}</td>
+        <td>{{ cobertura.descripcion }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success p-mr-2"
+            (click)="editCobertura(cobertura); $event.stopPropagation()"
+          ></button>
+          <button
+            pButton
+            pRipple
+            [disabled]="!activarCreate"
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            (click)="deleteCobertura(cobertura); $event.stopPropagation()"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{ coberturas ? coberturas.length : 0 }} registros.
+      </div>
+    </ng-template>
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="coberturaDialog"
+  [style]="{ width: '500px' }"
+  header="Cobertura Detalle"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <label for="poliza">Poliza</label>
+      <input
+        type="text"
+        pInputText
+        id="poliza"
+        [(ngModel)]="poliza.nombre"
+        readonly
+        required
+      />
+      <small class="p-invalid" *ngIf="submitted && !cobertura.poliza">
+        Poliza es requerida.
+      </small>
     </div>
-    
-    <p-dialog
-      [(visible)]="beneficioDialog"
-      [style]="{ width: '500px' }"
-      header="Beneficio Detalle"
-      [modal]="true"
-      styleClass="p-fluid"
-    >
-      <ng-template pTemplate="content">
-        <div class="p-field">
-          <label for="membresia">Membresía</label>
-          <input
-            type="text"
-            pInputText
-            id="membresia"
-            [(ngModel)]="membresia.nombres"
-            readonly
-            required
-          />
-          <small class="p-invalid" *ngIf="submitted && !beneficio.membresia">
-            Membresía es requerida.
-          </small>
-        </div>
-    
-        <div class="p-field">
-          <label for="nombre">Nombre</label>
-          <input
-            type="text"
-            pInputText
-            id="nombre"
-            [(ngModel)]="beneficio.nombre"
-            required
-            autofocus
-          />
-          <small class="p-invalid" *ngIf="submitted && !beneficio.nombre">
-            Nombre es requerido.
-          </small>
-        </div>
-        <div class="p-field">
-          <label for="descripcion">Descripción</label>
-          <input
-            type="text"
-            pInputText
-            id="descripcion"
-            [(ngModel)]="beneficio.descripcion"
-            required
-          />
-          <small class="p-invalid" *ngIf="submitted && !beneficio.descripcion">
-            Descripción es requerida.
-          </small>
-        </div>
-       
-        <p-blockUI [blocked]="loading">
-          <div class="p-field" *ngIf="loading">
-            <p-progressSpinner></p-progressSpinner>
-          </div>
-        </p-blockUI>
-      </ng-template>
-    
-      <ng-template pTemplate="footer">
-        <button
-          pButton
-          pRipple
-          label="Cancelar"
-          icon="pi pi-times"
-          class="p-button-text"
-          (click)="hideDialog()"
-        ></button>
-        <button
-          pButton
-          pRipple
-          label="Guardar"
-          icon="pi pi-check"
-          class="p-button-text"
-          (click)="saveBeneficio()"
-        ></button>
-      </ng-template>
-    </p-dialog>
-    
-    <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
-    
+
+    <div class="p-field">
+      <label for="nombre">Nombre</label>
+      <input
+        type="text"
+        pInputText
+        id="nombre"
+        [(ngModel)]="cobertura.nombre"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !cobertura.nombre">
+        Nombre es requerido.
+      </small>
+    </div>
+    <div class="p-field">
+      <label for="descripcion">Descripción</label>
+      <input
+        type="text"
+        pInputText
+        id="descripcion"
+        [(ngModel)]="cobertura.descripcion"
+        required
+      />
+      <small class="p-invalid" *ngIf="submitted && !cobertura.descripcion">
+        Descripción es requerida.
+      </small>
+    </div>
+   
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Guardar"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveCobertura()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
