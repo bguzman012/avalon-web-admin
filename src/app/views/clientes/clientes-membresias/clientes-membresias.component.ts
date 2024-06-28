@@ -135,7 +135,7 @@ export class ClientesMembresiasComponent implements OnInit {
 
     if (this.user.rol.id == this.ROL_ASESOR_ID) this.asesor = this.user
 
-    this.calcularFechaFin()
+    // this.calcularFechaFin()
     this.submitted = false;
     this.clienteMembresiaDialog = true;
     this.loading = false
