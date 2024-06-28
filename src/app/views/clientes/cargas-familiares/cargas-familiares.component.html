@@ -3,22 +3,26 @@
 <div class="card">
     <p-toolbar styleClass="p-mb-4">
         <ng-template pTemplate="left">
+            <div>
+                <h5><strong>Cliente:</strong> {{clientePoliza?.cliente?.nombreUsuario}}</h5>
+                <h5><strong>Poliza:</strong> {{clientePoliza?.poliza?.nombre}}</h5>
+            </div>
         </ng-template>
 
         <ng-template pTemplate="right">
-            <button pButton pRipple label="Nuevo Cliente" icon="pi pi-plus" class="p-button-success p-mr-2"
+            <button pButton pRipple label="Nueva Carga Familiar" icon="pi pi-plus" class="p-button-success p-mr-2"
                 (click)="openNew()"></button>
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="usuarios" [rows]="10" [paginator]="true"
-        [globalFilterFields]="['nombres','apellidos','correoElectronico','numeroTelefono','nombreUsuario']"
-        [(selection)]="selectedUsuarios" [rowHover]="true" dataKey="id"
+    <p-table #dt [value]="cargasFamiliares" [rows]="10" [paginator]="true"
+        [globalFilterFields]="['nombres','apellidos','correoElectronico','numeroTelefono']"
+        [(selection)]="selectedCargasFamiliares" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
         [showCurrentPageReport]="true">
         <ng-template pTemplate="caption">
             <div class="p-d-flex p-ai-center p-jc-between">
-                <h5 class="p-m-0">Administrar Clientes</h5>
+                <h5 class="p-m-0">Administrar Cargas Familiares</h5>
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
                     <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..." />
@@ -36,77 +40,65 @@
                         field="correoElectronico"></p-sortIcon></th>
                 <th pSortableColumn="numeroTelefono">Número Teléfono <p-sortIcon field="numeroTelefono"></p-sortIcon>
                 </th>
-                <th pSortableColumn="nombreUsuario">Nombre Usuario <p-sortIcon field="nombreUsuario"></p-sortIcon></th>
-                <th pSortableColumn="estado">Estado <p-sortIcon field="estado"></p-sortIcon></th>
-                
+                <th pSortableColumn="parentesco">Parentesco <p-sortIcon field="parentesco"></p-sortIcon></th>
                 <th></th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-usuario>
-            <tr (click)="redirectToMembresiasPage(usuario)">
+        <ng-template pTemplate="body" let-cargaFamiliar>
+            <tr>
                 <td>
-                    <p-tableCheckbox [value]="usuario"></p-tableCheckbox>
+                    <p-tableCheckbox [value]="cargaFamiliar"></p-tableCheckbox>
                 </td>
-                <td>{{usuario.nombres}}</td>
-                <td>{{usuario.apellidos}}</td>
-                <td>{{usuario.correoElectronico}}</td>
-                <td>{{usuario.numeroTelefono}}</td>
-                <td>{{usuario.nombreUsuario}}</td>
-                <td>
-                    {{ getEstadoLabel(usuario.estado) }}
-                  </td>
+                <td>{{cargaFamiliar.nombres}}</td>
+                <td>{{cargaFamiliar.apellidos}}</td>
+                <td>{{cargaFamiliar.correoElectronico}}</td>
+                <td>{{cargaFamiliar.numeroTelefono}}</td>
+                <td>{{cargaFamiliar.parentesco}}</td>
                 <td style="text-align: right;">
-                    <button
-                    *ngIf="usuario.estado != 'P'"
-                    pButton
-                    pRipple
-                    class="p-button-rounded p-button-primary p-mr-2"
-                    (click)="redirectToClientePolizaPage(usuario); $event.stopPropagation()"
-                  >Polizas</button>
-                    <button *ngIf="validarEnable && usuario.estado == 'P'" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success p-mr-2"
-                    (click)="activar(usuario);  $event.stopPropagation()"></button>
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
-                        (click)="editUsuario(usuario);  $event.stopPropagation()"></button>
+                        (click)="editCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
-                        (click)="deleteUsuario(usuario);  $event.stopPropagation()"></button>
+                        (click)="deleteCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
                 </td>
             </tr>
         </ng-template>
         <ng-template pTemplate="summary">
             <div class="p-d-flex p-ai-center p-jc-between">
-                En total existen {{usuarios ? usuarios.length : 0 }} registros.
+                En total existen {{cargasFamiliares ? cargasFamiliares.length : 0 }} registros.
             </div>
         </ng-template>
     </p-table>
 </div>
 
-<p-dialog [(visible)]="usuarioDialog" [style]="{width: '900px'}" header="Detalle de Cliente" [modal]="true"
+<p-dialog [(visible)]="cargaFamiliarDialog" [style]="{width: '600px'}" header="Detalle de Carga Familiar" [modal]="true"
     styleClass="p-fluid">
     <ng-template pTemplate="content">
         <div class="p-field">
             <label for="nombres">Nombres</label>
-            <input type="text" pInputText id="nombres" [(ngModel)]="usuario.nombres" required autofocus />
-            <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombres is required.</small>
+            <input type="text" pInputText id="nombres" [(ngModel)]="cargaFamiliar.nombres" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombres">Nombres es requerido.</small>
         </div>
         <div class="p-field">
             <label for="apellidos">Apellidos</label>
-            <input type="text" pInputText id="apellidos" [(ngModel)]="usuario.apellidos" required autofocus />
-            <small class="p-invalid" *ngIf="submitted && !usuario.apellidos">Nombres is required.</small>
+            <input type="text" pInputText id="apellidos" [(ngModel)]="cargaFamiliar.apellidos" required />
+            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidos">Apellidos es requerido.</small>
         </div>
-
         <div class="p-field">
             <label class="p-mb-3">Correo Electrónico</label>
-            <input type="text" pInputText [(ngModel)]="usuario.correoElectronico" />
+            <input type="text" pInputText [(ngModel)]="cargaFamiliar.correoElectronico" required />
+            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.correoElectronico">Correo Electrónico es
+                requerido.</small>
         </div>
-
         <div class="p-field">
             <label class="p-mb-3">Número Teléfono</label>
-            <input type="text" pInputText [(ngModel)]="usuario.numeroTelefono" />
+            <input type="text" pInputText [(ngModel)]="cargaFamiliar.numeroTelefono" required />
+            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.numeroTelefono">Número Teléfono es
+                requerido.</small>
         </div>
-
         <div class="p-field">
-            <label class="p-mb-3">Nombre Usuario</label>
-            <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
+            <label class="p-mb-3">Parentesco</label>
+            <input type="text" pInputText [(ngModel)]="cargaFamiliar.parentesco" required />
+            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.parentesco">Parentesco es requerido.</small>
         </div>
 
         <p-blockUI [blocked]="loading">
@@ -121,7 +113,7 @@
         <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
             (click)="hideDialog()"></button>
         <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
-            (click)="saveUsuario()"></button>
+            (click)="saveCargaFamiliar()"></button>
     </ng-template>
 </p-dialog>
 

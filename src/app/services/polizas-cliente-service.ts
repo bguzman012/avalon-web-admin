@@ -40,6 +40,16 @@ export class ClientePolizaService {
     }
   }
 
+  async obtenerClientesPolizasPorCliente(clienteId: number): Promise<any[]> {
+    try {
+      const clientesPolizas = await this.http.get<any[]>(`${this.apiUrl}/clientes/${clienteId}/clientesPolizas`).toPromise();
+      return clientesPolizas;
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      throw error;
+    }
+  }
+
   async obtenerClientePoliza(clientePolizaId: number): Promise<any> {
     try {
       const clientePoliza = await this.http.get<any>(`${this.apiUrl}/clientesPolizas/${clientePolizaId}`).toPromise();

@@ -86,6 +86,16 @@ export class ClientesComponent implements OnInit {
     });
   }
 
+  redirectToClientePolizaPage(cliente: any) {
+    localStorage.setItem("clienteId", cliente.id);
+
+    this.router.navigate(['clientes/polizas'], {
+      queryParams: {
+        clienteId: cliente.id
+      },
+    });
+  }
+
   async editUsuario(usuario: any) {
     this.usuario = { ...usuario };
     this.usuario.rolId = this.usuario.rol.id

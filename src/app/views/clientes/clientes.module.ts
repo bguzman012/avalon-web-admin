@@ -41,13 +41,17 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ClientesComponent } from './clientes/clientes.component';
 import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+import { ClientesPolizasComponent } from './clientes-polizas/clientes-polizas.component';
+import { CargasFamiliaresComponent } from './cargas-familiares/cargas-familiares.component';
 // import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
 @NgModule({
   declarations: [
     ClientesComponent,
-    ClientesMembresiasComponent
+    ClientesMembresiasComponent,
+    ClientesPolizasComponent,
+    CargasFamiliaresComponent
   ],
   imports: [
     CommonModule,

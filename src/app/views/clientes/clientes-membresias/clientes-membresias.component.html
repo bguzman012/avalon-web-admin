@@ -82,14 +82,6 @@
 <p-dialog [(visible)]="clienteMembresiaDialog" [style]="{ width: '500px' }" header="Detalle de Cliente Membresía"
   [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
-    <!-- <div class="p-field">
-      <label for="membresiaId">Membresia</label>
-      <p-autoComplete [(ngModel)]="membresia" [showEmptyMessage]="true" [suggestions]="filteredMembresias"
-        (completeMethod)="filterMembresia($event)" field="nombres" [minLength]="1"
-        [appendTo]="'body'" required></p-autoComplete>
-      <small class="p-invalid" *ngIf="submitted && !membresia">Membresia es requerido.</small>
-    </div> -->
-
     <div class="p-field">
       <label for="membresiaId">Membresia</label>
       <p-autoComplete 
