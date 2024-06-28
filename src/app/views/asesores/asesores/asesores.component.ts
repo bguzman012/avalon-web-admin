@@ -30,8 +30,6 @@ export class AsesoresComponent implements OnInit {
   ESTADO_ACTIVO = 'A'
   loading: boolean = false;
   rolId
-  filteredAseguradoras
-  selectedAseguradoras
 
   constructor(
     private messageService: MessageService,
@@ -80,8 +78,6 @@ export class AsesoresComponent implements OnInit {
   async editUsuario(usuario: any) {
     this.usuario = { ...usuario };
     this.usuario.rolId = this.usuario.rol.id
-    this.selectedAseguradoras = await this.aseguradorasService.obtenerAseguradorasByUsuarioAndEstado(this.usuario.id, "A")
-    console.log(this.selectedAseguradoras)
     this.usuarioDialog = true;
     // Implementar lógica para editar un usuario
   }
@@ -107,14 +103,12 @@ export class AsesoresComponent implements OnInit {
 
   hideDialog() {
     this.usuarioDialog = false;
-    this.selectedAseguradoras = []
     this.submitted = false;
   }
 
   async saveUsuario() {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
-    console.log(this.selectedAseguradoras)
     try {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id
@@ -128,7 +122,6 @@ export class AsesoresComponent implements OnInit {
       this.refrescarListado(this.ESTADO_ACTIVO)
       this.usuarioDialog = false;
       this.usuario = {};
-      this.filteredAseguradoras = []
       this.loading = false;
       this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
     } finally {

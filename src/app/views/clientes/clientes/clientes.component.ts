@@ -38,8 +38,7 @@ export class ClientesComponent implements OnInit {
   rolId
   validarEnable = false
   filteredAseguradoras
-  selectedAseguradoras
-
+  
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
@@ -99,8 +98,6 @@ export class ClientesComponent implements OnInit {
   async editUsuario(usuario: any) {
     this.usuario = { ...usuario };
     this.usuario.rolId = this.usuario.rol.id
-    this.selectedAseguradoras = await this.aseguradorasService.obtenerAseguradorasByUsuarioAndEstado(this.usuario.id, "A")
-    console.log(this.selectedAseguradoras)
     this.usuarioDialog = true;
     // Implementar lógica para editar un usuario
   }
@@ -157,7 +154,6 @@ export class ClientesComponent implements OnInit {
 
   hideDialog() {
     this.usuarioDialog = false;
-    this.selectedAseguradoras = []
     this.submitted = false;
   }
 
@@ -173,18 +169,15 @@ export class ClientesComponent implements OnInit {
   async saveUsuario() {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
-    console.log(this.selectedAseguradoras)
     try {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id
         await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario, this.ROL_CLIENTE_ID);
-        // this.saveUsuariosAseguradoras(this.usuario.id)
       } else {
         this.usuario.rolId = this.ROL_CLIENTE_ID;
         this.usuario.estado = 'P';
         this.usuario.contrasenia = environment.pass_default;
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_CLIENTE_ID);
-        // this.saveUsuariosAseguradoras(usuarioSaved.id)
       }
       this.refrescarListado(this.ESTADO_BUSQUEDA)
       this.usuarioDialog = false;
@@ -200,37 +193,5 @@ export class ClientesComponent implements OnInit {
     this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_CLIENTE_ID, estado);
   }
 
-  async filterAseguradoras(event) {
-    let filtered: any[] = [];
-    let query = event.query;
 
-    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado('A')
-
-    for (let i = 0; i < aseguradoras.length; i++) {
-      let aseguradora = aseguradoras[i];
-      if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(aseguradora);
-      }
-    }
-
-    this.filteredAseguradoras = filtered;
-  }
-
-  async armarSelectedAseguradorasData(usuarioId) {
-    let usuariosAseguradorasIds = []
-    console.log(this.selectedAseguradoras)
-    for (let index = 0; index < this.selectedAseguradoras.length; index++) {
-      const aseguradora = this.selectedAseguradoras[index];
-      usuariosAseguradorasIds.push({ aseguradoraId: aseguradora.id, usuarioId: usuarioId })
-    }
-    return usuariosAseguradorasIds
-  }
-  async saveUsuariosAseguradoras(usuarioId) {
-    let usuariosAseguradorasIds = this.armarSelectedAseguradorasData(usuarioId)
-
-    if (!this.usuario.id)
-      await this.usuariosAseguradorasService.guardarUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds });
-    else
-      await this.usuariosAseguradorasService.updateUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds }, usuarioId);
-  }
 }
