@@ -35,6 +35,11 @@ export const navItemsAdmin: INavData[] = [
   iconComponent: { }
   
 },{
+  name: 'Reclamaciones',
+  url: '/reclamaciones',
+  iconComponent: { }
+  
+},{
   name: 'Notificaciones',
   url: '/notificaciones',
   iconComponent: { }

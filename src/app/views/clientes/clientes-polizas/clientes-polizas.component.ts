@@ -75,6 +75,12 @@ export class ClientesPolizasComponent implements OnInit {
 
     if (!this.clienteId) this.clienteId = localStorage.getItem('clienteId');
 
+    this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO
+    );
+    this.cliente = this.clientes.find((x) => x.id == this.clienteId);
+
     await this.refrescarListado();
     this.loading = false;
   }
@@ -104,11 +110,6 @@ export class ClientesPolizasComponent implements OnInit {
       await this.aseguradorasService.obtenerAseguradorasByEstado(
         this.ESTADO_ACTIVO
       );
-
-    this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-      this.ROL_CLIENTE_ID,
-      this.ESTADO_ACTIVO
-    );
 
     this.asesores = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_ASESOR_ID,

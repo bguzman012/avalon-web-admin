@@ -2,7 +2,11 @@
 
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
-    <ng-template pTemplate="left"> </ng-template>
+    <ng-template pTemplate="left">
+      <div>
+          <h5><strong>Cliente:</strong> {{cliente?.nombreUsuario}}</h5>
+      </div>
+  </ng-template>
     <ng-template pTemplate="right">
       <button pButton pRipple label="Nueva" icon="pi pi-plus" class="p-button-success p-mr-2"
         (click)="openNew()"></button>
@@ -26,11 +30,11 @@
         <th style="width: 3rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
+        <th pSortableColumn="poliza.id">
+          Código <p-sortIcon field="poliza.id"></p-sortIcon>
+        </th>
         <th pSortableColumn="poliza.nombre">
           Poliza <p-sortIcon field="poliza.nombre"></p-sortIcon>
-        </th>
-        <th pSortableColumn="cliente.nombreUsuario">
-          Cliente <p-sortIcon field="cliente.nombreUsuario"></p-sortIcon>
         </th>
         <th pSortableColumn="asesor.nombreUsuario">
           Asesor <p-sortIcon field="asesor.nombreUsuario"></p-sortIcon>
@@ -52,8 +56,8 @@
         <td>
           <p-tableCheckbox [value]="clientePoliza"></p-tableCheckbox>
         </td>
+        <td>{{ clientePoliza.id }}</td>
         <td>{{ clientePoliza.poliza.nombre }}</td>
-        <td>{{ clientePoliza.cliente.nombreUsuario }}</td>
         <td>{{ clientePoliza.asesor.nombreUsuario }}</td>
         <td>{{ clientePoliza.agente.nombreUsuario }}</td>
         <td>{{ clientePoliza.fechaInicio}}</td>

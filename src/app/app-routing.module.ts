@@ -60,6 +60,11 @@ const routes: Routes = [
         loadChildren: () =>
           import('./views/aseguradoras/aseguradoras.module').then((m) => m.AseguradorasModule)
       },
+      {
+        path: 'reclamaciones',
+        loadChildren: () =>
+          import('./views/reclamaciones/reclamaciones.module').then((m) => m.ReclamacionesModule)
+      },
       // {
       //   path: 'aseguradoras',
       //   loadChildren: () =>

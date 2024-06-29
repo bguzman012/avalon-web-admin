@@ -1,0 +1,108 @@
+<p-toast></p-toast>
+
+<div class="card">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left">
+      <h5 class="p-m-0">Detalle Reclamación</h5>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <!-- Puedes agregar botones adicionales en la parte derecha del toolbar si es necesario -->
+    </ng-template>
+  </p-toolbar>
+
+  <div class="card">
+    <p-panel header="Cliente Póliza">
+      <div class="filter-container">
+        <!-- Filtro por Cliente -->
+        <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
+          (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="!clienteId || !reclamacion"
+          (ngModelChange)="loadPolizas()" [readonly]="clienteId || reclamacion" placeholder="Filtrar por Cliente"
+          [size]="30" [minLength]="1" [disabled]="false" [forceSelection]="true" [maxlength]="50">
+        </p-autoComplete>
+
+        <!-- Filtro por Póliza -->
+        <p-autoComplete [(ngModel)]="selectedClientePoliza" [suggestions]="filteredPolizas"
+          (completeMethod)="filterPolizas($event)" field="displayName" [dropdown]="!clientePolizaId || !reclamacion"
+          placeholder="Filtrar por Póliza" [size]="30" [minLength]="1" [disabled]="!selectedCliente"
+          [readonly]="clientePolizaId || reclamacion" [forceSelection]="true" [maxlength]="50">
+        </p-autoComplete>
+      </div>
+    </p-panel>
+  </div>
+
+  <div class="card">
+    <p-panel styleClass="p-fluid" header="Detalles de Reclamación">
+      <div class="p-field">
+        <label for="razon">Razón</label>
+        <input type="text" pInputText id="razon" [(ngModel)]="reclamacion.razon" required autofocus />
+        <small class="p-invalid" *ngIf="submitted && !reclamacion.razon">Razón es requerida.</small>
+      </div>
+
+      <div class="p-field">
+        <label for="estado">Estado</label>
+        <input type="text" pInputText id="estado" [(ngModel)]="reclamacion.estado" />
+      </div>
+      <div class="p-field">
+        <label for="fotoReclamo">Foto Reclamo</label>
+        <div class="upload-container">
+          <p-fileUpload name="fotoReclamo" #fileUploadRef (onSelect)="onFileSelect($event)" mode="basic" [auto]="false"
+            accept="image/*" chooseLabel="Seleccionar Archivo" customUpload="true"></p-fileUpload>
+          <button *ngIf="imagePreview" pButton pRipple icon="pi pi-trash" class="p-button-danger p-button-icon-only"
+            (click)="clearImageSelection(fileUploadRef)"></button>
+        </div>
+        <img *ngIf="(imagePreview && !reclamacion.id) || (imagePreview && editImage)" [src]="imagePreview"
+          alt="Vista Previa" class="image-preview" (click)="showDialogImage()" />
+        <img *ngIf="imagePreview && reclamacion.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
+          alt="Vista Previa" class="image-preview" (click)="showDialogImage()" />
+
+        <br />
+      </div>
+
+
+
+      <div class="custom-button-container">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-secondary" style="width: 30%;"
+          (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-primary" style="width: 30%;"
+          (click)="saveReclamacion()"></button>
+      </div>
+
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+    </p-panel>
+  </div>
+</div>
+<div class="card">
+  <p-panel styleClass="p-fluid" header="Comentarios">
+    <div *ngFor="let comentario of comentarios">
+      <label for="nuevoComentario" style="font-weight: bold;">{{comentario.usuarioComenta.nombreUsuario}}
+        ({{comentario.usuarioComenta.rol.nombre}})</label>
+      <textarea id="nuevoComentario" [(ngModel)]="comentario.contenido" rows="3" pInputTextarea readonly></textarea>
+      <!-- <button pButton pRipple icon="pi pi-trash" class="p-button-danger p-button-icon-only" (click)="deleteComentario(comentario.id)"></button> -->
+    </div>
+    <hr class="comment-separator"/>
+
+    <div class="p-field">
+      <label for="nuevoComentario">Añadir Comentario</label>
+      <textarea id="nuevoComentario" [(ngModel)]="nuevoComentario" rows="3" pInputTextarea></textarea>
+    </div>
+    <div class="custom-button-container">
+      <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-primary" style="width: 30%;"
+        (click)="addComentario()"></button>
+    </div>
+  </p-panel>
+</div>
+
+<!-- Agrega el siguiente código al final de tu plantilla -->
+<p-dialog header="Vista Previa de la Imagen" [(visible)]="displayDialog" [modal]="true" [style]="{width: '50vw'}">
+  <img *ngIf="(imagePreview && !reclamacion.id) || (imagePreview && editImage)" [src]="imagePreview"
+    alt="Vista Previa Completa" class="full-image-preview" />
+  <img *ngIf="imagePreview && reclamacion.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
+    alt="Vista Previa Completa" class="full-image-preview" />
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
