@@ -5,7 +5,6 @@ import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../services/auth-service';
 
 import { AseguradorasService } from '../../../services/aseguradoras-service';
-import { UsuariosAseguradorasService } from '../../../services/usuarios-aseguradoras-service';
 import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
 import { UsuariosService } from 'src/app/services/usuarios-service';

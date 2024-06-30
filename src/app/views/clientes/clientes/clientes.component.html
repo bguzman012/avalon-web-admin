@@ -109,6 +109,66 @@
             <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
         </div>
 
+        <div class="p-field">
+            <label for="direccionUno">Dirección</label>
+            <input type="text" pInputText id="direccionUno" [(ngModel)]="direccion.direccionUno" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !direccion.direccionUno">Dirección uno es required.</small>
+        </div>
+
+        <div class="p-field">
+            <label for="direccionDos">Dirección (2)</label>
+            <input type="text" pInputText id="direccionDos" [(ngModel)]="direccion.direccionDos" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !direccion.direccionDos">Dirección dos es required.</small>
+        </div>
+
+        <div class="p-field">
+            <label for="paisesId">País</label>
+            <p-autoComplete
+              [(ngModel)]="pais"
+              [showEmptyMessage]="true"
+              [suggestions]="filteredPaises"
+              (completeMethod)="filterPaises($event)"
+              field="nombre"
+              (ngModelChange)="loadEstados()" 
+              [minLength]="1"
+              [appendTo]="'body'"
+              required
+            ></p-autoComplete>
+            <small class="p-invalid" *ngIf="submitted && !pais"
+              >País es requerido.</small
+            >
+          </div>
+
+          <div class="p-field">
+            <label for="asesoresId">Estado</label>
+            <p-autoComplete
+              [(ngModel)]="estado"
+              [showEmptyMessage]="true"
+              [suggestions]="filteredEstados"
+              (completeMethod)="filterEstados($event)"
+              [readonly]="!pais"
+              field="nombre"
+              [minLength]="1"
+              [appendTo]="'body'"
+              required
+            ></p-autoComplete>
+            <small class="p-invalid" *ngIf="submitted && !estado">
+              Estado es requerido.</small
+            >
+          </div>
+
+        <div class="p-field">
+            <label for="ciudad">Ciudad</label>
+            <input type="text" pInputText id="ciudad" [(ngModel)]="direccion.ciudad" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !direccion.ciudad">Ciudad es required.</small>
+        </div>
+
+        <div class="p-field">
+            <label for="codigoPostal">Código Postal</label>
+            <input type="text" pInputText id="codigoPostal" [(ngModel)]="direccion.codigoPostal" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !direccion.ciudad">Código Postal es required.</small>
+        </div>
+
         <p-blockUI [blocked]="loading">
             <div class="p-field" *ngIf="loading">
                 <p-progressSpinner></p-progressSpinner>

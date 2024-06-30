@@ -3,7 +3,6 @@ import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { UsuariosService } from '../../../services/usuarios-service';
 import { AseguradorasService } from '../../../services/aseguradoras-service';
-import { UsuariosAseguradorasService } from '../../../services/usuarios-aseguradoras-service';
 import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
 import { BrokersService } from 'src/app/services/brokers-service';
@@ -40,7 +39,6 @@ export class BrokersComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
-    private usuariosAseguradorasService: UsuariosAseguradorasService,
     private confirmationService: ConfirmationService,
     private brokersService: BrokersService,
     private route: ActivatedRoute,

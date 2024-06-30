@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { UsuariosService } from '../../../services/usuarios-service';
+import { PaisesService } from '../../../services/paises-service';
+import { EstadosService } from '../../../services/estados-service';
 import { AseguradorasService } from '../../../services/aseguradoras-service';
-import { UsuariosAseguradorasService } from '../../../services/usuarios-aseguradoras-service';
 import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
 import { AuthService } from 'src/app/services/auth-service';
@@ -25,9 +26,21 @@ import { Router } from '@angular/router';
 export class ClientesComponent implements OnInit {
   usuarioDialog: boolean;
   usuarios: any[];
+
+  paises: any[];
+  estados: any[];
+
+  pais: any
+  estado: any
+
+  filteredPaises: any[]
+  filteredEstados: any[]
+
   selectedUsuarios: any[];
   submitted: boolean;
   usuario: any;
+  direccion: any;
+
   ROL_CLIENTE_ID = 3
   ROL_ADMINISTRADOR_ID = 1
 
@@ -38,17 +51,18 @@ export class ClientesComponent implements OnInit {
   rolId
   validarEnable = false
   filteredAseguradoras
-  
+
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
-    private usuariosAseguradorasService: UsuariosAseguradorasService,
+    private paisesService: PaisesService,
+    private estadosService: EstadosService,
     private confirmationService: ConfirmationService,
     private aseguradorasService: AseguradorasService,
     private filterService: FilterService,
-    private router: Router,    
+    private router: Router,
     private authService: AuthService
-  
+
   ) { }
 
   async ngOnInit() {
@@ -61,10 +75,22 @@ export class ClientesComponent implements OnInit {
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
+  async prepareData() {
+    this.paises = await this.paisesService.obtenerPaises()
+  }
+
   openNew() {
     this.usuario = {};
+    this.direccion = {};
     this.submitted = false;
+    this.prepareData()
     this.usuarioDialog = true;
+  }
+
+  async loadEstados() {
+    if (this.pais.id)
+      this.estados = await this.estadosService.obtenerEstadosByPais(this.pais.id);
+
   }
 
   deleteSelectedUsuarios() {
@@ -98,6 +124,19 @@ export class ClientesComponent implements OnInit {
   async editUsuario(usuario: any) {
     this.usuario = { ...usuario };
     this.usuario.rolId = this.usuario.rol.id
+    this.prepareData()
+    if (this.usuario.direccion){
+      this.direccion = this.usuario.direccion
+      this.pais = this.direccion.pais
+    }else
+      this.direccion = {};
+
+    if (this.pais)
+      this.loadEstados();
+    
+    if (this.direccion)
+      this.estado = this.direccion.state
+
     this.usuarioDialog = true;
     // Implementar lógica para editar un usuario
   }
@@ -113,7 +152,7 @@ export class ClientesComponent implements OnInit {
         return '';
     }
   }
-  
+
   async activar(usuario: any) {
     this.confirmationService.confirm({
       message: 'Estás seguro de activar el usuario ' + usuario.nombres + ' ' + usuario.apellidos + '?',
@@ -166,17 +205,36 @@ export class ClientesComponent implements OnInit {
     });
   }
 
+  filterPaises(event): void {
+    let query = event.query;
+    this.filteredPaises = this.paises.filter(pais =>
+      pais.nombre.toLowerCase().indexOf(query.toLowerCase()) === 0);
+  }
+
+  filterEstados(event): void {
+    let query = event.query;
+    this.filteredEstados = this.estados.filter(obj =>
+      obj.nombre.toLowerCase().indexOf(query.toLowerCase()) === 0);
+  }
+
+
   async saveUsuario() {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
     try {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id
+        this.direccion.paisId = this.pais.id
+        this.direccion.estadoId = this.estado.id
+        this.usuario.direccion = this.direccion
         await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario, this.ROL_CLIENTE_ID);
       } else {
         this.usuario.rolId = this.ROL_CLIENTE_ID;
         this.usuario.estado = 'P';
         this.usuario.contrasenia = environment.pass_default;
+        this.direccion.paisId = this.pais.id
+        this.direccion.estadoId = this.estado.id
+        this.usuario.direccion = this.direccion
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_CLIENTE_ID);
       }
       this.refrescarListado(this.ESTADO_BUSQUEDA)

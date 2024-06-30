@@ -3,7 +3,6 @@ import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { UsuariosService } from '../../../services/usuarios-service';
 import { AseguradorasService } from '../../../services/aseguradoras-service';
-import { UsuariosAseguradorasService } from '../../../services/usuarios-aseguradoras-service';
 import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
 
@@ -37,7 +36,6 @@ export class AsesoresComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
-    private usuariosAseguradorasService: UsuariosAseguradorasService,
     private confirmationService: ConfirmationService,
     private aseguradorasService: AseguradorasService,
     private filterService: FilterService
@@ -120,13 +118,11 @@ export class AsesoresComponent implements OnInit {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id
         await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario, this.ROL_ASESOR_ID);
-        await this.saveUsuariosAseguradoras(this.usuario.id)
       } else {
         this.usuario.rolId = this.ROL_ASESOR_ID;
         this.usuario.estado = 'A';
         this.usuario.contrasenia = environment.pass_default;
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_ASESOR_ID);
-        await this.saveUsuariosAseguradoras(usuarioSaved.id)
       }
       this.refrescarListado(this.ESTADO_ACTIVO)
       this.usuarioDialog = false;
@@ -167,13 +163,5 @@ export class AsesoresComponent implements OnInit {
       usuariosAseguradorasIds.push({ aseguradoraId: aseguradora.id, usuarioId: usuarioId })
     }
     return usuariosAseguradorasIds
-  }
-  async saveUsuariosAseguradoras(usuarioId) {
-    let usuariosAseguradorasIds = await this.armarSelectedAseguradorasData(usuarioId)
-
-    if (!this.usuario.id)
-      await this.usuariosAseguradorasService.guardarUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds });
-    else
-      await this.usuariosAseguradorasService.updateUsuariosAseguradoras({ usuariosAseguradoras: usuariosAseguradorasIds }, usuarioId);
   }
 }

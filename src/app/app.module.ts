@@ -32,9 +32,7 @@ import { AppComponent } from './app.component';
 import { DefaultFooterComponent, DefaultHeaderComponent, DefaultLayoutComponent } from './containers';
 import { IconModule, IconSetService } from '@coreui/icons-angular';
 import { FooterModule, DropdownModule as CuiDropdownModule, GridModule, HeaderModule, SidebarModule, NavModule, FormModule, UtilitiesModule, ButtonGroupModule, SharedModule, TabsModule, ListGroupModule, ProgressModule, BadgeModule, CardModule } from '@coreui/angular';
-import { MessageService, ConfirmationService, FilterService } from 'primeng/api';
-import { ProductService } from './services/productservice';
-import { AuthInterceptor } from './auth.interceptor';
+import { MessageService, ConfirmationService, FilterService } from 'primeng/api';import { AuthInterceptor } from './auth.interceptor';
 import { BreadcrumbComponent } from './containers/breadcrumb/breadcrumb.component'
 
 import { AvatarModule } from "primeng/avatar";
@@ -104,7 +102,6 @@ const APP_CONTAINERS = [
     MessageService,
     ConfirmationService,
     FilterService,
-    ProductService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]

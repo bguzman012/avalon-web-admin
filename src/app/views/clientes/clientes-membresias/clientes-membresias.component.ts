@@ -4,11 +4,9 @@ import { MessageService } from 'primeng/api';
 import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { MembresiasService } from '../../../services/membresias-service';
 import { ClientesMembresiasService } from '../../../services/clientes-membresias-service';
-import { UsuarioAseguradorUsuarioMembresiasService } from '../../../services/usu-aseg-usu-memb-service';
 import { environment } from '../../../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsuariosService } from 'src/app/services/usuarios-service';
-import { UsuariosAseguradorasService } from 'src/app/services/usuarios-aseguradoras-service';
 import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
@@ -76,11 +74,9 @@ export class ClientesMembresiasComponent implements OnInit {
     private usuarioService: UsuariosService,
     private clientesMembresiasService: ClientesMembresiasService,
     private confirmationService: ConfirmationService,
-    private usuarioAseguradoraService: UsuariosAseguradorasService,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private router: Router,
-    private usuarioAseguradorUsuarioMembresiasService: UsuarioAseguradorUsuarioMembresiasService
+    private router: Router
   ) { }
 
   async ngOnInit() {
@@ -304,18 +300,6 @@ export class ClientesMembresiasComponent implements OnInit {
 
     this.filteredAsesores = filtered;
     console.log(this.filteredAsesores)
-  }
-
-  async guardarUsuaSegUsuMemb(usuarioMembresiaId) {
-    let asesorAsegUsuMemb = {
-      usuarioAseguradoraId: this.asesor.id,
-      usuarioMembresiaId: usuarioMembresiaId,
-    };
-    console.log(asesorAsegUsuMemb)
-
-    await this.usuarioAseguradorUsuarioMembresiasService.guardarUsuAsegUsuMemb(
-      asesorAsegUsuMemb
-    );
   }
 
   filterBrokers(event) {
