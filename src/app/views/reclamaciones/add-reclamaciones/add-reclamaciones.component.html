@@ -52,9 +52,9 @@
             (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
         <img *ngIf="(imagePreview && !reclamacion.id) || (imagePreview && editImage)" [src]="imagePreview"
-          alt="Vista Previa" class="image-preview" (click)="showDialogImage()" />
+          alt="Vista Previa" class="image-preview" (click)="showDialogImage()"    loading="lazy"  />
         <img *ngIf="imagePreview && reclamacion.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
-          alt="Vista Previa" class="image-preview" (click)="showDialogImage()" />
+          alt="Vista Previa" class="image-preview" (click)="showDialogImage()"    loading="lazy" />
 
         <br />
       </div>

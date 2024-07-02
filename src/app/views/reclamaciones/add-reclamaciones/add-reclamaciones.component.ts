@@ -24,6 +24,7 @@ export class AddReclamacionesComponent implements OnInit {
   submitted: boolean;
   reclamacion: any;
   loading: boolean = false;
+  idLoadingImage: boolean = false;
 
   clientes: any[]; // Lista de clientes para el autocompletado
   aseguradoras: any[]; // Lista de aseguradoras para el autocompletado
@@ -67,22 +68,35 @@ export class AddReclamacionesComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
+    this.idLoadingImage = true;
     this.openNew();
     await this.prepareData();
 
     if (await this.getRouteParams('reclamacionId')) {
-      this.reclamacionId = +(await this.getRouteParams('reclamacionId'));
-      this.loading = false;
-      this.reclamacion = await this.reclamacionesService.getReclamacion(this.reclamacionId);
+      const reclamacion = JSON.parse(localStorage.getItem('reclamacion'));
 
-      if (this.reclamacion.fotoReclamo) {
-        this.imagePreview = this.reclamacion.fotoReclamo;
-      }
+      this.reclamacionId = +(await this.getRouteParams('reclamacionId'));
+     
+      this.reclamacion = reclamacion
+      // this.reclamacion = await this.reclamacionesService.getReclamacion(this.reclamacionId);
 
       this.selectedCliente = this.reclamacion.clientePoliza.cliente
       await this.loadPolizas();
       this.selectedClientePoliza = this.clientePolizas.find(x => x.id === this.reclamacion.clientePoliza.id);
       this.comentarios = await this.comentariosService.getComentariosByReclamacion(this.reclamacionId);
+
+
+      this.loading = false;
+
+      let reclamacionFoto = await this.reclamacionesService.getReclamacion(this.reclamacionId);
+
+      this.reclamacion.fotoReclamo = reclamacionFoto.fotoReclamo 
+      
+      if (this.reclamacion.fotoReclamo) {
+        this.imagePreview = this.reclamacion.fotoReclamo;
+      }
+      
+      this.idLoadingImage = false;
       return
     }
 
@@ -323,6 +337,5 @@ export class AddReclamacionesComponent implements OnInit {
       else
         await this.refrescarListado("ALL");
     }
-  
   }
   

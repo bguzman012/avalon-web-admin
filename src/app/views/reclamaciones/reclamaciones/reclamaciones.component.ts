@@ -104,6 +104,7 @@ export class ReclamacionesComponent implements OnInit {
     } 
 
     if (this.reclamacion && this.reclamacion.id) {
+      localStorage.setItem('reclamacion', JSON.stringify(this.reclamacion));
       queryParamsClientePoliza['reclamacionId']= this.reclamacion.id
       this.router.navigate(['reclamaciones/detalle-reclamacion'], {
         queryParams: queryParamsClientePoliza,
