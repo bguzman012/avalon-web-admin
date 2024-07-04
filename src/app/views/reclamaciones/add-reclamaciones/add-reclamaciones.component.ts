@@ -8,6 +8,7 @@ import { AseguradorasService } from 'src/app/services/aseguradoras-service';
 import { PolizasService } from 'src/app/services/polizas-service';
 import { ComentariosService } from 'src/app/services/comentarios-service';
 import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
+import { ImagenesService } from 'src/app/services/imagenes-service';
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AuthService } from 'src/app/services/auth-service';
@@ -24,8 +25,7 @@ export class AddReclamacionesComponent implements OnInit {
   submitted: boolean;
   reclamacion: any;
   loading: boolean = false;
-  idLoadingImage: boolean = false;
-
+  
   clientes: any[]; // Lista de clientes para el autocompletado
   aseguradoras: any[]; // Lista de aseguradoras para el autocompletado
   clientePolizas: any[]; // Lista de polizas para el autocompletado
@@ -50,6 +50,8 @@ export class AddReclamacionesComponent implements OnInit {
 
   comentarios: any[] = [];
   nuevoComentario: string = '';
+  imagen
+  nombreDocumento
 
   constructor(
     private messageService: MessageService,
@@ -58,6 +60,7 @@ export class AddReclamacionesComponent implements OnInit {
     private usuariosService: UsuariosService,
     private comentariosService: ComentariosService,
     private confirmationService: ConfirmationService,
+    private imagenService: ImagenesService,
     private polizasService: PolizasService,
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
@@ -68,11 +71,11 @@ export class AddReclamacionesComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
-    this.idLoadingImage = true;
     this.openNew();
     await this.prepareData();
 
     if (await this.getRouteParams('reclamacionId')) {
+      this.nombreDocumento = 'Cargando ...'
       const reclamacion = JSON.parse(localStorage.getItem('reclamacion'));
 
       this.reclamacionId = +(await this.getRouteParams('reclamacionId'));
@@ -88,15 +91,19 @@ export class AddReclamacionesComponent implements OnInit {
 
       this.loading = false;
 
-      let reclamacionFoto = await this.reclamacionesService.getReclamacion(this.reclamacionId);
-
-      this.reclamacion.fotoReclamo = reclamacionFoto.fotoReclamo 
+      if (reclamacion.imagenId){
+        let foto = await this.imagenService.getImagen(reclamacion.imagenId);
+        this.imagen =  foto.documento
+        this.nombreDocumento = foto.nombreDocumento
+      }
+      // this.reclamacion.fotoReclamo = reclamacionFoto.fotoReclamo 
       
-      if (this.reclamacion.fotoReclamo) {
-        this.imagePreview = this.reclamacion.fotoReclamo;
+      if (this.imagen) {
+        this.imagePreview = this.imagen;
+      }else{
+        this.nombreDocumento = undefined
       }
       
-      this.idLoadingImage = false;
       return
     }
 
@@ -156,7 +163,9 @@ export class AddReclamacionesComponent implements OnInit {
       this.editImage = true;
     
     const file = event.files[0];
-    this.reclamacion.fotoReclamo = file;
+    this.imagen = file;
+    this.nombreDocumento = this.imagen.name
+    console.log('Nombre del archivo:', file.name);
 
     const reader = new FileReader();
     reader.onload = (e: any) => {
@@ -169,7 +178,8 @@ export class AddReclamacionesComponent implements OnInit {
     if (this.reclamacion)
       this.editImage = true;
 
-    this.reclamacion.fotoReclamo = null;
+    this.imagen = null;
+    this.nombreDocumento = null
     this.imagePreview = null;
     fileUploadRef.clear(); // Limpiar la selección de archivo en el componente de carga
   }
@@ -262,14 +272,25 @@ export class AddReclamacionesComponent implements OnInit {
 
   async saveReclamacion() {
     this.submitted = true;
+    
+    if (!this.imagen){
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error!',
+        detail: 'Imagen es requerido',
+        life: 3000,
+      });
+      return 
+    }
+
     this.loading = true; // Mostrar spinner
     const formData = new FormData();
     this.reclamacion.clientePolizaId = this.selectedClientePoliza.id
+    this.reclamacion.nombreDocumento = this.nombreDocumento
     formData.append('reclamacion', new Blob([JSON.stringify(this.reclamacion)], { type: 'application/json' }));
-    if (this.reclamacion.fotoReclamo) {
-      formData.append('fotoReclamo', this.reclamacion.fotoReclamo);
+    if (this.imagen) {
+      formData.append('fotoReclamo', this.imagen);
     }
-
 
     try {
       if (this.reclamacion.id) {

@@ -16,14 +16,14 @@
       <div class="filter-container">
         <!-- Filtro por Cliente -->
         <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
-          (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="!clienteId || !reclamacion"
+          (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="!clienteId && !reclamacion"
           (ngModelChange)="loadPolizas()" [readonly]="clienteId || reclamacion" placeholder="Filtrar por Cliente"
           [size]="30" [minLength]="1" [disabled]="false" [forceSelection]="true" [maxlength]="50">
         </p-autoComplete>
 
         <!-- Filtro por Póliza -->
         <p-autoComplete [(ngModel)]="selectedClientePoliza" [suggestions]="filteredPolizas"
-          (completeMethod)="filterPolizas($event)" field="displayName" [dropdown]="!clientePolizaId || !reclamacion"
+          (completeMethod)="filterPolizas($event)" field="displayName" [dropdown]="!clientePolizaId && !reclamacion"
           placeholder="Filtrar por Póliza" [size]="30" [minLength]="1" [disabled]="!selectedCliente"
           [readonly]="clientePolizaId || reclamacion" [forceSelection]="true" [maxlength]="50">
         </p-autoComplete>
@@ -34,7 +34,7 @@
   <div class="card">
     <p-panel styleClass="p-fluid" header="Detalles de Reclamación">
       <div class="p-field">
-        <label for="razon">Razón</label>
+        <label for="razon">Razón  (*)</label>
         <input type="text" pInputText id="razon" [(ngModel)]="reclamacion.razon" required autofocus />
         <small class="p-invalid" *ngIf="submitted && !reclamacion.razon">Razón es requerida.</small>
       </div>
@@ -44,10 +44,10 @@
         <input type="text" pInputText id="estado" [(ngModel)]="reclamacion.estado" />
       </div>
       <div class="p-field">
-        <label for="fotoReclamo">Foto Reclamo</label>
+        <label for="fotoReclamo">Foto Reclamo (*)</label>
         <div class="upload-container">
           <p-fileUpload name="fotoReclamo" #fileUploadRef (onSelect)="onFileSelect($event)" mode="basic" [auto]="false"
-            accept="image/*" chooseLabel="Seleccionar Archivo" customUpload="true"></p-fileUpload>
+            accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'" customUpload="true"></p-fileUpload>
           <button *ngIf="imagePreview" pButton pRipple icon="pi pi-trash" class="p-button-danger p-button-icon-only"
             (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
@@ -58,8 +58,6 @@
 
         <br />
       </div>
-
-
 
       <div class="custom-button-container">
         <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-secondary" style="width: 30%;"
