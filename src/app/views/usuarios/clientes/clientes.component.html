@@ -56,11 +56,11 @@
                     {{ getEstadoLabel(usuario.estado) }}
                   </td>
                 <td>
-                    <button *ngIf="validarEnable && usuario.estado == 'P'" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success p-mr-2"
+                    <button *ngIf="validarEnable && usuario.estado == 'P'" pButton pRipple icon="pi pi-check" class="small-button p-button-rounded p-button-success p-mr-2 p-button-sm"
                     (click)="activar(usuario)"></button>
-                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 p-button-sm"
                         (click)="editUsuario(usuario)"></button>
-                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning p-button-sm"
                         (click)="deleteUsuario(usuario)"></button>
                 </td>
             </tr>

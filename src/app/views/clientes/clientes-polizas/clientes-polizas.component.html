@@ -48,7 +48,7 @@
         <th pSortableColumn="fechaFin">
           Fecha Fin <p-sortIcon field="fechaFin"></p-sortIcon>
         </th>
-        <th></th>
+        <th style="width: 250px;"></th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-clientePoliza>
@@ -67,12 +67,12 @@
           <button
           pButton
           pRipple
-          class="p-button-rounded p-button-primary p-mr-2"
+          class="p-button-rounded p-button-primary p-mr-2 small-button"
           (click)="redirectToCargasFamiliaresPage(clientePoliza); $event.stopPropagation()"
         >Cargas Fam.</button>
-          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
             (click)="editPoliza(clientePoliza)"></button>
-          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
             (click)="deletePoliza(clientePoliza)"></button>
         </td>
       </tr>

@@ -1,2 +1,34 @@
 // Here you can add other styles
 
+.small-button {
+    font-size: 0.80rem; /* Ajusta el tamaño de la fuente */
+    padding: 0.50rem; /* Ajusta el relleno */
+    display: inline-flex; /* Usa flexbox para el contenido del botón */
+    align-items: center; /* Alinea verticalmente el contenido */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    min-width: auto; /* Ajusta el ancho mínimo */
+    min-height: auto; /* Ajusta la altura mínima */
+    height: auto; /* Ajusta la altura automáticamente */
+    width: auto; /* Ajusta el ancho automáticamente */
+}
+
+.small-button .pi {
+    font-size: 0.80rem; /* Ajusta el tamaño del icono */
+}
+
+
+.medium-button {
+    font-size: 0.95rem; /* Ajusta el tamaño de la fuente */
+    padding: 0.50rem; /* Ajusta el relleno */
+    display: inline-flex; /* Usa flexbox para el contenido del botón */
+    align-items: center; /* Alinea verticalmente el contenido */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    min-width: auto; /* Ajusta el ancho mínimo */
+    min-height: auto; /* Ajusta la altura mínima */
+    height: auto; /* Ajusta la altura automáticamente */
+    width: auto; /* Ajusta el ancho automáticamente */
+}
+
+.medium-button .pi {
+    font-size: 0.95rem; /* Ajusta el tamaño del icono */
+}

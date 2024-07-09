@@ -57,7 +57,7 @@
         <th pSortableColumn="vigenciaMeses">
           Vigencia <p-sortIcon field="vigenciaMeses"></p-sortIcon>
         </th>
-        <th></th>
+        <th style="width: 200px;"></th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-membresia>
@@ -72,14 +72,14 @@
           <button
             pButton
             pRipple
-            class="p-button-rounded p-button-primary p-mr-2"
+            class="p-button-rounded p-button-primary p-mr-2 small-button"
             (click)="redirectToBeneficiosPage(membresia); $event.stopPropagation()"
           >Beneficios</button>
           <button
             pButton
             pRipple
             icon="pi pi-pencil"
-            class="p-button-rounded p-button-success p-mr-2"
+            class="p-button-rounded p-button-success p-mr-2 small-button"
             (click)="editMembresia(membresia); $event.stopPropagation()"
           ></button>
           <button
@@ -87,7 +87,7 @@
             pRipple
             icon="pi pi-trash"
             [disabled]="!activarCreate"
-            class="p-button-rounded p-button-warning"
+            class="p-button-rounded p-button-warning small-button"
             (click)="deleteMembresia(membresia); $event.stopPropagation()"
           ></button>
         </td>

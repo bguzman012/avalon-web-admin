@@ -38,7 +38,7 @@
         <th pSortableColumn="aseguradora.nombres">
           Aseguradora <p-sortIcon field="aseguradora.nombre"></p-sortIcon>
         </th>
-        <th></th>
+        <th style="width: 200px;"></th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-poliza>
@@ -54,12 +54,12 @@
           <button
             pButton
             pRipple
-            class="p-button-rounded p-button-primary p-mr-2"
+            class="p-button-rounded p-button-primary p-mr-2 small-button"
             (click)="redirectToCoberturasPage(poliza); $event.stopPropagation()"
           >Coberturas</button>
-          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
             (click)="editPoliza(poliza); $event.stopPropagation()"></button>
-          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
             (click)="deletePoliza(poliza); $event.stopPropagation()"></button>
         </td>
       </tr>

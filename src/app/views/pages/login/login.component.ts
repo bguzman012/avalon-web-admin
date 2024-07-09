@@ -40,7 +40,7 @@ export class LoginComponent {
         .subscribe(
           (response) => {
             this.loading = false
-            this.router.navigate(['/usuarios']);
+            this.router.navigate(['/clientes']);
           },
           (error) => {
             // Handle login error
