@@ -69,15 +69,38 @@
 <p-dialog [(visible)]="usuarioDialog" [style]="{width: '900px'}" header="Asesor Detalle" [modal]="true"
     styleClass="p-fluid">
     <ng-template pTemplate="content">
-        <div class="p-field">
-            <label for="nombres">Nombres</label>
-            <input type="text" pInputText id="nombres" [(ngModel)]="usuario.nombres" required autofocus />
-            <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombres is required.</small>
+        <div class="p-grid p-fluid">
+            <div class="p-col-12 p-md-6">
+                <div class="p-field">
+                    <label for="nombres">Nombre Uno</label>
+                    <input type="text" pInputText id="nombres" [(ngModel)]="usuario.nombres" required autofocus />
+                    <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombre uno is required.</small>
+                </div>
+            </div>
+            
+            <div class="p-col-12 p-md-6">
+                <div class="p-field">
+                    <label for="nombres">Nombre Dos</label>
+                    <input type="text" pInputText id="nombresDos" [(ngModel)]="usuario.nombresDos" required autofocus />
+                    <small class="p-invalid" *ngIf="submitted && !usuario.nombresDos">Nombre dos is required.</small>
+                </div>
+            </div>
         </div>
-        <div class="p-field">
-            <label for="apellidos">Apellidos</label>
-            <input type="text" pInputText id="apellidos" [(ngModel)]="usuario.apellidos" required autofocus />
-            <small class="p-invalid" *ngIf="submitted && !usuario.apellidos">Nombres is required.</small>
+        <div class="p-grid p-fluid">
+            <div class="p-col-12 p-md-6">
+                <div class="p-field">
+                    <label for="apellidos">Apellido Uno</label>
+                    <input type="text" pInputText id="apellidos" [(ngModel)]="usuario.apellidos" required autofocus />
+                    <small class="p-invalid" *ngIf="submitted && !usuario.apellidos">Apellido uno is required.</small>
+                </div>
+            </div>
+            <div class="p-col-12 p-md-6">
+                <div class="p-field">
+                    <label for="apellidosDos">Apellido Dos</label>
+                    <input type="text" pInputText id="apellidosDos" [(ngModel)]="usuario.apellidosDos" required autofocus />
+                    <small class="p-invalid" *ngIf="submitted && !usuario.apellidosDos">Apellido dos is required.</small>
+                </div>
+            </div>            
         </div>
 
         <div class="p-field">

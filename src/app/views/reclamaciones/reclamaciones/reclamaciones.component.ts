@@ -116,7 +116,7 @@ export class ReclamacionesComponent implements OnInit {
 
   async deleteReclamacion(reclamacion: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar la reclamación?',
+      message: 'Estás seguro de eliminar la reclamo?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
@@ -126,7 +126,7 @@ export class ReclamacionesComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Enhorabuena!',
-          detail: 'Reclamación eliminada exitosamente',
+          detail: 'Reclamo eliminado exitosamente',
           life: 3000,
         });
       },

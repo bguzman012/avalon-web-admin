@@ -235,6 +235,7 @@ export class ClientesComponent implements OnInit {
         this.direccion.paisId = this.pais.id
         this.direccion.estadoId = this.estado.id
         this.usuario.direccion = this.direccion
+        console.log(this.usuario)
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_CLIENTE_ID);
       }
       this.refrescarListado(this.ESTADO_BUSQUEDA)
