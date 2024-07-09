@@ -248,7 +248,7 @@ export class AddReclamacionesComponent implements OnInit {
 
   async deleteReclamacion(reclamacion: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar la reclamación?',
+      message: 'Estás seguro de eliminar el reclamo?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
@@ -258,7 +258,7 @@ export class AddReclamacionesComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Enhorabuena!',
-          detail: 'Reclamación eliminada exitosamente',
+          detail: 'Reclamo eliminada exitosamente',
           life: 3000,
         });
       },
@@ -302,7 +302,7 @@ export class AddReclamacionesComponent implements OnInit {
       this.loading = false;
       this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar la reclamación' });
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar el reclamo' });
     } finally {
       this.loading = false; // Ocultar spinner
     }

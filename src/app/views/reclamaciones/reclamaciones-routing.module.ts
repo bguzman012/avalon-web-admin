@@ -8,7 +8,7 @@ const routes: Routes = [
   {
     path: '',
     data: {
-      breadcrumb: 'Reclamaciones'
+      breadcrumb: 'Reclamos'
     },
     children: [
       {
@@ -21,7 +21,7 @@ const routes: Routes = [
       {
         path: 'detalle-reclamacion',
         data: {
-          breadcrumb: 'Detalle Reclamaciónn'
+          breadcrumb: 'Detalle Reclamo'
         },
         children: [
           {
