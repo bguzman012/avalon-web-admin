@@ -40,6 +40,11 @@ export const navItemsAdmin: INavData[] = [
   iconComponent: { }
   
 },{
+  name: 'Árbol de Preguntas',
+  url: '/preguntas',
+  iconComponent: { }
+  
+},{
   name: 'Notificaciones',
   url: '/notificaciones',
   iconComponent: { }

@@ -1,0 +1,181 @@
+<p-toast></p-toast>
+
+<div class="card">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left"> </ng-template>
+    <ng-template pTemplate="right">
+      <button
+        pButton
+        pRipple
+        label="Nueva"
+        icon="pi pi-plus"
+        [disabled]="!activarCreate"
+        class="p-button-success p-mr-2"
+        (click)="openNew()"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="preguntas"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['contenido', 'orden', 'nivel']"
+    [(selection)]="selectedPreguntas"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    [showCurrentPageReport]="true"
+  >
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <h5 class="p-m-0">Administrar Preguntas</h5>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="filterGlobal($event, dt)"
+            placeholder="Buscar..."
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="contenido">
+          Contenido <p-sortIcon field="contenido"></p-sortIcon>
+        </th>
+        <th pSortableColumn="orden">
+          Orden <p-sortIcon field="orden"></p-sortIcon>
+        </th>
+        <th pSortableColumn="nivel">
+          Nivel <p-sortIcon field="nivel"></p-sortIcon>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-pregunta>
+      <tr (click)="redirectToDetallesPage(pregunta)">
+        <td>
+          <p-tableCheckbox [value]="pregunta"></p-tableCheckbox>
+        </td>
+        <td>{{ pregunta.contenido }}</td>
+        <td>{{ pregunta.orden }}</td>
+        <td>{{ pregunta.nivel }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success p-mr-2 medium-button"
+            (click)="editPregunta(pregunta); $event.stopPropagation()"
+          ></button>
+          <button
+            pButton
+            pRipple
+            [disabled]="!activarCreate"
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning medium-button"
+            (click)="deletePregunta(pregunta); $event.stopPropagation()"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="summary">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{ preguntas ? preguntas.length : 0 }} registros.
+      </div>
+    </ng-template>
+    <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="preguntaDialog"
+  [style]="{ width: '500px' }"
+  header="Pregunta Detalle"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <label for="contenido">Contenido</label>
+      <input
+        type="text"
+        pInputText
+        id="contenido"
+        [(ngModel)]="pregunta.contenido"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !pregunta.contenido"
+        >Contenido es requerido.</small
+      >
+    </div>
+    <div class="p-field">
+      <label for="orden">Orden</label>
+      <input
+        type="number"
+        pInputText
+        id="orden"
+        [(ngModel)]="pregunta.orden"
+        required
+      />
+      <small class="p-invalid" *ngIf="submitted && !pregunta.orden"
+        >Orden es requerido.</small
+      >
+    </div>
+    <div class="p-field">
+      <label for="nivel">Nivel</label>
+      <input
+        type="number"
+        pInputText
+        id="nivel"
+        [(ngModel)]="pregunta.nivel"
+        required
+      />
+      <small class="p-invalid" *ngIf="submitted && !pregunta.nivel"
+        >Nivel es requerido.</small
+      >
+    </div>
+
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-text"
+      [disabled]="!activarCreate"
+      (click)="hideDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Guardar"
+      icon="pi pi-check"
+      class="p-button-text"
+      [disabled]="!activarCreate"
+      (click)="savePregunta()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

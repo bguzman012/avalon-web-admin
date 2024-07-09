@@ -64,6 +64,10 @@ const routes: Routes = [
         path: 'reclamaciones',
         loadChildren: () =>
           import('./views/reclamaciones/reclamaciones.module').then((m) => m.ReclamacionesModule)
+      },{
+        path: 'preguntas',
+        loadChildren: () =>
+          import('./views/arbol-preguntas/arbol-preguntas.module').then((m) => m.PreguntasModule)
       },
       // {
       //   path: 'aseguradoras',
