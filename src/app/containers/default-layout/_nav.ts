@@ -40,6 +40,11 @@ export const navItemsAdmin: INavData[] = [
   iconComponent: { }
   
 },{
+  name: 'Citas Médicas',
+  url: '/citas-medicas',
+  iconComponent: { }
+  
+},{
   name: 'Árbol de Preguntas',
   url: '/preguntas',
   iconComponent: { }

@@ -64,6 +64,11 @@ const routes: Routes = [
         path: 'reclamaciones',
         loadChildren: () =>
           import('./views/reclamaciones/reclamaciones.module').then((m) => m.ReclamacionesModule)
+      },
+      {
+        path: 'citas-medicas',
+        loadChildren: () =>
+          import('./views/citas-medicas/citas-medicas.module').then((m) => m.CitasMedicasModule)
       },{
         path: 'preguntas',
         loadChildren: () =>
