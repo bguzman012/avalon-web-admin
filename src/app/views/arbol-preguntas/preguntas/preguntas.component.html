@@ -21,7 +21,7 @@
     [value]="preguntas"
     [rows]="10"
     [paginator]="true"
-    [globalFilterFields]="['contenido', 'nivel', 'padre.contenido']"
+    [globalFilterFields]="['contenido', 'nivel', 'padre.contenido', 'respuesta']"
     [(selection)]="selectedPreguntas"
     [rowHover]="true"
     dataKey="id"
@@ -53,6 +53,9 @@
         <th pSortableColumn="nivel">
           Nivel <p-sortIcon field="nivel"></p-sortIcon>
         </th>
+        <th pSortableColumn="respuesta">
+          Respuesta <p-sortIcon field="respuesta"></p-sortIcon>
+        </th>
         <th pSortableColumn="padre.contenido">
           Padre <p-sortIcon field="padre.contenido"></p-sortIcon>
         </th>
@@ -65,7 +68,9 @@
           <p-tableCheckbox [value]="pregunta"></p-tableCheckbox>
         </td>
         <td>{{ pregunta.contenido }}</td>
+        
         <td>{{ pregunta.nivel }}</td>
+        <td>{{ pregunta.respuesta }}</td>
         <td>{{ pregunta.padre?.contenido }}</td>
         <td>
           <button
@@ -136,6 +141,10 @@
       <small class="p-invalid" *ngIf="submitted && !pregunta.nivel"
         >Nivel es requerido.</small
       >
+    </div>
+    <div class="p-field">
+      <label for="respuesta">Respuesta</label>
+      <textarea pInputTextarea id="respuesta" [(ngModel)]="pregunta.respuesta"></textarea>
     </div>
     <div class="p-field">
       <label for="padreId">Padre</label>
