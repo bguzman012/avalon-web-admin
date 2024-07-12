@@ -96,6 +96,7 @@
     <div class="p-field">
       <label for="asesoresId">Aseguradora</label>
       <p-autoComplete
+      dropdown="true"
         [(ngModel)]="aseguradora"
         [showEmptyMessage]="true"
         [suggestions]="filteredAseguradoras"
@@ -113,11 +114,13 @@
     <div class="p-field">
       <label for="asesoresId">Poliza</label>
       <p-autoComplete
+      dropdown="true"
         [(ngModel)]="poliza"
         [showEmptyMessage]="true"
         [suggestions]="filteredPolizas"
         (completeMethod)="filterPolizas($event)"
         (ngModelChange)="calcularFechaFin()"
+        [disabled]="!aseguradora"
         field="nombre"
         [minLength]="1"
         [appendTo]="'body'"
@@ -154,6 +157,7 @@
   <div class="p-field">
     <label for="asesoresId">Cliente</label>
     <p-autoComplete
+    dropdown="true"
       [(ngModel)]="cliente"
       [showEmptyMessage]="true"
       [suggestions]="filteredClientes"
@@ -172,6 +176,7 @@
   <div class="p-field">
     <label for="asesoresId">Asesor</label>
     <p-autoComplete
+    dropdown="true"
       [(ngModel)]="asesor"
       [showEmptyMessage]="true"
       [suggestions]="filteredAsesores"
@@ -195,6 +200,7 @@
       [suggestions]="filteredBrokers"
       (completeMethod)="filterBrokers($event)"
       field="nombreUsuario"
+      dropdown="true"
       [minLength]="1"
       [appendTo]="'body'"
       required
