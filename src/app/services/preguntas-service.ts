@@ -44,7 +44,7 @@ export class PreguntasService {
 
   async eliminarPregunta(preguntaId: number): Promise<any> {
     try {
-      const response = await this.http.patch<any>(`${this.apiUrl}/preguntas/${preguntaId}`, { estado: 'I' }).toPromise();
+      const response = await this.http.delete<any>(`${this.apiUrl}/preguntas/${preguntaId}`).toPromise();
       return response;
     } catch (error) {
       console.error('Error al eliminar pregunta:', error);

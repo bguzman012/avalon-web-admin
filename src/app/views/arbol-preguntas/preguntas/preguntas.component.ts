@@ -29,6 +29,11 @@ export class PreguntasComponent implements OnInit {
   ESTADO_ACTIVO = 'A';
   ROL_ADMINISTRADOR_ID = 1;
   activarCreate = false;
+  preguntasPadre: any[];
+  filteredPreguntas: any[];
+  nivel
+  
+  padre
 
   constructor(
     private messageService: MessageService,
@@ -41,6 +46,7 @@ export class PreguntasComponent implements OnInit {
   async ngOnInit() {
     this.loading = true;
     this.refrescarListado();
+    
     let user = await this.authService.obtenerUsuarioLoggeado();
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.activarCreate = true;
     this.loading = false;
@@ -50,14 +56,21 @@ export class PreguntasComponent implements OnInit {
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  openNew() {
+  async openNew() {
     this.pregunta = {};
+    this.nivel = 1
+    this.padre = null
+    this.preguntasPadre = await this.preguntasService.obtenerPreguntas();
     this.submitted = false;
     this.preguntaDialog = true;
   }
 
-  editPregunta(pregunta: any) {
+  async editPregunta(pregunta: any) {
     this.pregunta = { ...pregunta };
+    this.nivel = this.pregunta.nivel
+    this.preguntasPadre = await this.preguntasService.obtenerPreguntas();
+    this.preguntasPadre = this.preguntasPadre.filter(pregunta => pregunta.id != this.pregunta.id)
+    this.padre = this.pregunta.padre
     this.preguntaDialog = true;
   }
 
@@ -90,8 +103,13 @@ export class PreguntasComponent implements OnInit {
     this.loading = true; // Mostrar spinner
     try {
       if (this.pregunta.id) {
+        this.pregunta.nivel = this.nivel
+        this.pregunta.padreId = this.padre?.id
         await this.preguntasService.actualizarPregunta(this.pregunta.id, this.pregunta);
       } else {
+        this.pregunta.nivel = this.nivel
+        this.pregunta.padreId = this.padre?.id
+        console.log(this.pregunta)
         await this.preguntasService.guardarPregunta(this.pregunta);
       }
       this.refrescarListado();
@@ -114,4 +132,24 @@ export class PreguntasComponent implements OnInit {
   async redirectToDetallesPage(pregunta: any) {
     this.router.navigate(['/preguntas-detalle', pregunta.id]);
   }
+
+  filterPreguntas(event) {
+    let filtered: any[] = [];
+    let query = event.query;
+    for (let i = 0; i < this.preguntasPadre.length; i++) {
+      let preguntaPadre = this.preguntasPadre[i];
+      if (preguntaPadre.contenido.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(preguntaPadre);
+      }
+    }
+
+    this.filteredPreguntas = filtered;
+  }
+
+  loadPregunta(){
+    if (this.padre){
+      this.nivel = this.padre.nivel + 1
+    }
+  }
+
 }

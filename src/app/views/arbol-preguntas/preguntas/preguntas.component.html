@@ -21,7 +21,7 @@
     [value]="preguntas"
     [rows]="10"
     [paginator]="true"
-    [globalFilterFields]="['contenido', 'orden', 'nivel']"
+    [globalFilterFields]="['contenido', 'nivel', 'padre.contenido']"
     [(selection)]="selectedPreguntas"
     [rowHover]="true"
     dataKey="id"
@@ -50,11 +50,11 @@
         <th pSortableColumn="contenido">
           Contenido <p-sortIcon field="contenido"></p-sortIcon>
         </th>
-        <th pSortableColumn="orden">
-          Orden <p-sortIcon field="orden"></p-sortIcon>
-        </th>
         <th pSortableColumn="nivel">
           Nivel <p-sortIcon field="nivel"></p-sortIcon>
+        </th>
+        <th pSortableColumn="padre.contenido">
+          Padre <p-sortIcon field="padre.contenido"></p-sortIcon>
         </th>
         <th></th>
       </tr>
@@ -65,8 +65,8 @@
           <p-tableCheckbox [value]="pregunta"></p-tableCheckbox>
         </td>
         <td>{{ pregunta.contenido }}</td>
-        <td>{{ pregunta.orden }}</td>
         <td>{{ pregunta.nivel }}</td>
+        <td>{{ pregunta.padre?.contenido }}</td>
         <td>
           <button
             pButton
@@ -122,31 +122,36 @@
         >Contenido es requerido.</small
       >
     </div>
-    <div class="p-field">
-      <label for="orden">Orden</label>
-      <input
-        type="number"
-        pInputText
-        id="orden"
-        [(ngModel)]="pregunta.orden"
-        required
-      />
-      <small class="p-invalid" *ngIf="submitted && !pregunta.orden"
-        >Orden es requerido.</small
-      >
-    </div>
+
     <div class="p-field">
       <label for="nivel">Nivel</label>
       <input
         type="number"
         pInputText
         id="nivel"
-        [(ngModel)]="pregunta.nivel"
+        readonly="true"
+        [(ngModel)]="nivel"
         required
       />
       <small class="p-invalid" *ngIf="submitted && !pregunta.nivel"
         >Nivel es requerido.</small
       >
+    </div>
+    <div class="p-field">
+      <label for="padreId">Padre</label>
+      <p-autoComplete
+        [(ngModel)]="padre"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredPreguntas"
+        (completeMethod)="filterPreguntas($event)"
+        (ngModelChange)="loadPregunta()" 
+        field="contenido"
+        dropdown = "true"
+        [minLength]="1"
+        [appendTo]="'body'"
+        required
+      ></p-autoComplete>
+
     </div>
 
     <p-blockUI [blocked]="loading">
