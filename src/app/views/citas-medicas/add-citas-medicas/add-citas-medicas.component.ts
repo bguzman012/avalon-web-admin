@@ -45,6 +45,7 @@ export class AddCitasMedicasComponent implements OnInit {
   citaMedicaId: number;
   displayDialog: boolean = false;
   editImage = false
+  readOnlyForm = false
 
   imagePreview: SafeUrl | null = null; // Utilizamos SafeUrl para la URL segura de la imagen
 
@@ -103,6 +104,9 @@ export class AddCitasMedicasComponent implements OnInit {
       }else{
         this.nombreDocumento = undefined
       }
+
+      if (citaMedica.estado == 'C')
+        this.readOnlyForm = true
       
       return
     }
@@ -133,6 +137,32 @@ export class AddCitasMedicasComponent implements OnInit {
       this.nuevoComentario = '';
       await this.loadComentarios();
       this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Comentario añadido con éxito' });
+      this.loading = false
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });
+      this.loading = false
+    }
+  }
+
+  async cerrarTramite() {
+    this.loading = true
+    let currentUser = await this.authService.obtenerUsuarioLoggeado();
+    const comentario = {
+      citaMedicaId: this.citaMedicaId,
+      contenido: this.nuevoComentario,
+      usuarioComentaId: currentUser.id,
+      estado: 'C' // Estado activo
+    };
+
+    await this.citasMedicasService.partiallyUpdateCitaMedica(this.citaMedica.id, 'C')
+
+    this.readOnlyForm = true
+
+    try {
+      await this.comentariosCitasMedicasService.createComentario(comentario);
+      this.nuevoComentario = '';
+      await this.loadComentarios();
+      this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Cita médica cerrada con éxito' });
       this.loading = false
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });

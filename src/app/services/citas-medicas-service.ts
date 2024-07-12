@@ -63,4 +63,14 @@ export class CitasMedicasService {
       throw error;
     }
   }
+
+  async partiallyUpdateCitaMedica(citaMedicaId: number, estado: string): Promise<any> {
+    try {
+      const response = await this.http.patch<any>(`${this.apiUrl}/citasMedicas/${citaMedicaId}`, { estado: estado }).toPromise();
+      return response;
+    } catch (error) {
+      console.error('Error al actualizar  part. cita medica:', error);
+      throw error;
+    }
+  }
 }

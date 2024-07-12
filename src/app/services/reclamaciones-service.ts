@@ -63,4 +63,14 @@ export class ReclamacionesService {
       throw error;
     }
   }
+
+  async partiallyUpdateReclamacion(reclamacionId: number, estado: string): Promise<any> {
+    try {
+      const response = await this.http.patch<any>(`${this.apiUrl}/reclamaciones/${reclamacionId}`, { estado: estado }).toPromise();
+      return response;
+    } catch (error) {
+      console.error('Error al actualizar  part. reclamo:', error);
+      throw error;
+    }
+  }
 }

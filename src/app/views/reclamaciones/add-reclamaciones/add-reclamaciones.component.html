@@ -35,34 +35,34 @@
     <p-panel styleClass="p-fluid" header="Detalles de Reclamo">
       <div class="p-field">
         <label for="razon">Razón  (*)</label>
-        <input type="text" pInputText id="razon" [(ngModel)]="reclamacion.razon" required autofocus />
+        <input type="text" pInputText id="razon" [(ngModel)]="reclamacion.razon"  [readonly]="readOnlyForm" required autofocus />
         <small class="p-invalid" *ngIf="submitted && !reclamacion.razon">Razón es requerida.</small>
       </div>
 
       <div class="p-field">
         <label for="estado">Estado</label>
-        <input type="text" pInputText id="estado" [(ngModel)]="reclamacion.estado" />
+        <input type="text" pInputText id="estado" readonly [(ngModel)]="reclamacion.estado" />
       </div>
       <div class="p-field">
         <label for="fotoReclamo">Foto Reclamo (*)</label>
         <div class="upload-container">
-          <p-fileUpload name="fotoReclamo" #fileUploadRef (onSelect)="onFileSelect($event)" mode="basic" [auto]="false"
+          <p-fileUpload name="fotoReclamo" [disabled]="readOnlyForm" #fileUploadRef (onSelect)="onFileSelect($event)" mode="basic" [auto]="false"
             accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'" customUpload="true"></p-fileUpload>
-          <button *ngIf="imagePreview" pButton pRipple icon="pi pi-trash" class="p-button-danger p-button-icon-only"
+          <button *ngIf="imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash" class="p-button-danger p-button-icon-only"
             (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
-        <img *ngIf="(imagePreview && !reclamacion.id) || (imagePreview && editImage)" [src]="imagePreview"
+        <img *ngIf="(imagePreview && !reclamacion.id) || (imagePreview && editImage)"  [src]="imagePreview"
           alt="Vista Previa" class="image-preview" (click)="showDialogImage()"    loading="lazy"  />
-        <img *ngIf="imagePreview && reclamacion.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
+        <img *ngIf="imagePreview && reclamacion.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview" 
           alt="Vista Previa" class="image-preview" (click)="showDialogImage()"    loading="lazy" />
 
         <br />
       </div>
 
       <div class="custom-button-container">
-        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-secondary" style="width: 30%;"
+        <button pButton pRipple label="Cancelar" icon="pi pi-times"  [disabled]="readOnlyForm"  class="p-button-secondary" style="width: 30%;"
           (click)="hideDialog()"></button>
-        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-primary" style="width: 30%;"
+        <button pButton pRipple label="Guardar" icon="pi pi-check"   [disabled]="readOnlyForm"  class="p-button-primary" style="width: 30%;"
           (click)="saveReclamacion()"></button>
       </div>
 
@@ -86,10 +86,12 @@
 
     <div class="p-field">
       <label for="nuevoComentario">Añadir Comentario</label>
-      <textarea id="nuevoComentario" [(ngModel)]="nuevoComentario" rows="3" pInputTextarea></textarea>
+      <textarea id="nuevoComentario"  [readonly]="readOnlyForm"  [(ngModel)]="nuevoComentario" rows="3" pInputTextarea></textarea>
     </div>
     <div class="custom-button-container">
-      <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-primary" style="width: 30%;"
+      <button pButton pRipple label="Cerrar" [disabled]="readOnlyForm" icon="pi pi-check" class="p-button-danger" style="width: 30%;"
+      (click)="cerrarReclamo()"></button>
+      <button pButton pRipple label="Guardar"  [disabled]="readOnlyForm"  icon="pi pi-check" class="p-button-primary" style="width: 30%;"
         (click)="addComentario()"></button>
     </div>
   </p-panel>

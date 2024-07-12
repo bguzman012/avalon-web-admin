@@ -45,7 +45,7 @@ export class AddReclamacionesComponent implements OnInit {
   reclamacionId: number;
   displayDialog: boolean = false;
   editImage = false
-
+  readOnlyForm = false
   imagePreview: SafeUrl | null = null; // Utilizamos SafeUrl para la URL segura de la imagen
 
   comentarios: any[] = [];
@@ -103,6 +103,9 @@ export class AddReclamacionesComponent implements OnInit {
       }else{
         this.nombreDocumento = undefined
       }
+
+      if (reclamacion.estado == 'C')
+        this.readOnlyForm = true
       
       return
     }
@@ -133,6 +136,56 @@ export class AddReclamacionesComponent implements OnInit {
       this.nuevoComentario = '';
       await this.loadComentarios();
       this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Comentario añadido con éxito' });
+      this.loading = false
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });
+      this.loading = false
+    }
+  }
+
+  // async cerrarTramite() {
+  //   this.loading = true
+  //   let currentUser = await this.authService.obtenerUsuarioLoggeado();
+  //   const comentario = {
+  //     citaMedicaId: this.citaMedicaId,
+  //     contenido: this.nuevoComentario,
+  //     usuarioComentaId: currentUser.id,
+  //     estado: 'C' // Estado activo
+  //   };
+
+  //   await this.citasMedicasService.partiallyUpdateCitaMedica(this.citaMedica.id, 'C')
+
+  //   try {
+  //     await this.comentariosCitasMedicasService.createComentario(comentario);
+  //     this.nuevoComentario = '';
+  //     await this.loadComentarios();
+  //     this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Cita médica cerrada con éxito' });
+  //     this.loading = false
+  //   } catch (error) {
+  //     this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });
+  //     this.loading = false
+  //   }
+  // }
+
+  async cerrarReclamo() {
+    this.loading = true
+    let currentUser = await this.authService.obtenerUsuarioLoggeado();
+    const comentario = {
+      reclamacionId: this.reclamacionId,
+      contenido: this.nuevoComentario,
+      usuarioComentaId: currentUser.id,
+      estado: 'C' // Estado activo
+    };
+
+    await this.reclamacionesService.partiallyUpdateReclamacion(this.reclamacion.id, 'C')
+    
+    this.readOnlyForm = true
+
+    try {
+      await this.comentariosService.createComentario(comentario);
+      this.nuevoComentario = '';
+      await this.loadComentarios();
+      this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Reclamo cerrado con éxito' });
       this.loading = false
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });
