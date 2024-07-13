@@ -177,7 +177,7 @@ export class ClientesComponent implements OnInit {
   }
 
   async refrescarListado(estado) {
-    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_CLIENTE_ID, estado);
+    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_CLIENTE_ID, estado, 0, 10);
   }
 
   async filterAseguradoras(event) {

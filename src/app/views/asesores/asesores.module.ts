@@ -34,6 +34,7 @@ import {InputNumberModule} from 'primeng/inputnumber';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { BlockUIModule } from 'primeng/blockui';
+import {PaginatorModule} from 'primeng/paginator';
 import { MessageService } from 'primeng/api';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -53,6 +54,7 @@ import { AsesoresComponent } from './asesores/asesores.component';
     CardModule,
     FormModule,
     GridModule,
+    PaginatorModule,
     FormsModule,
     ReactiveFormsModule,
     FormModule,

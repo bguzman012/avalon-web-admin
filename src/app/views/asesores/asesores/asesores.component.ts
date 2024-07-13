@@ -30,6 +30,10 @@ export class AsesoresComponent implements OnInit {
   loading: boolean = false;
   rolId
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
@@ -40,12 +44,17 @@ export class AsesoresComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    console.log(environment.production);
-    this.refrescarListado(this.ESTADO_ACTIVO)
-    console.log(this.usuarios);
+    this.loading=true
+    await this.refrescarListado(this.ESTADO_ACTIVO)
+    this.loading=false
   }
 
   filterGlobal(event: Event, dt: any) {
+    const paramBusqueda = (event.target as HTMLInputElement).value
+    if (paramBusqueda.length >= 3)
+      console.log("ENTRA AL MS")
+    
+    console.log("BUSCAR", (event.target as HTMLInputElement).value)
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
@@ -87,6 +96,7 @@ export class AsesoresComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         await this.usuariosService.eliminarUsuario(usuario.id, this.ROL_ASESOR_ID);
+        this.first = 0
         this.refrescarListado(this.ESTADO_ACTIVO)
 
         this.messageService.add({
@@ -117,6 +127,7 @@ export class AsesoresComponent implements OnInit {
         this.usuario.contrasenia = environment.pass_default;
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_ASESOR_ID);
       }
+      this.first = 0
       this.refrescarListado(this.ESTADO_ACTIVO)
       this.usuarioDialog = false;
       this.usuario = {};
@@ -128,7 +139,17 @@ export class AsesoresComponent implements OnInit {
   }
 
   async refrescarListado(estado) {
-    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_ASESOR_ID, estado);
+    const response = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_ASESOR_ID, estado, this.first / this.pageSize, this.pageSize);
+    this.usuarios = response.data;
+    this.totalRecords = response.totalRecords;
+  }
+
+  async onPageChange(event) {
+    this.loading = true
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado(this.ESTADO_ACTIVO);
+    this.loading = false    
   }
 
 }

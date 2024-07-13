@@ -100,17 +100,23 @@ export class ClientesPolizasComponent implements OnInit {
 
     this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
-      this.ESTADO_ACTIVO
+      this.ESTADO_ACTIVO,
+      0,
+      100
     );
 
     this.asesores = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_ASESOR_ID,
-      this.ESTADO_ACTIVO
+      this.ESTADO_ACTIVO,
+      0,
+      100
     );
 
     this.brokers = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_BROKER_ID,
-      this.ESTADO_ACTIVO
+      this.ESTADO_ACTIVO,
+      0,
+      100
     );
   }
 

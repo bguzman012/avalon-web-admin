@@ -232,7 +232,9 @@ export class AddCitasMedicasComponent implements OnInit {
   async prepareData() {
     this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
-      this.ESTADO_ACTIVO
+      this.ESTADO_ACTIVO,
+      0,
+      10
     );
   }
 

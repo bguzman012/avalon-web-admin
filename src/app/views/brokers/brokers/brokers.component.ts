@@ -36,6 +36,10 @@ export class BrokersComponent implements OnInit {
   broker
   brokerId
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
@@ -46,12 +50,14 @@ export class BrokersComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    this.loading=true
     this.brokerId = +(await this.getRouteParams('brokerId'));
 
     if (!this.brokerId)
       this.brokerId = localStorage.getItem('brokerId');
 
     await this.refrescarListado(this.ESTADO_ACTIVO);
+    this.loading=false
   }
 
   private getRouteParams(param: string): Promise<string> {
@@ -111,6 +117,7 @@ export class BrokersComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         await this.usuariosService.eliminarUsuario(usuario.id, this.ROL_BROKER_ID);
+        this.first = 0
         await this.refrescarListado(this.ESTADO_ACTIVO);
 
         this.messageService.add({
@@ -143,6 +150,7 @@ export class BrokersComponent implements OnInit {
         this.usuario.brokerId = this.broker.id
         await this.usuariosService.guardarUsuario(this.usuario, this.ROL_BROKER_ID);
       }
+      this.first = 0
       await this.refrescarListado(this.ESTADO_ACTIVO);
       this.usuarioDialog = false;
       this.usuario = {};
@@ -153,7 +161,18 @@ export class BrokersComponent implements OnInit {
   }
 
   async refrescarListado(estado: string) {
-    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_BROKER_ID, estado);
+    const response = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_BROKER_ID, estado, this.first / this.pageSize, this.pageSize);
+    this.usuarios = response.data;
+    this.totalRecords = response.totalRecords;
+  }
+
+
+  async onPageChange(event) {
+    this.loading = true
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado(this.ESTADO_ACTIVO);
+    this.loading = false
   }
 
   

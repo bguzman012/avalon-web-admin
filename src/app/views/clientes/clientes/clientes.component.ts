@@ -52,6 +52,11 @@ export class ClientesComponent implements OnInit {
   validarEnable = false
   filteredAseguradoras
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
@@ -66,9 +71,19 @@ export class ClientesComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.refrescarListado(this.ESTADO_BUSQUEDA)
+    this.loading=true
+    await this.refrescarListado(this.ESTADO_BUSQUEDA)
     let user = await this.authService.obtenerUsuarioLoggeado()
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true
+    this.loading=false
+  }
+
+  async onPageChange(event) {
+    this.loading = true
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado(this.ESTADO_BUSQUEDA);
+    this.loading = false
   }
 
   filterGlobal(event: Event, dt: any) {
@@ -160,6 +175,7 @@ export class ClientesComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         await this.usuariosService.partiallyUpdateUsuario(usuario.id, "A", this.ROL_CLIENTE_ID);
+        this.first = 0
         this.refrescarListado(this.ESTADO_BUSQUEDA)
 
         this.messageService.add({
@@ -179,6 +195,7 @@ export class ClientesComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         await this.usuariosService.eliminarUsuario(usuario.id, this.ROL_CLIENTE_ID);
+        this.first = 0
         this.refrescarListado(this.ESTADO_BUSQUEDA)
 
         this.messageService.add({
@@ -238,6 +255,7 @@ export class ClientesComponent implements OnInit {
         console.log(this.usuario)
         let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_CLIENTE_ID);
       }
+      this.first = 0
       this.refrescarListado(this.ESTADO_BUSQUEDA)
       this.usuarioDialog = false;
       this.usuario = {};
@@ -249,8 +267,14 @@ export class ClientesComponent implements OnInit {
   }
 
   async refrescarListado(estado) {
-    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_CLIENTE_ID, estado);
+    const response = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID, 
+      estado, 
+      this.first / this.pageSize, 
+      this.pageSize);
+    this.usuarios = response.data;
+    this.totalRecords = response.totalRecords;
+    
   }
-
 
 }

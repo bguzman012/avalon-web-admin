@@ -136,7 +136,10 @@ export class AsesoresComponent implements OnInit {
   }
 
   async refrescarListado(estado) {
-    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_ASESOR_ID, estado);
+    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_ASESOR_ID, estado,
+      0,
+      10
+    );
   }
 
   async filterAseguradoras(event) {

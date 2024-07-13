@@ -11,7 +11,7 @@
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="usuarios" [rows]="10" [paginator]="true"
+    <p-table #dt [value]="usuarios" [rows]="10" 
         [globalFilterFields]="['nombres','apellidos','correoElectronico','numeroTelefono','nombreUsuario']"
         [(selection)]="selectedUsuarios" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"

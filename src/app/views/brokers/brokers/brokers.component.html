@@ -11,7 +11,7 @@
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="usuarios" [rows]="10" [paginator]="true"
+    <p-table #dt [value]="usuarios" 
         [globalFilterFields]="['nombres','apellidos','correoElectronico','numeroTelefono','nombreUsuario']"
         [(selection)]="selectedUsuarios" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
@@ -59,6 +59,12 @@
             </tr>
         </ng-template>
         <ng-template pTemplate="summary">
+            <p-blockUI [blocked]="loading">
+                <div class="p-field" *ngIf="loading">
+                  <p-progressSpinner></p-progressSpinner>
+                </div>
+              </p-blockUI>
+              <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
             <div class="p-d-flex p-ai-center p-jc-between">
                 En total existen {{usuarios ? usuarios.length : 0 }} registros.
             </div>

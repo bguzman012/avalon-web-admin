@@ -24,13 +24,15 @@ export class UsuariosService {
 
   async obtenerUsuariosPorRolAndEstado(
     rolId: number,
-    estado: string
-  ): Promise<any[]> {
+    estado: string,
+    page: number,
+    size: number
+  ): Promise<any> {
     try {
       const uri_object = this.URLS.find(url => url.KEY === rolId);
 
       const usuarios = await this.http
-        .get<any[]>(`${this.apiUrl}/${uri_object.URI}?estado=${estado}`)
+        .get<any[]>(`${this.apiUrl}/${uri_object.URI}?estado=${estado}&page=${page}&size=${size}`)
         .toPromise();
       console.log(`Resultado de USUARIOS ${uri_object.URI}:`, usuarios);
       return usuarios;

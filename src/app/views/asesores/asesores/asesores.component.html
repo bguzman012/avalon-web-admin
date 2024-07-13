@@ -11,7 +11,7 @@
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="usuarios" [rows]="10" [paginator]="true"
+    <p-table #dt [value]="usuarios" 
         [globalFilterFields]="['nombres','apellidos','correoElectronico','numeroTelefono','nombreUsuario']"
         [(selection)]="selectedUsuarios" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
@@ -45,14 +45,15 @@
                 <td>
                     <p-tableCheckbox [value]="usuario"></p-tableCheckbox>
                 </td>
-                
+
                 <td>{{ usuario.nombres }} {{ usuario.nombresDos }}</td>
                 <td>{{ usuario.apellidos }} {{ usuario.apellidosDos }}</td>
                 <td>{{usuario.correoElectronico}}</td>
                 <td>{{usuario.numeroTelefono}}</td>
                 <td>{{usuario.nombreUsuario}}</td>
                 <td>
-                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
+                    <button pButton pRipple icon="pi pi-pencil"
+                        class="p-button-rounded p-button-success p-mr-2 small-button"
                         (click)="editUsuario(usuario)"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
                         (click)="deleteUsuario(usuario)"></button>
@@ -60,6 +61,12 @@
             </tr>
         </ng-template>
         <ng-template pTemplate="summary">
+            <p-blockUI [blocked]="loading">
+                <div class="p-field" *ngIf="loading">
+                  <p-progressSpinner></p-progressSpinner>
+                </div>
+              </p-blockUI>
+              <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
             <div class="p-d-flex p-ai-center p-jc-between">
                 En total existen {{usuarios ? usuarios.length : 0 }} registros.
             </div>
@@ -78,7 +85,7 @@
                     <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombre uno is required.</small>
                 </div>
             </div>
-            
+
             <div class="p-col-12 p-md-6">
                 <div class="p-field">
                     <label for="nombres">Nombre Dos</label>
@@ -98,10 +105,12 @@
             <div class="p-col-12 p-md-6">
                 <div class="p-field">
                     <label for="apellidosDos">Apellido Dos</label>
-                    <input type="text" pInputText id="apellidosDos" [(ngModel)]="usuario.apellidosDos" required autofocus />
-                    <small class="p-invalid" *ngIf="submitted && !usuario.apellidosDos">Apellido dos is required.</small>
+                    <input type="text" pInputText id="apellidosDos" [(ngModel)]="usuario.apellidosDos" required
+                        autofocus />
+                    <small class="p-invalid" *ngIf="submitted && !usuario.apellidosDos">Apellido dos is
+                        required.</small>
                 </div>
-            </div>            
+            </div>
         </div>
 
         <div class="p-field">

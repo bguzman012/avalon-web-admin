@@ -138,13 +138,17 @@ export class ClientesMembresiasComponent implements OnInit {
   async prepareData(){
     this.clientes = await this.usuarioService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
-      this.ESTADO_ACTIVO
+      this.ESTADO_ACTIVO,
+      0,
+      10
     );
 
     this.asesores =
       await this.usuarioService.obtenerUsuariosPorRolAndEstado(
         this.ROL_ASESOR_ID,
-        this.ESTADO_ACTIVO
+        this.ESTADO_ACTIVO,
+        0,
+        10
       );
 
     this.membresias =

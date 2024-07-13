@@ -19,8 +19,6 @@
   <p-table
     #dt
     [value]="usuarios"
-    [rows]="10"
-    [paginator]="true"
     [globalFilterFields]="[
       'nombres',
       'apellidos',
@@ -68,7 +66,7 @@
         <th pSortableColumn="nombreUsuario">
           Nombre Usuario <p-sortIcon field="nombreUsuario"></p-sortIcon>
         </th>
-        <th pSortableColumn="estado" >
+        <th pSortableColumn="estado">
           Estado <p-sortIcon field="estado"></p-sortIcon>
         </th>
 
@@ -85,7 +83,7 @@
         <td>{{ usuario.correoElectronico }}</td>
         <td>{{ usuario.numeroTelefono }}</td>
         <td>{{ usuario.nombreUsuario }}</td>
-        <td >
+        <td>
           {{ getEstadoLabel(usuario.estado) }}
         </td>
         <td style="text-align: right">
@@ -123,10 +121,17 @@
           ></button>
         </td>
       </tr>
+      
     </ng-template>
     <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{ usuarios ? usuarios.length : 0 }} registros.
+        En total existen {{ totalRecords }} registros.
       </div>
     </ng-template>
   </p-table>

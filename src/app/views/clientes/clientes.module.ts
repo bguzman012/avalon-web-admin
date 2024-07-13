@@ -31,6 +31,7 @@ import {ToolbarModule} from 'primeng/toolbar';
 import {RatingModule} from 'primeng/rating';
 import {RadioButtonModule} from 'primeng/radiobutton';
 import {InputNumberModule} from 'primeng/inputnumber';
+import {PaginatorModule} from 'primeng/paginator';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { BlockUIModule } from 'primeng/blockui';
@@ -69,7 +70,7 @@ import { CargasFamiliaresComponent } from './cargas-familiares/cargas-familiares
     SharedModule,
     ListGroupModule,
     AutoCompleteModule,
-    
+    PaginatorModule,
     TableModule,
     CalendarModule,
 		SliderModule,
