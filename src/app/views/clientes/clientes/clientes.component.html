@@ -19,18 +19,13 @@
   <p-table
     #dt
     [value]="usuarios"
-    [globalFilterFields]="[
-      'nombres',
-      'apellidos',
-      'correoElectronico',
-      'numeroTelefono',
-      'nombreUsuario'
-    ]"
     [(selection)]="selectedUsuarios"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
     [showCurrentPageReport]="true"
+    (onSort)="onSort($event)"
+    [customSort]="true"
   >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">

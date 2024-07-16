@@ -102,21 +102,24 @@ export class ClientesPolizasComponent implements OnInit {
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO,
       0,
-      100
+      100,
+      ""
     );
 
     this.asesores = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_ASESOR_ID,
       this.ESTADO_ACTIVO,
       0,
-      100
+      10,
+      ""
     );
 
     this.brokers = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_BROKER_ID,
       this.ESTADO_ACTIVO,
       0,
-      100
+      10,
+      ""
     );
   }
 

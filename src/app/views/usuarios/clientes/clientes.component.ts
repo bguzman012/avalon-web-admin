@@ -4,41 +4,42 @@ import { MessageService } from 'primeng/api';
 import { UsuariosService } from '../../../services/usuarios-service';
 import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { environment } from '../../../../environments/environment';
-import { FilterService } from "primeng/api";
+import { FilterService } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
   selector: 'clientes',
   templateUrl: './clientes.component.html',
-  styles: [`
-  :host ::ng-deep .p-dialog .product-image {
-      width: 150px;
-      margin: 0 auto 2rem auto;
-      display: block;
-  }
-`],
+  styles: [
+    `
+      :host ::ng-deep .p-dialog .product-image {
+        width: 150px;
+        margin: 0 auto 2rem auto;
+        display: block;
+      }
+    `,
+  ],
   styleUrls: ['./clientes.component.scss'],
 })
-
 export class ClientesComponent implements OnInit {
   usuarioDialog: boolean;
   usuarios: any[];
   selectedUsuarios: any[];
   submitted: boolean;
   usuario: any;
-  ROL_CLIENTE_ID = 3
-  ROL_ADMINISTRADOR_ID = 1
+  ROL_CLIENTE_ID = 3;
+  ROL_ADMINISTRADOR_ID = 1;
 
-  ESTADO_ACTIVO = 'A'
-  ESTADO_BUSQUEDA = 'T'
-  TIPO_EMPRESA_ID = 1
+  ESTADO_ACTIVO = 'A';
+  ESTADO_BUSQUEDA = 'T';
+  TIPO_EMPRESA_ID = 1;
   loading: boolean = false;
-  rolId
-  validarEnable = false
-  filteredAseguradoras
-  selectedAseguradoras
+  rolId;
+  validarEnable = false;
+  filteredAseguradoras;
+  selectedAseguradoras;
 
-  direccion: any
+  direccion: any;
 
   constructor(
     private messageService: MessageService,
@@ -47,14 +48,12 @@ export class ClientesComponent implements OnInit {
     private aseguradorasService: AseguradorasService,
     private filterService: FilterService,
     private authService: AuthService
-  
-  ) { }
+  ) {}
 
   async ngOnInit() {
-    this.refrescarListado(this.ESTADO_BUSQUEDA)
-    let user = await this.authService.obtenerUsuarioLoggeado()
-    if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true
-        
+    this.refrescarListado(this.ESTADO_BUSQUEDA);
+    let user = await this.authService.obtenerUsuarioLoggeado();
+    if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true;
   }
 
   filterGlobal(event: Event, dt: any) {
@@ -87,9 +86,13 @@ export class ClientesComponent implements OnInit {
 
   async editUsuario(usuario: any) {
     this.usuario = { ...usuario };
-    this.usuario.rolId = this.usuario.rol.id
-    this.selectedAseguradoras = await this.aseguradorasService.obtenerAseguradorasByUsuarioAndEstado(this.usuario.id, "A")
-    console.log(this.selectedAseguradoras)
+    this.usuario.rolId = this.usuario.rol.id;
+    this.selectedAseguradoras =
+      await this.aseguradorasService.obtenerAseguradorasByUsuarioAndEstado(
+        this.usuario.id,
+        'A'
+      );
+    console.log(this.selectedAseguradoras);
     this.usuarioDialog = true;
     // Implementar lógica para editar un usuario
   }
@@ -105,15 +108,24 @@ export class ClientesComponent implements OnInit {
         return '';
     }
   }
-  
+
   async activar(usuario: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de activar el usuario ' + usuario.nombres + ' ' + usuario.apellidos + '?',
+      message:
+        'Estás seguro de activar el usuario ' +
+        usuario.nombres +
+        ' ' +
+        usuario.apellidos +
+        '?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
-        await this.usuariosService.partiallyUpdateUsuario(usuario.id, "A", this.ROL_CLIENTE_ID);
-        this.refrescarListado(this.ESTADO_BUSQUEDA)
+        await this.usuariosService.partiallyUpdateUsuario(
+          usuario.id,
+          'A',
+          this.ROL_CLIENTE_ID
+        );
+        this.refrescarListado(this.ESTADO_BUSQUEDA);
 
         this.messageService.add({
           severity: 'success',
@@ -122,17 +134,25 @@ export class ClientesComponent implements OnInit {
           life: 3000,
         });
       },
-    })
+    });
   }
 
   async deleteUsuario(usuario: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de inhabilitar el usuario ' + usuario.nombres + ' ' + usuario.apellidos + '?',
+      message:
+        'Estás seguro de inhabilitar el usuario ' +
+        usuario.nombres +
+        ' ' +
+        usuario.apellidos +
+        '?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
-        await this.usuariosService.eliminarUsuario(usuario.id, this.ROL_CLIENTE_ID);
-        this.refrescarListado(this.ESTADO_BUSQUEDA)
+        await this.usuariosService.eliminarUsuario(
+          usuario.id,
+          this.ROL_CLIENTE_ID
+        );
+        this.refrescarListado(this.ESTADO_BUSQUEDA);
 
         this.messageService.add({
           severity: 'success',
@@ -146,45 +166,63 @@ export class ClientesComponent implements OnInit {
 
   hideDialog() {
     this.usuarioDialog = false;
-    this.selectedAseguradoras = []
+    this.selectedAseguradoras = [];
     this.submitted = false;
   }
 
   async saveUsuario() {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
-    console.log(this.selectedAseguradoras)
+    console.log(this.selectedAseguradoras);
     try {
       if (this.usuario.id) {
-        this.usuario.rolId = this.usuario.rol.id
-        await this.usuariosService.actualizarUsuario(this.usuario.id, this.usuario, this.ROL_CLIENTE_ID);
+        this.usuario.rolId = this.usuario.rol.id;
+        await this.usuariosService.actualizarUsuario(
+          this.usuario.id,
+          this.usuario,
+          this.ROL_CLIENTE_ID
+        );
         // this.saveUsuariosAseguradoras(this.usuario.id)
       } else {
         this.usuario.rolId = this.ROL_CLIENTE_ID;
         this.usuario.estado = 'P';
         this.usuario.contrasenia = environment.pass_default;
-        let usuarioSaved = await this.usuariosService.guardarUsuario(this.usuario, this.ROL_CLIENTE_ID);
+        let usuarioSaved = await this.usuariosService.guardarUsuario(
+          this.usuario,
+          this.ROL_CLIENTE_ID
+        );
         // this.saveUsuariosAseguradoras(usuarioSaved.id)
       }
-      this.refrescarListado(this.ESTADO_BUSQUEDA)
+      this.refrescarListado(this.ESTADO_BUSQUEDA);
       this.usuarioDialog = false;
       this.usuario = {};
-      this.filteredAseguradoras = []
-      this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
+      this.filteredAseguradoras = [];
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Enhorabuena!',
+        detail: 'Operación ejecutada con éxito',
+      });
     } finally {
       this.loading = false; // Ocultar spinner
     }
   }
 
   async refrescarListado(estado) {
-    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(this.ROL_CLIENTE_ID, estado, 0, 10);
+    this.usuarios = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      estado,
+      0,
+      10,
+      ""
+    );
   }
 
   async filterAseguradoras(event) {
     let filtered: any[] = [];
     let query = event.query;
 
-    let aseguradoras = await this.aseguradorasService.obtenerAseguradorasByEstado('A')
+    let aseguradoras =
+      await this.aseguradorasService.obtenerAseguradorasByEstado('A');
 
     for (let i = 0; i < aseguradoras.length; i++) {
       let aseguradora = aseguradoras[i];
@@ -197,13 +235,15 @@ export class ClientesComponent implements OnInit {
   }
 
   async armarSelectedAseguradorasData(usuarioId) {
-    let usuariosAseguradorasIds = []
-    console.log(this.selectedAseguradoras)
+    let usuariosAseguradorasIds = [];
+    console.log(this.selectedAseguradoras);
     for (let index = 0; index < this.selectedAseguradoras.length; index++) {
       const aseguradora = this.selectedAseguradoras[index];
-      usuariosAseguradorasIds.push({ aseguradoraId: aseguradora.id, usuarioId: usuarioId })
+      usuariosAseguradorasIds.push({
+        aseguradoraId: aseguradora.id,
+        usuarioId: usuarioId,
+      });
     }
-    return usuariosAseguradorasIds
+    return usuariosAseguradorasIds;
   }
-
 }

@@ -62,7 +62,8 @@ export class CitasMedicasComponent implements OnInit {
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO,
       0,
-      10
+      10,
+      ""
     );
   }
 

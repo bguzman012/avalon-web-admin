@@ -140,7 +140,8 @@ export class ClientesMembresiasComponent implements OnInit {
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO,
       0,
-      10
+      10,
+      ""
     );
 
     this.asesores =
@@ -148,7 +149,8 @@ export class ClientesMembresiasComponent implements OnInit {
         this.ROL_ASESOR_ID,
         this.ESTADO_ACTIVO,
         0,
-        10
+        10,
+        ""
       );
 
     this.membresias =

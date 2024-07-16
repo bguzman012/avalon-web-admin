@@ -26,13 +26,18 @@ export class UsuariosService {
     rolId: number,
     estado: string,
     page: number,
-    size: number
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1
   ): Promise<any> {
     try {
       const uri_object = this.URLS.find(url => url.KEY === rolId);
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
 
       const usuarios = await this.http
-        .get<any[]>(`${this.apiUrl}/${uri_object.URI}?estado=${estado}&page=${page}&size=${size}`)
+        .get<any[]>(`${this.apiUrl}/${uri_object.URI}?estado=${estado}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`)
         .toPromise();
       console.log(`Resultado de USUARIOS ${uri_object.URI}:`, usuarios);
       return usuarios;

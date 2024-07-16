@@ -79,7 +79,8 @@ export class ClientesPolizasComponent implements OnInit {
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO,
       0,
-      10
+      10,
+      ""
     );
     this.cliente = this.clientes.find((x) => x.id == this.clienteId);
 
@@ -117,14 +118,16 @@ export class ClientesPolizasComponent implements OnInit {
       this.ROL_ASESOR_ID,
       this.ESTADO_ACTIVO,
       0,
-      10
+      10,
+      ""
     );
 
     this.brokers = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_BROKER_ID,
       this.ESTADO_ACTIVO,
       0,
-      10
+      10,
+      ""
     );
   }
 
