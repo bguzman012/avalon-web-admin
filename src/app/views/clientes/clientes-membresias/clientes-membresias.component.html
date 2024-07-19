@@ -2,24 +2,29 @@
 
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
-    <ng-template pTemplate="left"> </ng-template>
+    <ng-template pTemplate="left"></ng-template>
 
     <ng-template pTemplate="right">
       <button pButton pRipple label="Nueva" icon="pi pi-plus" class="p-button-success p-mr-2"
-        (click)="openNew()"></button>
+              (click)="openNew()"></button>
     </ng-template>
   </p-toolbar>
 
-  <p-table #dt [value]="clienteMembresias" [rows]="10" [paginator]="true"
-    [globalFilterFields]="['usuario.nombreUsuario', 'membresia.nombres', 'asesor.usuario.nombreUsuario']"
-    [(selection)]="selectedClientesMembresia" [rowHover]="true" dataKey="id"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" [showCurrentPageReport]="true">
+  <p-table #dt
+           [value]="clienteMembresias"
+           [(selection)]="selectedClientesMembresia"
+           [rowHover]="true"
+           dataKey="id"
+           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+           [showCurrentPageReport]="true"
+           (onSort)="onSort($event)"
+           [customSort]="true">
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
         <h5 class="p-m-0">Administrar Clientes Membresías</h5>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..." />
+          <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..."/>
         </span>
       </div>
     </ng-template>
@@ -29,19 +34,24 @@
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
         <th pSortableColumn="cliente">
-          Cliente <p-sortIcon field="cliente"></p-sortIcon>
+          Cliente
+          <p-sortIcon field="cliente"></p-sortIcon>
         </th>
         <th pSortableColumn="membresia">
-          Membresía <p-sortIcon field="membresia"></p-sortIcon>
+          Membresía
+          <p-sortIcon field="membresia"></p-sortIcon>
         </th>
         <th pSortableColumn="asesor">
-          Asesor <p-sortIcon field="asesor"></p-sortIcon>
+          Asesor
+          <p-sortIcon field="asesor"></p-sortIcon>
         </th>
         <th pSortableColumn="fechaInicio">
-          Fecha Inicio <p-sortIcon field="fechaInicio"></p-sortIcon>
+          Fecha Inicio
+          <p-sortIcon field="fechaInicio"></p-sortIcon>
         </th>
         <th pSortableColumn="fechaFin">
-          Fecha Fin <p-sortIcon field="fechaFin"></p-sortIcon>
+          Fecha Fin
+          <p-sortIcon field="fechaFin"></p-sortIcon>
         </th>
         <th></th>
       </tr>
@@ -53,48 +63,49 @@
         </td>
         <td>{{ clienteMembresia.cliente.nombreUsuario }}</td>
         <td>{{ clienteMembresia.membresia.nombres }}</td>
-        <td>{{ clienteMembresia.asesor.nombreUsuario}}</td>
-        <td>{{ clienteMembresia.fechaInicio}}</td>
-        <td>{{ clienteMembresia.fechaFin}}</td>
+        <td>{{ clienteMembresia.asesor.nombreUsuario }}</td>
+        <td>{{ clienteMembresia.fechaInicio }}</td>
+        <td>{{ clienteMembresia.fechaFin }}</td>
 
         <td>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
-            (click)="editClienteMembresia(clienteMembresia)"></button>
+                  (click)="editClienteMembresia(clienteMembresia)"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
-            (click)="deleteClienteMembresia(clienteMembresia)"></button>
+                  (click)="deleteClienteMembresia(clienteMembresia)"></button>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
         En total existen
         {{ clienteMembresias ? clienteMembresias.length : 0 }} registros.
       </div>
     </ng-template>
-    <p-blockUI [blocked]="loading">
-      <div class="p-field" *ngIf="loading">
-        <p-progressSpinner></p-progressSpinner>
-      </div>
-    </p-blockUI>
   </p-table>
 </div>
 
 <p-dialog [(visible)]="clienteMembresiaDialog" [style]="{ width: '500px' }" header="Detalle de Cliente Membresía"
-  [modal]="true" styleClass="p-fluid">
+          [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
     <div class="p-field">
       <label for="membresiaId">Membresia</label>
-      <p-autoComplete 
-        [(ngModel)]="membresia" 
-        [showEmptyMessage]="true" 
+      <p-autoComplete
+        [(ngModel)]="membresia"
+        [showEmptyMessage]="true"
         [suggestions]="filteredMembresias"
-        (completeMethod)="filterMembresia($event)" 
+        (completeMethod)="filterMembresia($event)"
         (ngModelChange)="calcularFechaFin()"
-        field="nombres" 
+        field="nombres"
         [minLength]="1"
-        [appendTo]="'body'" 
+        [appendTo]="'body'"
         required>
-        
+
         <!-- Template for the items in the suggestion list -->
         <ng-template let-membresia pTemplate="item">
           <div>
@@ -119,29 +130,30 @@
     <div class="p-field">
       <label for="fechaInicio">Fecha de Inicio</label>
       <p-calendar [(ngModel)]="clienteMembresia.fechaInicio" (ngModelChange)="calcularFechaFin()" dateFormat="dd/mm/yy"
-        [showIcon]="true"></p-calendar>
+                  [showIcon]="true"></p-calendar>
       <small class="p-invalid" *ngIf="submitted && !clienteMembresia.fechaInicio">Fecha de Inicio es requerido.</small>
     </div>
     <div class="p-field">
       <label for="fechaFin">Fecha de Fin</label>
       <p-calendar [(ngModel)]="clienteMembresia.fechaFin" dateFormat="dd/mm/yy" [showIcon]="true"
-        [disabled]="true"></p-calendar>
+                  [disabled]="true"></p-calendar>
     </div>
 
     <div class="p-field">
       <label for="asesoresId">Asesor</label>
       <p-autoComplete [(ngModel)]="asesor" [showEmptyMessage]="true" [suggestions]="filteredAsesores"
-        (completeMethod)="filterAsesores($event)" field="nombreUsuario" [readonly]="user.rol.id == ROL_ASESOR_ID"
-        [minLength]="1" [appendTo]="'body'" required></p-autoComplete>
+                      (completeMethod)="filterAsesores($event)" field="nombreUsuario"
+                      [readonly]="user.rol.id == ROL_ASESOR_ID"
+                      [minLength]="1" [appendTo]="'body'" required></p-autoComplete>
       <small class="p-invalid" *ngIf="submitted && !asesor">Asesor es requerido.</small>
     </div>
 
     <div class="p-field">
       <label for="clienteId">Cliente</label>
       <p-autoComplete [(ngModel)]="cliente" [showEmptyMessage]="true" [suggestions]="filteredClientes"
-        (completeMethod)="filterClientes($event)" field="nombreUsuario" [readonly]="clienteId"
-        [minLength]="1" [appendTo]="'body'"
-        required></p-autoComplete>
+                      (completeMethod)="filterClientes($event)" field="nombreUsuario" [readonly]="clienteId"
+                      [minLength]="1" [appendTo]="'body'"
+                      required></p-autoComplete>
       <small class="p-invalid" *ngIf="submitted && !cliente">Cliente es requerido.</small>
     </div>
 
@@ -154,7 +166,7 @@
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
     <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
-      (click)="saveClienteMembresia()"></button>
+            (click)="saveClienteMembresia()"></button>
   </ng-template>
 </p-dialog>
 

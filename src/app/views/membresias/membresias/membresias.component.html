@@ -20,14 +20,13 @@
   <p-table
     #dt
     [value]="membresias"
-    [rows]="10"
-    [paginator]="true"
-    [globalFilterFields]="['nombres', 'detalle', 'estado']"
     [(selection)]="selectedMembresias"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
     [showCurrentPageReport]="true"
+    (onSort)="onSort($event)"
+    [customSort]="true"
   >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
@@ -94,15 +93,17 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
         En total existen {{ membresias ? membresias.length : 0 }} registros.
       </div>
     </ng-template>
-    <p-blockUI [blocked]="loading">
-      <div class="p-field" *ngIf="loading">
-        <p-progressSpinner></p-progressSpinner>
-      </div>
-    </p-blockUI>
+
   </p-table>
 </div>
 

@@ -12,9 +12,18 @@ export class MembresiasService {
 
   constructor(private http: HttpClient) { }
 
-  async obtenerMembresiasByEstado(estado: string): Promise<any[]> {
+  async obtenerMembresiasByEstado(
+    estado: string,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1): Promise<any> {
     try {
-      const membresias = await this.http.get<any[]>(`${this.apiUrl}/membresias?estado=${estado}`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+      const membresias = await this.http.get<any[]>(`${this.apiUrl}/membresias?estado=${estado}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de membresías:', membresias);
       return membresias;
     } catch (error) {

@@ -19,14 +19,13 @@
   <p-table
     #dt
     [value]="beneficios"
-    [rows]="10"
-    [paginator]="true"
-    [globalFilterFields]="['nombre', 'descripcion']"
     [(selection)]="selectedBeneficios"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
     [showCurrentPageReport]="true"
+    (onSort)="onSort($event)"
+    [customSort]="true"
   >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
@@ -53,6 +52,9 @@
         <th pSortableColumn="descripcion">
           Descripción <p-sortIcon field="descripcion"></p-sortIcon>
             </th>
+        <th pSortableColumn="membresia">
+          Membresia <p-sortIcon field="membresia"></p-sortIcon>
+        </th>
             <th></th>
           </tr>
         </ng-template>
@@ -63,6 +65,7 @@
             </td>
             <td>{{ beneficio.nombre }}</td>
             <td>{{ beneficio.descripcion }}</td>
+            <td>{{ beneficio.membresia.nombres }}</td>
             <td>
               <button
                 pButton
@@ -83,18 +86,19 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="summary">
+          <p-blockUI [blocked]="loading">
+            <div class="p-field" *ngIf="loading">
+              <p-progressSpinner></p-progressSpinner>
+            </div>
+          </p-blockUI>
+          <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
           <div class="p-d-flex p-ai-center p-jc-between">
-            En total existen {{ beneficios ? beneficios.length : 0 }} registros.
+            En total existen {{totalRecords ? totalRecords : 0  }} registros.
           </div>
         </ng-template>
-        <p-blockUI [blocked]="loading">
-          <div class="p-field" *ngIf="loading">
-            <p-progressSpinner></p-progressSpinner>
-          </div>
-        </p-blockUI>
       </p-table>
     </div>
-    
+
     <p-dialog
       [(visible)]="beneficioDialog"
       [style]="{ width: '500px' }"
@@ -117,7 +121,7 @@
             Membresía es requerida.
           </small>
         </div>
-    
+
         <div class="p-field">
           <label for="nombre">Nombre</label>
           <input
@@ -145,14 +149,14 @@
             Descripción es requerida.
           </small>
         </div>
-       
+
         <p-blockUI [blocked]="loading">
           <div class="p-field" *ngIf="loading">
             <p-progressSpinner></p-progressSpinner>
           </div>
         </p-blockUI>
       </ng-template>
-    
+
       <ng-template pTemplate="footer">
         <button
           pButton
@@ -172,6 +176,5 @@
         ></button>
       </ng-template>
     </p-dialog>
-    
+
     <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
-    

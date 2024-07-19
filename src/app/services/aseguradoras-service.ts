@@ -13,9 +13,9 @@ export class AseguradorasService {
 
   constructor(
     private http: HttpClient) { }
-  
+
     async obtenerAseguradorasByEstado(
-      estado: string, 
+      estado: string,
       page: number,
       size: number,
       busqueda: string,
@@ -56,7 +56,7 @@ export class AseguradorasService {
         throw error;
       }
     }
-  
+
     async actualizarAseguradora(aseguradoraId: number, aseguradoraData: any): Promise<any> {
       try {
         const response = await this.http.put<any>(`${this.apiUrl}/aseguradoras/${aseguradoraId}`, aseguradoraData).toPromise();
@@ -66,7 +66,7 @@ export class AseguradorasService {
         throw error;
       }
     }
-  
+
     async eliminarAseguradora(aseguradoraId: number): Promise<any> {
       try {
         const response = await this.http.patch<any>(`${this.apiUrl}/aseguradoras/${aseguradoraId}`, { estado: 'I' }).toPromise();

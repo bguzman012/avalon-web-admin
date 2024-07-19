@@ -19,14 +19,13 @@
   <p-table
     #dt
     [value]="clienteMembresias"
-    [rows]="10"
-    [paginator]="true"
-    [globalFilterFields]="['usuario.nombreUsuario', 'membresia.nombres', 'asesor.usuario.nombreUsuario']"
     [(selection)]="selectedClientesMembresia"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
     [showCurrentPageReport]="true"
+    (onSort)="onSort($event)"
+    [customSort]="true"
   >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
@@ -75,7 +74,7 @@
         <td>{{ clienteMembresia.asesor.nombreUsuario}}</td>
         <td>{{ clienteMembresia.fechaInicio}}</td>
         <td>{{ clienteMembresia.fechaFin}}</td>
-        
+
         <td>
           <button
             pButton
@@ -95,16 +94,17 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
         En total existen
         {{ clienteMembresias ? clienteMembresias.length : 0 }} registros.
       </div>
     </ng-template>
-    <p-blockUI [blocked]="loading">
-        <div class="p-field" *ngIf="loading">
-          <p-progressSpinner></p-progressSpinner>
-        </div>
-      </p-blockUI>
   </p-table>
 </div>
 
@@ -190,7 +190,7 @@
         >Cliente es requerido.</small
       >
     </div>
-    
+
     <p-blockUI [blocked]="loading">
       <div class="p-field" *ngIf="loading">
         <p-progressSpinner></p-progressSpinner>

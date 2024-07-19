@@ -23,7 +23,7 @@ export class ClientesMembresiasService {
   //   }
   // }
 
-  
+
   // async obtenerMembresiasByAseguradora(aseguradoraId: number): Promise<any[]> {
   //   try {
   //     const aseguradoras = await this.http.get<any[]>(`${this.apiUrl}/aseguradoras/${aseguradoraId}/membresias`).toPromise();
@@ -34,9 +34,18 @@ export class ClientesMembresiasService {
   //     throw error; // Puedes personalizar esto según tus necesidades
   //   }
   // }
-  async obtenerUsuariosMembresiaByMebresiaId(membresiaId: number): Promise<any[]> {
+  async obtenerUsuariosMembresiaByMebresiaId(
+    membresiaId: number,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1): Promise<any> {
     try {
-      const clientes = await this.http.get<any[]>(`${this.apiUrl}/membresias/${membresiaId}/clienteMembresias`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+      const clientes = await this.http.get<any[]>(`${this.apiUrl}/membresias/${membresiaId}/clienteMembresias?page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de clientes por usuario membresia:', clientes);
       return clientes;
     } catch (error) {
@@ -45,9 +54,18 @@ export class ClientesMembresiasService {
     }
   }
 
-  async obtenerUsuariosMembresiaByUsuarioId(usuarioId: number): Promise<any[]> {
+  async obtenerUsuariosMembresiaByUsuarioId(
+    usuarioId: number,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1): Promise<any> {
     try {
-      const clientes = await this.http.get<any[]>(`${this.apiUrl}/clientes/${usuarioId}/clienteMembresias`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+      const clientes = await this.http.get<any[]>(`${this.apiUrl}/clientes/${usuarioId}/clienteMembresias?page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de clientes por usuario membresia:', clientes);
       return clientes;
     } catch (error) {

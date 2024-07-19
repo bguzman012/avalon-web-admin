@@ -41,6 +41,7 @@ import { MembresiasComponent } from './membresias/membresias.component';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 import { BeneficiosComponent } from './beneficios/beneficios.component';
+import {PaginatorModule} from "primeng/paginator";
 
 
 @NgModule({
@@ -49,45 +50,46 @@ import { BeneficiosComponent } from './beneficios/beneficios.component';
     ClientesMembresiasComponent,
     BeneficiosComponent
   ],
-  imports: [
-    CommonModule,
-    MembresiasRoutingModule,
-    CardModule,
-    FormModule,
-    GridModule,
-    FormsModule,
-    ReactiveFormsModule,
-    FormModule,
-    ButtonGroupModule,
-    DropdownModule,
-    AlertModule,
-    TableModule,
-    SharedModule,
-    ListGroupModule,
-    AutoCompleteModule,
-    
-    TableModule,
-    CalendarModule,
-		SliderModule,
-		DialogModule,
-    BlockUIModule,
-    ProgressSpinnerModule,
-		MultiSelectModule,
-		ContextMenuModule,
-		DropdownModule,
-		ButtonModule,
-		ToastModule,
-    InputTextModule,
-    ProgressBarModule,
-    FileUploadModule,
-    ToolbarModule,
-    RatingModule,
-    FormsModule,
-    RadioButtonModule,
-    InputNumberModule,
-    ConfirmDialogModule,
-    InputTextareaModule,
-  ]
+    imports: [
+        CommonModule,
+        MembresiasRoutingModule,
+        CardModule,
+        FormModule,
+        GridModule,
+        FormsModule,
+        ReactiveFormsModule,
+        FormModule,
+        ButtonGroupModule,
+        DropdownModule,
+        AlertModule,
+        TableModule,
+        SharedModule,
+        ListGroupModule,
+        AutoCompleteModule,
+
+        TableModule,
+        CalendarModule,
+        SliderModule,
+        DialogModule,
+        BlockUIModule,
+        ProgressSpinnerModule,
+        MultiSelectModule,
+        ContextMenuModule,
+        DropdownModule,
+        ButtonModule,
+        ToastModule,
+        InputTextModule,
+        ProgressBarModule,
+        FileUploadModule,
+        ToolbarModule,
+        RatingModule,
+        FormsModule,
+        RadioButtonModule,
+        InputNumberModule,
+        ConfirmDialogModule,
+        InputTextareaModule,
+        PaginatorModule,
+    ]
 })
 export class MembresiasModule {
 }

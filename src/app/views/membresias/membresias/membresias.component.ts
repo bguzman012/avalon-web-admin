@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService } from 'primeng/api';
+import {ConfirmationService, SortEvent} from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { MembresiasService } from '../../../services/membresias-service';
@@ -36,6 +36,14 @@ export class MembresiasComponent implements OnInit {
   ROL_ADMINISTRADOR_ID = 1
   activarCreate = false
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+  busqueda: string = '';
+  sortField
+  sortOrder
+
   constructor(
     private messageService: MessageService,
     private membresiasService: MembresiasService,
@@ -52,12 +60,25 @@ export class MembresiasComponent implements OnInit {
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.activarCreate = true
 
     this.refrescarListado(this.ESTADO_ACTIVO);
-  
+
     this.loading = false
   }
 
   filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      this.refrescarListado(this.ESTADO_ACTIVO);
+
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      this.refrescarListado(this.ESTADO_ACTIVO);
+    }
   }
 
   openNew() {
@@ -79,6 +100,7 @@ export class MembresiasComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         await this.membresiasService.eliminarMembresia(membresia.id);
+        this.first = 0;
         this.refrescarListado(this.ESTADO_ACTIVO);
         this.messageService.add({
           severity: 'success',
@@ -107,6 +129,7 @@ export class MembresiasComponent implements OnInit {
       } else {
         await this.membresiasService.guardarMembresia(this.membresia);
       }
+      this.first = 0;
       this.refrescarListado(this.ESTADO_ACTIVO);
       this.membresiaDialog = false;
       this.membresia = {};
@@ -121,10 +144,24 @@ export class MembresiasComponent implements OnInit {
   }
 
   async refrescarListado(estado: string) {
-    this.membresias =
-      await this.membresiasService.obtenerMembresiasByEstado(
-        this.ESTADO_ACTIVO
-      ); // Obtener lista de aseguradoras
+    const response = await this.membresiasService.obtenerMembresiasByEstado(
+      this.ESTADO_ACTIVO,
+      this.first / this.pageSize,
+      this.pageSize,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder);
+
+    this.membresias = response.data
+    this.totalRecords = response.totalRecords
+  }
+
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado(this.ESTADO_ACTIVO);
+    this.loading = false;
   }
 
   private getRouteParams(param: string): Promise<string> {
@@ -135,6 +172,7 @@ export class MembresiasComponent implements OnInit {
 
   redirectToMembresiasPage(membresia: any) {
     localStorage.setItem("membresiaId", membresia.id);
+    localStorage.setItem("membresia", JSON.stringify(membresia));
     this.router.navigate(['membresias/clientes'], {
       queryParams: {
         membresiaId: membresia.id,
@@ -144,7 +182,9 @@ export class MembresiasComponent implements OnInit {
   }
 
   redirectToBeneficiosPage(membresia: any) {
+    console.log(membresia);
     localStorage.setItem("membresiaId", membresia.id);
+    localStorage.setItem("membresia", JSON.stringify(membresia));
     this.router.navigate(['membresias/beneficios'], {
       queryParams: {
         membresiaId: membresia.id
@@ -152,16 +192,4 @@ export class MembresiasComponent implements OnInit {
     });
   }
 
-  filterAseguradora(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.aseguradoras.length; i++) {
-      let aseguradora = this.aseguradoras[i];
-      if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(aseguradora);
-      }
-    }
-
-    this.filteredAseguradoras = filtered;
-  }
 }

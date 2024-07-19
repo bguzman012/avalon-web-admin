@@ -75,7 +75,7 @@ export class ClientesComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
-    await this.refrescarListado(this.ESTADO_BUSQUEDA);
+    await await this.refrescarListado(this.ESTADO_BUSQUEDA);
     let user = await this.authService.obtenerUsuarioLoggeado();
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true;
     this.loading = false;
@@ -85,15 +85,15 @@ export class ClientesComponent implements OnInit {
     this.loading = true;
     this.first = event.first;
     this.pageSize = event.rows;
-    await this.refrescarListado(this.ESTADO_BUSQUEDA);
+    await await this.refrescarListado(this.ESTADO_BUSQUEDA);
     this.loading = false;
   }
 
-  filterGlobal(event: Event, dt: any) {
+  async filterGlobal(event: Event, dt: any) {
     this.first = 0;
     this.busqueda = (event.target as HTMLInputElement).value;
     if (this.busqueda.length == 0 || this.busqueda.length >= 3)
-      this.refrescarListado(this.ESTADO_BUSQUEDA);
+      await this.refrescarListado(this.ESTADO_BUSQUEDA);
 
     // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
@@ -102,11 +102,11 @@ export class ClientesComponent implements OnInit {
     this.paises = await this.paisesService.obtenerPaises();
   }
 
-  onSort(event: SortEvent) {
+  async onSort(event: SortEvent) {
     if (event.field !== this.sortField || event.order !== this.sortOrder) {
       this.sortField = event.field;
       this.sortOrder = event.order;
-      this.refrescarListado(this.ESTADO_BUSQUEDA);
+      await this.refrescarListado(this.ESTADO_BUSQUEDA);
     }
   }
 
@@ -123,24 +123,6 @@ export class ClientesComponent implements OnInit {
       this.estados = await this.estadosService.obtenerEstadosByPais(
         this.pais.id
       );
-  }
-
-  deleteSelectedUsuarios() {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete the selected users?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        // Implementar lógica para eliminar usuarios seleccionados
-        this.selectedUsuarios = [];
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Users Deleted',
-          life: 3000,
-        });
-      },
-    });
   }
 
   redirectToClientePolizaPage(cliente: any) {
@@ -199,7 +181,7 @@ export class ClientesComponent implements OnInit {
           this.ROL_CLIENTE_ID
         );
         this.first = 0;
-        this.refrescarListado(this.ESTADO_BUSQUEDA);
+        await this.refrescarListado(this.ESTADO_BUSQUEDA);
 
         this.messageService.add({
           severity: 'success',
@@ -227,7 +209,7 @@ export class ClientesComponent implements OnInit {
           this.ROL_CLIENTE_ID
         );
         this.first = 0;
-        this.refrescarListado(this.ESTADO_BUSQUEDA);
+        await this.refrescarListado(this.ESTADO_BUSQUEDA);
 
         this.messageService.add({
           severity: 'success',
@@ -246,6 +228,7 @@ export class ClientesComponent implements OnInit {
 
   redirectToMembresiasPage(usuario: any) {
     localStorage.setItem('clienteId', usuario.id);
+    localStorage.setItem("cliente", JSON.stringify(usuario));
     this.router.navigate(['clientes/membresias'], {
       queryParams: {
         clienteId: usuario.id,
@@ -295,7 +278,7 @@ export class ClientesComponent implements OnInit {
         );
       }
       this.first = 0;
-      this.refrescarListado(this.ESTADO_BUSQUEDA);
+      await this.refrescarListado(this.ESTADO_BUSQUEDA);
       this.usuarioDialog = false;
       this.usuario = {};
       this.filteredAseguradoras = [];

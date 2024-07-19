@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { ConfirmationService } from 'primeng/api';
-import { MessageService } from 'primeng/api';
-import { AseguradorasService } from '../../../services/aseguradoras-service';
-import { MembresiasService } from '../../../services/membresias-service';
-import { ClientesMembresiasService } from '../../../services/clientes-membresias-service';
-import { environment } from '../../../../environments/environment';
-import { ActivatedRoute, Router } from '@angular/router';
-import { UsuariosService } from 'src/app/services/usuarios-service';
-import { AuthService } from 'src/app/services/auth-service';
+import {Component, OnInit} from '@angular/core';
+import {ConfirmationService, SortEvent} from 'primeng/api';
+import {MessageService} from 'primeng/api';
+import {AseguradorasService} from '../../../services/aseguradoras-service';
+import {MembresiasService} from '../../../services/membresias-service';
+import {ClientesMembresiasService} from '../../../services/clientes-membresias-service';
+import {environment} from '../../../../environments/environment';
+import {ActivatedRoute, Router} from '@angular/router';
+import {UsuariosService} from 'src/app/services/usuarios-service';
+import {AuthService} from 'src/app/services/auth-service';
 
 @Component({
   selector: 'app-clientes-membresias',
@@ -62,8 +62,15 @@ export class ClientesMembresiasComponent implements OnInit {
   filteredBrokers;
 
   vigenciaMeses
-
   user
+
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+  busqueda: string = '';
+  sortField
+  sortOrder
 
   constructor(
     private messageService: MessageService,
@@ -76,7 +83,8 @@ export class ClientesMembresiasComponent implements OnInit {
     private route: ActivatedRoute,
     private authService: AuthService,
     private router: Router
-  ) { }
+  ) {
+  }
 
   async ngOnInit() {
     this.loading = true
@@ -85,15 +93,34 @@ export class ClientesMembresiasComponent implements OnInit {
     if (!this.membresiaId)
       this.membresiaId = localStorage.getItem('membresiaId');
 
+    this.membresia = JSON.parse(localStorage.getItem('membresia'));
+
     this.user = await this.authService.obtenerUsuarioLoggeado()
 
-    this.refrescarListado(this.ESTADO_ACTIVO);
+    await this.refrescarListado();
     this.loading = false
 
   }
 
-  filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  async filterGlobal(event: Event, dt: any) {
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3) {
+      this.loading = true
+      await this.refrescarListado();
+      this.loading = false
+    }
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  async onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.loading = true
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      await this.refrescarListado();
+      this.loading = false
+    }
   }
 
   async openNew() {
@@ -101,13 +128,8 @@ export class ClientesMembresiasComponent implements OnInit {
     this.loading = true
 
     this.clienteMembresia.fechaInicio = new Date();
-    
-    await this.prepareData()
 
-    this.membresia = this.membresias.find(
-        (membresia) => membresia.id == this.membresiaId
-      );
-    
+    await this.prepareData()
 
     this.cliente = null;
     this.asesor = null;
@@ -123,7 +145,7 @@ export class ClientesMembresiasComponent implements OnInit {
   }
 
   async editClienteMembresia(clienteMembresia: any) {
-    this.clienteMembresia = { ...clienteMembresia };
+    this.clienteMembresia = {...clienteMembresia};
     this.clienteMembresia.fechaInicio = new Date(this.clienteMembresia.fechaInicio + 'T23:59:00Z');
     this.clienteMembresia.fechaFin = new Date(this.clienteMembresia.fechaFin + 'T23:59:00Z');
 
@@ -135,8 +157,8 @@ export class ClientesMembresiasComponent implements OnInit {
     this.clienteMembresiaDialog = true;
   }
 
-  async prepareData(){
-    this.clientes = await this.usuarioService.obtenerUsuariosPorRolAndEstado(
+  async prepareData() {
+    const responseCliente= await this.usuarioService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO,
       0,
@@ -144,7 +166,7 @@ export class ClientesMembresiasComponent implements OnInit {
       ""
     );
 
-    this.asesores =
+    const responseAsesor =
       await this.usuarioService.obtenerUsuariosPorRolAndEstado(
         this.ROL_ASESOR_ID,
         this.ESTADO_ACTIVO,
@@ -153,10 +175,17 @@ export class ClientesMembresiasComponent implements OnInit {
         ""
       );
 
-    this.membresias =
+    const responseMembresia =
       await this.membresiasService.obtenerMembresiasByEstado(
-        this.ESTADO_ACTIVO
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        this.membresia.nombres
       );
+
+    this.clientes = responseCliente.data;
+    this.asesores = responseAsesor.data;
+    this.membresias= responseMembresia.data;
 
   }
 
@@ -168,10 +197,10 @@ export class ClientesMembresiasComponent implements OnInit {
     }
 
     if (this.membresia.vigenciaMeses && this.clienteMembresia.fechaInicio) {
-        const fechaInicio = new Date(this.clienteMembresia.fechaInicio);
-        const vigenciaMeses = this.membresia.vigenciaMeses;
-        const fechaFin = new Date(fechaInicio.setMonth(fechaInicio.getMonth() + vigenciaMeses));
-        this.clienteMembresia.fechaFin = fechaFin;
+      const fechaInicio = new Date(this.clienteMembresia.fechaInicio);
+      const vigenciaMeses = this.membresia.vigenciaMeses;
+      const fechaFin = new Date(fechaInicio.setMonth(fechaInicio.getMonth() + vigenciaMeses));
+      this.clienteMembresia.fechaFin = fechaFin;
     }
   }
 
@@ -191,6 +220,15 @@ export class ClientesMembresiasComponent implements OnInit {
     //     });
     //   },
     // });
+  }
+
+
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado();
+    this.loading = false;
   }
 
   hideDialog() {
@@ -213,7 +251,7 @@ export class ClientesMembresiasComponent implements OnInit {
         await this.clientesMembresiasService.actualizarClienteMembresia(
           this.clienteMembresia.id, clienteMembresiaToUpdate
         );
-        
+
       } else {
         this.clienteMembresia.membresiaId = this.membresia.id;
         this.clienteMembresia.clienteId = this.cliente.id;
@@ -223,8 +261,8 @@ export class ClientesMembresiasComponent implements OnInit {
           this.clienteMembresia
         );
       }
-
-      this.refrescarListado(this.ESTADO_ACTIVO);
+      this.first = 0;
+      await this.refrescarListado();
       this.clienteMembresiaDialog = false;
       this.clienteMembresia = {};
       this.messageService.add({
@@ -237,11 +275,19 @@ export class ClientesMembresiasComponent implements OnInit {
     }
   }
 
-  async refrescarListado(estado: string) {
-    this.clienteMembresias =
-      await this.clientesMembresiasService.obtenerUsuariosMembresiaByMebresiaId(
-        this.membresiaId
-      );
+  async refrescarListado() {
+    console.log(this.membresiaId)
+    const response = await this.clientesMembresiasService.obtenerUsuariosMembresiaByMebresiaId(
+      this.membresiaId,
+      this.first / this.pageSize,
+      this.pageSize,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder
+    );
+
+    this.clienteMembresias = response.data
+    this.totalRecords = response.totalRecords;
 
   }
 
@@ -251,80 +297,30 @@ export class ClientesMembresiasComponent implements OnInit {
     });
   }
 
-  filterAseguradora(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.aseguradoras.length; i++) {
-      let aseguradora = this.aseguradoras[i];
-      if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(aseguradora);
-      }
-    }
+  async filterMembresia(event) {
+    const responseMembresia = await this.membresiasService.obtenerMembresiasByEstado(
+      this.ESTADO_ACTIVO, 0, 10, event.query
+    )
 
-    this.filteredAseguradoras = filtered;
+    this.filteredMembresias = responseMembresia.data;
   }
 
-  filterMembresia(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.membresias.length; i++) {
-      let membresia = this.membresias[i];
-      if (membresia.nombres.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(membresia);
-      }
-    }
+  async filterClientes(event) {
+    const responseCliente = await this.usuarioService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO, 0, 10, event.query
+    )
 
-    this.filteredMembresias = filtered;
+    this.filteredClientes = responseCliente.data;
   }
 
-  filterClientes(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.clientes.length; i++) {
-      let cliente = this.clientes[i];
-      if (
-        cliente.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(cliente);
-      }
-    }
+  async filterAsesores(event) {
+    const responseAsesor = await this.usuarioService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_ASESOR_ID,
+      this.ESTADO_ACTIVO, 0, 10, event.query
+    )
 
-    this.filteredClientes = filtered;
+    this.filteredAsesores = responseAsesor.data;
   }
 
-  filterAsesores(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.asesores.length; i++) {
-      let asesor = this.asesores[i];
-      if (
-        asesor.nombreUsuario
-          .toLowerCase()
-          .indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(asesor);
-      }
-    }
-
-    this.filteredAsesores = filtered;
-    console.log(this.filteredAsesores)
-  }
-
-
-  filterBrokers(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.brokers.length; i++) {
-      let broker = this.brokers[i];
-      if (
-        broker.usuario.nombreUsuario
-          .toLowerCase()
-          .indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(broker);
-      }
-    }
-
-    this.filteredBrokers = filtered;
-  }
 }

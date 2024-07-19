@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import {MessageService, SortEvent} from 'primeng/api';
 import { BeneficiosService } from '../../../services/beneficios-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth-service';
@@ -25,6 +25,14 @@ export class BeneficiosComponent implements OnInit {
   membresiaId
   membresia
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+  busqueda: string = '';
+  sortField
+  sortOrder
+
   constructor(
     private messageService: MessageService,
     private beneficioService: BeneficiosService,
@@ -36,17 +44,14 @@ export class BeneficiosComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
-    this.membresias =
-    await this.membresiasService.obtenerMembresiasByEstado(
-      this.ESTADO_ACTIVO
-    );
 
     this.membresiaId = +(await this.getRouteParams('membresiaId'));
 
     if (!this.membresiaId)
       this.membresiaId = localStorage.getItem('membresiaId');
 
-    this.membresia = this.membresias.find(x => x.id === this.membresiaId)
+
+    this.membresia = JSON.parse(localStorage.getItem('membresia'));
 
     this.refrescarListado();
     let user = await this.authService.obtenerUsuarioLoggeado();
@@ -55,22 +60,50 @@ export class BeneficiosComponent implements OnInit {
   }
 
   filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      this.refrescarListado();
+
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  openNew() {
+  onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      this.refrescarListado();
+    }
+  }
+
+  async openNew() {
     this.beneficio = {};
+    this.membresia = {};
     this.submitted = false;
+    const responseMembresias = await this.membresiasService.obtenerMembresiasByEstado(
+      this.ESTADO_ACTIVO,
+      0, 10, this.membresia.nombres
+    );
+
+    this.membresias = responseMembresias.data
+
     this.beneficioDialog = true;
   }
 
-  editBeneficio(beneficio: any) {
+  async editBeneficio(beneficio: any) {
     this.beneficio = { ...beneficio };
+    const responseMembresias = await this.membresiasService.obtenerMembresiasByEstado(
+      this.ESTADO_ACTIVO,
+      0, 10, this.membresia.nombres
+    );
+
+    this.membresias = responseMembresias.data
     this.beneficioDialog = true;
   }
 
   async deleteBeneficio(beneficio: any) {
     await this.beneficioService.eliminarBeneficio(beneficio.id)
+    this.first = 0;
     this.refrescarListado();
     this.messageService.add({
       severity: 'success',
@@ -96,6 +129,7 @@ export class BeneficiosComponent implements OnInit {
       } else {
         await this.beneficioService.guardarBeneficio(this.beneficio)
       }
+      this.first = 0;
       this.refrescarListado();
       this.beneficioDialog = false;
       this.beneficio = {};
@@ -110,9 +144,29 @@ export class BeneficiosComponent implements OnInit {
     }
   }
 
-  async refrescarListado() {
-    this.beneficios = await this.beneficioService.obtenerBeneficiosByMembresia(this.membresiaId)
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado();
+    this.loading = false;
   }
+
+  async refrescarListado() {
+    const response = await this.beneficioService.obtenerBeneficiosByMembresia(
+      this.membresiaId,
+      this.first / this.pageSize,
+      this.pageSize,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder);
+
+    this.beneficios = response.data
+    this.totalRecords = response.totalRecords
+
+  }
+
+
 
   private getRouteParams(param: string): Promise<string> {
     return new Promise((resolve) => {
