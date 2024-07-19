@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, SortEvent } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { UsuariosService } from '../../../services/usuarios-service';
-import { AseguradorasService } from '../../../services/aseguradoras-service';
 import { environment } from '../../../../environments/environment';
-import { FilterService } from 'primeng/api';
 
 @Component({
   selector: 'asesores',
@@ -35,12 +33,14 @@ export class AsesoresComponent implements OnInit {
   pageSize: number = 10;
   totalRecords: number = 0;
 
+  busqueda: string = '';
+  sortField
+  sortOrder
+
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
-    private confirmationService: ConfirmationService,
-    private aseguradorasService: AseguradorasService,
-    private filterService: FilterService
+    private confirmationService: ConfirmationService
   ) {}
 
   async ngOnInit() {
@@ -50,17 +50,26 @@ export class AsesoresComponent implements OnInit {
   }
 
   filterGlobal(event: Event, dt: any) {
-    const paramBusqueda = (event.target as HTMLInputElement).value;
-    if (paramBusqueda.length >= 3) console.log('ENTRA AL MS');
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      this.refrescarListado(this.ESTADO_ACTIVO);
 
-    console.log('BUSCAR', (event.target as HTMLInputElement).value);
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
-
+  
   openNew() {
     this.usuario = {};
     this.submitted = false;
     this.usuarioDialog = true;
+  }
+
+  onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      this.refrescarListado(this.ESTADO_ACTIVO);
+    }
   }
 
   deleteSelectedUsuarios() {
@@ -162,7 +171,9 @@ export class AsesoresComponent implements OnInit {
       estado,
       this.first / this.pageSize,
       this.pageSize,
-      ""
+      this.busqueda,
+      this.sortField,
+      this.sortOrder
     );
     this.usuarios = response.data;
     this.totalRecords = response.totalRecords;

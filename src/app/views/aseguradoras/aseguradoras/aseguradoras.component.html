@@ -21,14 +21,13 @@
   <p-table
     #dt
     [value]="aseguradoras"
-    [rows]="10"
-    [paginator]="true"
-    [globalFilterFields]="['nombre', 'correoElectronico']"
     [(selection)]="selectedAseguradoras"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
     [showCurrentPageReport]="true"
+    (onSort)="onSort($event)"
+    [customSort]="true"
   >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
@@ -86,15 +85,17 @@
     </ng-template>
     
     <ng-template pTemplate="summary">
-      <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{ aseguradoras ? aseguradoras.length : 0 }} registros.
-      </div>
-    </ng-template>
-    <p-blockUI [blocked]="loading">
+      <p-blockUI [blocked]="loading">
         <div class="p-field" *ngIf="loading">
           <p-progressSpinner></p-progressSpinner>
         </div>
       </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{totalRecords ? totalRecords : 0  }} registros.
+      </div>
+    </ng-template>
+
   </p-table>
 </div>
 

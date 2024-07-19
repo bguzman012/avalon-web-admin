@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, SortEvent } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { UsuariosService } from '../../../services/usuarios-service';
-import { AseguradorasService } from '../../../services/aseguradoras-service';
+import { AgentesService } from '../../../services/agentes-service';
 import { environment } from '../../../../environments/environment';
 import { FilterService } from 'primeng/api';
 import { BrokersService } from 'src/app/services/brokers-service';
@@ -41,11 +41,16 @@ export class BrokersComponent implements OnInit {
   pageSize: number = 10;
   totalRecords: number = 0;
 
+  busqueda: string = '';
+  sortField
+  sortOrder
+
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
     private confirmationService: ConfirmationService,
     private brokersService: BrokersService,
+    private agentesService: AgentesService,
     private route: ActivatedRoute,
     private filterService: FilterService
   ) {}
@@ -55,6 +60,8 @@ export class BrokersComponent implements OnInit {
     this.brokerId = +(await this.getRouteParams('brokerId'));
 
     if (!this.brokerId) this.brokerId = localStorage.getItem('brokerId');
+
+    this.broker = JSON.parse(localStorage.getItem('broker'));
 
     await this.refrescarListado(this.ESTADO_ACTIVO);
     this.loading = false;
@@ -67,15 +74,31 @@ export class BrokersComponent implements OnInit {
   }
 
   filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      this.refrescarListado(this.ESTADO_ACTIVO);
+
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      this.refrescarListado(this.ESTADO_ACTIVO);
+    }
   }
 
   async openNew() {
     this.usuario = {};
     this.submitted = false;
-    this.brokers = await this.brokersService.obtenerBrokersByEstado(
-      this.ESTADO_ACTIVO
+    const responseBrokers = await this.brokersService.obtenerBrokersByEstado(
+      this.ESTADO_ACTIVO,
+      0, 10, this.broker.correoElectronico
     );
+
+    this.brokers = responseBrokers.data
 
     this.broker = this.brokers.find((x) => x.id === this.brokerId);
     this.usuarioDialog = true;
@@ -102,14 +125,16 @@ export class BrokersComponent implements OnInit {
   async editUsuario(usuario: any) {
     this.usuario = { ...usuario };
     this.usuario.rolId = this.usuario.rol.id;
-    this.brokers = await this.brokersService.obtenerBrokersByEstado(
-      this.ESTADO_ACTIVO
+    const responseBrokers = await this.brokersService.obtenerBrokersByEstado(
+      this.ESTADO_ACTIVO,
+      0, 10, this.usuario.broker.correoElectronico
     );
+
+    this.brokers = responseBrokers.data
+    console.log(this.brokers)
     this.broker = this.brokers.find((x) => x.id === this.usuario.broker.id);
-    // this.selectedBrokers = await this.aseguradorasService.obtenerAseguradorasByUsuarioAndEstado(this.usuario.id, 'A');
-    // console.log(this.selectedAseguradoras);
+
     this.usuarioDialog = true;
-    // Implementar lógica para editar un usuario
   }
 
   async deleteUsuario(usuario: any) {
@@ -182,12 +207,14 @@ export class BrokersComponent implements OnInit {
   }
 
   async refrescarListado(estado: string) {
-    const response = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-      this.ROL_BROKER_ID,
+    const response = await this.agentesService.obtenerAgentesPorBrokerAndEstado(
+      this.brokerId,
       estado,
       this.first / this.pageSize,
       this.pageSize,
-      ""
+      this.busqueda,
+      this.sortField,
+      this.sortOrder
     );
     this.usuarios = response.data;
     this.totalRecords = response.totalRecords;
@@ -201,16 +228,12 @@ export class BrokersComponent implements OnInit {
     this.loading = false;
   }
 
-  filterBrokers(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.brokers.length; i++) {
-      let aseguradora = this.brokers[i];
-      if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(aseguradora);
-      }
-    }
+  async filterBrokers(event) {
+    const responseBrokers = await this.brokersService.obtenerBrokersByEstado(
+      this.ESTADO_ACTIVO,
+      0, 10, event.query
+    );
 
-    this.filteredBrokers = filtered;
+    this.filteredBrokers = responseBrokers.data;
   }
 }

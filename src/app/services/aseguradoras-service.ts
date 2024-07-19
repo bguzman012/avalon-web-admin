@@ -14,9 +14,19 @@ export class AseguradorasService {
   constructor(
     private http: HttpClient) { }
   
-    async obtenerAseguradorasByEstado(estado: string): Promise<any[]> {
+    async obtenerAseguradorasByEstado(
+      estado: string, 
+      page: number,
+      size: number,
+      busqueda: string,
+      sortField: string | null = 'createdDate',
+      sortOrder: number | null = -1
+    ): Promise<any> {
       try {
-        const aseguradoras = await this.http.get<any[]>(`${this.apiUrl}/aseguradoras?estado=${estado}`).toPromise();
+        const order = sortOrder === 1 ? 'asc' : 'desc';
+        const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+        const aseguradoras = await this.http.get<any[]>(`${this.apiUrl}/aseguradoras?estado=${estado}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
         console.log('Resultado de aseguradoras:', aseguradoras);
         return aseguradoras;
       } catch (error) {

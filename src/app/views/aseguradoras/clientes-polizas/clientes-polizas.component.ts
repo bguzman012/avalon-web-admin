@@ -95,7 +95,7 @@ export class ClientesPolizasComponent implements OnInit {
 
     this.aseguradoras =
       await this.aseguradorasService.obtenerAseguradorasByEstado(
-        this.ESTADO_ACTIVO
+        this.ESTADO_ACTIVO, 0, 10, ""
       );
 
     this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(

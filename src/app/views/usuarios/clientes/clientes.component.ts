@@ -222,7 +222,7 @@ export class ClientesComponent implements OnInit {
     let query = event.query;
 
     let aseguradoras =
-      await this.aseguradorasService.obtenerAseguradorasByEstado('A');
+      await this.aseguradorasService.obtenerAseguradorasByEstado('A', 0, 10, "");
 
     for (let i = 0; i < aseguradoras.length; i++) {
       let aseguradora = aseguradoras[i];

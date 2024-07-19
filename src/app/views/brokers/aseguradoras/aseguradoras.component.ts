@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, SortEvent } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { BrokersService } from '../../../services/brokers-service';
 import { environment } from '../../../../environments/environment';
@@ -29,6 +29,14 @@ export class AseguradorasComponent implements OnInit {
   ESTADO_ACTIVO = 'A'
   ROL_ADMINISTRADOR_ID = 1
   TIPO_EMPRESA_ID = 2
+
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+  busqueda: string = '';
+  sortField
+  sortOrder
   
   activarCreate = false
 
@@ -49,7 +57,20 @@ export class AseguradorasComponent implements OnInit {
   }
 
   filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      this.refrescarListado(this.ESTADO_ACTIVO);
+
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      this.refrescarListado(this.ESTADO_ACTIVO);
+    }
   }
 
   openNew() {
@@ -70,6 +91,7 @@ export class AseguradorasComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async  () => {
         await this.brokersService.eliminarBroker(broker.id);
+        this.first = 0;
         this.refrescarListado(this.ESTADO_ACTIVO);
 
         this.messageService.add({
@@ -96,6 +118,7 @@ export class AseguradorasComponent implements OnInit {
       } else {
         await this.brokersService.guardarBroker(this.broker);
       }
+      this.first = 0;
       this.refrescarListado(this.ESTADO_ACTIVO);
       this.brokerDialog = false;
       this.broker = {};
@@ -105,12 +128,30 @@ export class AseguradorasComponent implements OnInit {
     }
   }
 
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado(this.ESTADO_ACTIVO);
+    this.loading = false;
+  }
+
   async refrescarListado(estado){
-    this.brokers = await this.brokersService.obtenerBrokersByEstado(estado);
+    const response = await this.brokersService.obtenerBrokersByEstado(
+      estado, 
+      this.first / this.pageSize,
+      this.pageSize,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder);
+    this.brokers = response.data;
+    this.totalRecords = response.totalRecords;
   }
 
   redirectToAgentesPage(broker: any) {
     localStorage.setItem("brokerId", broker.id);
+    localStorage.setItem('broker', JSON.stringify(broker));
+      
     this.router.navigate(['brokers/agentes'], { queryParams: { brokerId: broker.id } });
   }
 }

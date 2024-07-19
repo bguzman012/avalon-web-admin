@@ -79,7 +79,7 @@ export class PolizasComponent implements OnInit {
     this.submitted = false;
     this.aseguradoras =
       await this.aseguradorasService.obtenerAseguradorasByEstado(
-        this.ESTADO_ACTIVO
+        this.ESTADO_ACTIVO, 0, 10, ""
       );
 
       if (this.aseguradoraId)
@@ -97,7 +97,7 @@ export class PolizasComponent implements OnInit {
     this.poliza = { ...poliza };
     this.aseguradoras =
     await this.aseguradorasService.obtenerAseguradorasByEstado(
-      this.ESTADO_ACTIVO
+      this.ESTADO_ACTIVO, 0, 10, ""
     );
 
     if (this.aseguradoraId)

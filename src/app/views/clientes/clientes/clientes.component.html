@@ -126,7 +126,7 @@
       </p-blockUI>
       <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{ totalRecords }} registros.
+        En total existen  {{totalRecords ? totalRecords : 0 }} registros.
       </div>
     </ng-template>
   </p-table>

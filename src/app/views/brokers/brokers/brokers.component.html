@@ -12,10 +12,13 @@
     </p-toolbar>
 
     <p-table #dt [value]="usuarios" 
-        [globalFilterFields]="['nombres','apellidos','correoElectronico','numeroTelefono','nombreUsuario']"
-        [(selection)]="selectedUsuarios" [rowHover]="true" dataKey="id"
+        [(selection)]="selectedUsuarios" 
+        [rowHover]="true" 
+        dataKey="id"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-        [showCurrentPageReport]="true">
+        [showCurrentPageReport]="true"
+        (onSort)="onSort($event)"
+        [customSort]="true">
         <ng-template pTemplate="caption">
             <div class="p-d-flex p-ai-center p-jc-between">
                 <h5 class="p-m-0">Administrar Agentes</h5>
@@ -66,7 +69,7 @@
               </p-blockUI>
               <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
             <div class="p-d-flex p-ai-center p-jc-between">
-                En total existen {{usuarios ? usuarios.length : 0 }} registros.
+                En total existen {{totalRecords ? totalRecords : 0 }} registros.
             </div>
         </ng-template>
     </p-table>
@@ -75,6 +78,23 @@
 <p-dialog [(visible)]="usuarioDialog" [style]="{width: '900px'}" header="Agente Detalle" [modal]="true"
     styleClass="p-fluid">
     <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="brokerId">Broker</label>
+            <p-autoComplete
+              [(ngModel)]="broker"
+              [showEmptyMessage]="true"
+              [suggestions]="filteredBrokers"
+              (completeMethod)="filterBrokers($event)"
+              field="nombre"
+              readonly
+              [minLength]="1"
+              [appendTo]="'body'"
+              required
+            ></p-autoComplete>
+            <small class="p-invalid" *ngIf="submitted && !broker"
+              >Broker es requerido.</small
+            >
+          </div>
         <div class="p-grid p-fluid">
             <div class="p-col-12 p-md-6">
                 <div class="p-field">
@@ -123,22 +143,7 @@
             <label class="p-mb-3">Nombre Usuario</label>
             <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
         </div>
-        <div class="p-field">
-            <label for="brokerId">Broker</label>
-            <p-autoComplete
-              [(ngModel)]="broker"
-              [showEmptyMessage]="true"
-              [suggestions]="filteredBrokers"
-              (completeMethod)="filterBrokers($event)"
-              field="nombre"
-              [minLength]="1"
-              [appendTo]="'body'"
-              required
-            ></p-autoComplete>
-            <small class="p-invalid" *ngIf="submitted && !broker"
-              >Broker es requerido.</small
-            >
-          </div>
+       
 
         <p-blockUI [blocked]="loading">
             <div class="p-field" *ngIf="loading">

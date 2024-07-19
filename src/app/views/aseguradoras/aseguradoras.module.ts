@@ -32,6 +32,8 @@ import {RatingModule} from 'primeng/rating';
 import {RadioButtonModule} from 'primeng/radiobutton';
 import {InputNumberModule} from 'primeng/inputnumber';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
+import {PaginatorModule} from 'primeng/paginator';
 import { ConfirmationService } from 'primeng/api';
 import { BlockUIModule } from 'primeng/blockui';
 import { MessageService } from 'primeng/api';
@@ -55,6 +57,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
   imports: [
     CommonModule,
     AseguradorasRoutingModule,
+    PaginatorModule,
     CardModule,
     FormModule,
     GridModule,
