@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
-import { PolizasService } from '../../../services/polizas-service';
-import { ClientePolizaService } from '../../../services/polizas-cliente-service';
-import { ConfirmationService } from 'primeng/api';
-import { AuthService } from 'src/app/services/auth-service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AseguradorasService } from 'src/app/services/aseguradoras-service';
+import {Component, OnInit} from '@angular/core';
+import {MessageService, SortEvent} from 'primeng/api';
+import {PolizasService} from '../../../services/polizas-service';
+import {ClientePolizaService} from '../../../services/polizas-cliente-service';
+import {ConfirmationService} from 'primeng/api';
+import {AuthService} from 'src/app/services/auth-service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AseguradorasService} from 'src/app/services/aseguradoras-service';
 
 @Component({
   selector: 'app-polizas',
@@ -29,18 +29,24 @@ export class PolizasComponent implements OnInit {
   aseguradoraId
   polizaId
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
 
+  busqueda: string = '';
+  sortField
+  sortOrder
 
   constructor(
     private messageService: MessageService,
     private polizasService: PolizasService,
-    private clientePolizaService: ClientePolizaService,
     private confirmationService: ConfirmationService,
     private aseguradorasService: AseguradorasService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {
+  }
 
   async ngOnInit() {
     this.loading = true;
@@ -51,7 +57,9 @@ export class PolizasComponent implements OnInit {
     if (!this.aseguradoraId)
       this.aseguradoraId = localStorage.getItem('aseguradoraId');
 
-    this.refrescarListado();
+    this.aseguradora = JSON.parse(localStorage.getItem('aseguradora'));
+
+    await this.refrescarListado();
     this.loading = false;
   }
 
@@ -61,15 +69,42 @@ export class PolizasComponent implements OnInit {
     });
   }
 
-  
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado();
+    this.loading = false;
+  }
+
+
+  async filterGlobal(event: Event, dt: any) {
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      await this.refrescarListado();
+
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  async onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.loading = true
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      await this.refrescarListado();
+      this.loading = false
+    }
+  }
+
   redirectToCoberturasPage(poliza: any) {
     localStorage.setItem("polizaId", poliza.id);
     localStorage.setItem("aseguradoraId", poliza.aseguradora.id);
-
+    localStorage.setItem("poliza", JSON.stringify(poliza));
     this.router.navigate(['aseguradoras/polizas/coberturas'], {
       queryParams: {
         polizaId: poliza.id,
-        aseguradoraId:  poliza.aseguradora.id
+        aseguradoraId: poliza.aseguradora.id
       },
     });
   }
@@ -77,46 +112,42 @@ export class PolizasComponent implements OnInit {
   async openNew() {
     this.poliza = {};
     this.submitted = false;
-    this.aseguradoras =
+    const responseAseguradora =
       await this.aseguradorasService.obtenerAseguradorasByEstado(
-        this.ESTADO_ACTIVO, 0, 10, ""
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        this.aseguradora.nombre
       );
 
-      if (this.aseguradoraId)
-        this.aseguradora = this.aseguradoras.find(x => x.id == this.aseguradoraId);
-
+    this.aseguradoras = responseAseguradora.data
     this.polizaDialog = true;
-  }
-
-  
-  filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
   async editPoliza(poliza: any) {
-    this.poliza = { ...poliza };
-    this.aseguradoras =
-    await this.aseguradorasService.obtenerAseguradorasByEstado(
-      this.ESTADO_ACTIVO, 0, 10, ""
-    );
+    this.poliza = {...poliza};
+    const responseAseguradora =
+      await this.aseguradorasService.obtenerAseguradorasByEstado(
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        this.aseguradora.nombre
+      );
 
-    if (this.aseguradoraId)
-      this.aseguradora = this.aseguradoras.find(x => x.id == this.aseguradoraId);
-
+    this.aseguradoras = responseAseguradora.data
     this.polizaDialog = true;
   }
 
-  filterAseguradoras(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.aseguradoras.length; i++) {
-      let aseguradora = this.aseguradoras[i];
-      if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(aseguradora);
-      }
-    }
+  async filterAseguradoras(event) {
+    const responseAseguradora =
+      await this.aseguradorasService.obtenerAseguradorasByEstado(
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        event.query
+      );
 
-    this.filteredAseguradoras = filtered;
+    this.filteredAseguradoras = responseAseguradora.data;
   }
 
   async deletePoliza(poliza: any) {
@@ -126,7 +157,8 @@ export class PolizasComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         await this.polizasService.eliminarPoliza(poliza.id);
-        this.refrescarListado();
+        this.first = 0
+        await this.refrescarListado();
         this.messageService.add({
           severity: 'success',
           summary: 'Enhorabuena!',
@@ -155,7 +187,8 @@ export class PolizasComponent implements OnInit {
         await this.polizasService.guardarPoliza(this.poliza);
       }
 
-      this.refrescarListado();
+      this.first = 0
+      await this.refrescarListado();
       this.polizaDialog = false;
       this.poliza = {};
       this.messageService.add({
@@ -170,10 +203,29 @@ export class PolizasComponent implements OnInit {
 
   redirectToMembresiasPage(poliza: any) {
     localStorage.setItem("polizaId", poliza.id);
-    this.router.navigate(['aseguradoras/polizas/cliente-polizas'], { queryParams: { polizaId: poliza.id } });
+    localStorage.setItem("aseguradoraId", poliza.aseguradora.id);
+    localStorage.setItem("poliza", JSON.stringify(poliza));
+    this.router.navigate(['aseguradoras/polizas/cliente-polizas'],
+      {
+        queryParams:
+          {
+            polizaId: poliza.id,
+            aseguradoraId: poliza.aseguradora.id
+          },
+      });
   }
 
   async refrescarListado() {
-    this.polizas = await this.polizasService.obtenerPolizasByAseguradora(this.aseguradoraId);
+    const response = await this.polizasService.obtenerPolizasByAseguradora(
+      this.aseguradoraId,
+      0,
+      10,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder
+    );
+
+    this.polizas = response.data
+    this.totalRecords = response.totalRecords;
   }
 }

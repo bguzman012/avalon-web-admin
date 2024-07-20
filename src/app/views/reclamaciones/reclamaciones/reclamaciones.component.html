@@ -1,85 +1,99 @@
 <p-toast></p-toast>
 <div class="card">
-    <p-toolbar styleClass="p-mb-4">
-        <ng-template pTemplate="left">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left">
 
-            <h5 class="p-m-0">Administrar Reclamos</h5>
-
-
-        </ng-template>
-
-        <ng-template pTemplate="right">
-            <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
-                (click)="redirectToDetailReclamacionPage()"></button>
-        </ng-template>
-    </p-toolbar>
-    <p-panel>
-        <div class="filter-container">
-        <!-- Filtro por Cliente -->
-        <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
-            (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="true"
-            (ngModelChange)="loadPolizas()"
-            placeholder="Filtrar por Cliente" [size]="30" [minLength]="1" [disabled]="false" [forceSelection]="true"
-            [maxlength]="50">
-        </p-autoComplete>
+      <h5 class="p-m-0">Administrar Reclamos</h5>
 
 
-        <!-- Filtro por Póliza -->
-        <p-autoComplete [(ngModel)]="selectedClientePoliza" [suggestions]="filteredPolizas"
-            (completeMethod)="filterPolizas($event)" field="displayName" [dropdown]="true" placeholder="Filtrar por Póliza"
-            [size]="30" [minLength]="1" [disabled]="!selectedCliente" [forceSelection]="true" [maxlength]="50">
-        </p-autoComplete>
+    </ng-template>
 
-        <button pButton pRipple class="p-button-primary p-mr-2" (click)="manageListado()">Buscar</button>
+    <ng-template pTemplate="right">
+      <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
+              (click)="redirectToDetailReclamacionPage()"></button>
+    </ng-template>
+  </p-toolbar>
+  <p-panel>
+    <div class="filter-container">
+      <!-- Filtro por Cliente -->
+      <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
+                      (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="true"
+                      (ngModelChange)="loadPolizas()"
+                      placeholder="Filtrar por Cliente" [size]="30" [minLength]="1" [disabled]="false"
+                      [forceSelection]="true"
+                      [maxlength]="50">
+      </p-autoComplete>
+
+
+      <!-- Filtro por Póliza -->
+      <p-autoComplete [(ngModel)]="selectedClientePoliza" [suggestions]="filteredPolizas"
+                      (completeMethod)="filterPolizas($event)" field="displayName" [dropdown]="true"
+                      placeholder="Filtrar por Póliza"
+                      [size]="30" [minLength]="1" [disabled]="!selectedCliente" [forceSelection]="true"
+                      [maxlength]="50">
+      </p-autoComplete>
+
+      <button pButton pRipple class="p-button-primary p-mr-2" (click)="manageListado()">Buscar</button>
+    </div>
+  </p-panel>
+
+  <p-table #dt [value]="reclamaciones"
+           [(selection)]="selectedReclamaciones"
+           [rowHover]="true" dataKey="id"
+           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+           [showCurrentPageReport]="true"
+           (onSort)="onSort($event)"
+           [customSort]="true">
+    <ng-template pTemplate="caption">
+
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="id">ID
+          <p-sortIcon field="id"></p-sortIcon>
+        </th>
+        <th pSortableColumn="razon">Razón
+          <p-sortIcon field="razon"></p-sortIcon>
+        </th>
+        <th pSortableColumn="estado">Estado
+          <p-sortIcon field="estado"></p-sortIcon>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-reclamacion>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="reclamacion"></p-tableCheckbox>
+        </td>
+        <td>{{ reclamacion.id }}</td>
+        <td>{{ reclamacion.razon }}</td>
+        <td>{{ reclamacion.estado }}</td>
+        <td>
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 medium-button"
+                  (click)="editReclamacion(reclamacion)"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning medium-button"
+                  (click)="deleteReclamacion(reclamacion)"></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
         </div>
-    </p-panel>
-
-    <p-table #dt [value]="reclamaciones" [rows]="10" [paginator]="true" [globalFilterFields]="['id','razon','estado']"
-        [(selection)]="selectedReclamaciones" [rowHover]="true" dataKey="id"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-        [showCurrentPageReport]="true">
-        <ng-template pTemplate="caption">
-
-        </ng-template>
-
-        <ng-template pTemplate="header">
-            <tr>
-                <th style="width: 3rem">
-                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                </th>
-                <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
-                <th pSortableColumn="razon">Razón <p-sortIcon field="razon"></p-sortIcon></th>
-                <th pSortableColumn="estado">Estado <p-sortIcon field="estado"></p-sortIcon></th>
-                <th></th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-reclamacion>
-            <tr>
-                <td>
-                    <p-tableCheckbox [value]="reclamacion"></p-tableCheckbox>
-                </td>
-                <td>{{reclamacion.id}}</td>
-                <td>{{reclamacion.razon}}</td>
-                <td>{{reclamacion.estado}}</td>
-                <td>
-                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 medium-button"
-                        (click)="editReclamacion(reclamacion)"></button>
-                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning medium-button"
-                        (click)="deleteReclamacion(reclamacion)"></button>
-                </td>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="summary">
-            <div class="p-d-flex p-ai-center p-jc-between">
-                En total existen {{reclamaciones ? reclamaciones.length : 0 }} registros.
-            </div>
-        </ng-template>
-        <p-blockUI [blocked]="loading">
-            <div class="p-field" *ngIf="loading">
-                <p-progressSpinner></p-progressSpinner>
-            </div>
-        </p-blockUI>
-    </p-table>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first"
+                   (onPageChange)="onPageChange($event)"></p-paginator>
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{ totalRecords ? totalRecords : 0 }} registros.
+      </div>
+    </ng-template>
+  </p-table>
 </div>
 
 <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

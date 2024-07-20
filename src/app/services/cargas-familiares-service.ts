@@ -30,9 +30,18 @@ export class CargaFamiliarService {
     }
   }
 
-  async getCargasFamiliaresByClientePoliza(clientePolizaId: number): Promise<any[]> {
+  async getCargasFamiliaresByClientePoliza(
+    clientePolizaId: number,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1
+  ): Promise<any> {
     try {
-      const cargasFamiliares = await this.http.get<any[]>(`${this.apiUrl}/clientesPolizas/${clientePolizaId}/cargasFamiliares`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+      const cargasFamiliares = await this.http.get<any[]>(`${this.apiUrl}/clientesPolizas/${clientePolizaId}/cargasFamiliares?page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       return cargasFamiliares;
     } catch (error) {
       console.error('Error fetching cargas familiares by cliente poliza:', error);

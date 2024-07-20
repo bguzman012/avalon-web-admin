@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import {MessageService, SortEvent} from 'primeng/api';
 import { PolizasService } from '../../../services/polizas-service';
 import { ConfirmationService } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth-service';
@@ -55,6 +55,14 @@ export class ClientesPolizasComponent implements OnInit {
 
   vigenciaMeses
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+  busqueda: string = '';
+  sortField
+  sortOrder
+
   constructor(
     private messageService: MessageService,
     private polizasService: PolizasService,
@@ -75,17 +83,38 @@ export class ClientesPolizasComponent implements OnInit {
 
     if (!this.clienteId) this.clienteId = localStorage.getItem('clienteId');
 
-    this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-      this.ROL_CLIENTE_ID,
-      this.ESTADO_ACTIVO,
-      0,
-      10,
-      ""
-    );
-    this.cliente = this.clientes.find((x) => x.id == this.clienteId);
+    this.cliente = JSON.parse(localStorage.getItem('cliente'));
 
     await this.refrescarListado();
     this.loading = false;
+  }
+
+  async filterGlobal(event: Event, dt: any) {
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      await this.refrescarListado();
+
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado();
+    this.loading = false;
+  }
+
+
+  async onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.loading = true
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      await this.refrescarListado();
+      this.loading = false
+    }
   }
 
   private getRouteParams(param: string): Promise<string> {
@@ -96,7 +125,7 @@ export class ClientesPolizasComponent implements OnInit {
 
   redirectToCargasFamiliaresPage(clientePoliza: any) {
     localStorage.setItem("clientePolizaId", clientePoliza.id);
-
+    localStorage.setItem("clientePoliza", JSON.stringify(clientePoliza));
     this.router.navigate(['clientes/polizas/cargas-familiares'], {
       queryParams: {
         clientePoliza: clientePoliza.id
@@ -105,30 +134,36 @@ export class ClientesPolizasComponent implements OnInit {
   }
 
   async prepareData() {
-    // this.polizas = await this.polizasService.obtenerPolizasByAseguradora(
-    //   this.aseguradoraId
-    // );
+    if (this.user.rol.id == this.ROL_ASESOR_ID) this.asesor = this.user;
 
-    this.aseguradoras =
+     const responseAseguradora=
       await this.aseguradorasService.obtenerAseguradorasByEstado(
-        this.ESTADO_ACTIVO, 0, 10, ""
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        this.aseguradora ? this.aseguradora.nombre : ""
       );
 
-    this.asesores = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-      this.ROL_ASESOR_ID,
-      this.ESTADO_ACTIVO,
-      0,
-      10,
-      ""
-    );
+    const responseAsesor =
+      await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+        this.ROL_ASESOR_ID,
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        this.user.rol.id == this.ROL_ASESOR_ID || this.asesor ? this.asesor.nombreUsuario : ""
+      );
 
-    this.brokers = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+    const responseBroker = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_BROKER_ID,
       this.ESTADO_ACTIVO,
       0,
       10,
-      ""
+      this.broker ? this.broker.nombreUsuario : ""
     );
+
+    this.aseguradoras = responseAseguradora.data;
+    this.asesores = responseAsesor.data;
+    this.brokers = responseBroker.data;
   }
 
   async openNew() {
@@ -139,115 +174,111 @@ export class ClientesPolizasComponent implements OnInit {
 
     await this.prepareData();
 
-    if (this.clienteId)
-      this.cliente = this.clientes.find((x) => x.id == this.clienteId);
-
-    if (this.user.rol.id == this.ROL_ASESOR_ID) this.asesor = this.user;
-
     // this.calcularFechaFin()
     this.loading = false;
     this.polizaDialog = true;
   }
 
-  filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
-
   async editPoliza(poliza: any) {
+    this.loading = true
     this.polizaCliente = { ...poliza };
     this.polizaCliente.fechaInicio = new Date(this.polizaCliente.fechaInicio + 'T23:59:00Z');
     this.polizaCliente.fechaFin = new Date(this.polizaCliente.fechaFin + 'T23:59:00Z');
-    await this.prepareData();
 
     this.cliente = this.polizaCliente.cliente
     this.asesor = this.polizaCliente.asesor
     this.broker = this.polizaCliente.agente
     this.aseguradora = this.polizaCliente.poliza.aseguradora
 
-    this.changeAseguradora(this.aseguradora)
     this.poliza = this.polizaCliente.poliza
-    
+
+    await this.prepareData();
+
+    const response = await this.polizasService.obtenerPolizasByAseguradora(
+      this.aseguradora.id,
+      0,
+      10,
+      this.poliza.nombre
+    );
+
+    this.polizas = response.data
+
     this.vigenciaMeses = this.polizaCliente.poliza.vigenciaMeses;
+    this.loading = false
     this.polizaDialog = true;
   }
 
-  filterPolizas(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.polizas.length; i++) {
-      let poliza = this.polizas[i];
-      if (poliza.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(poliza);
-      }
-    }
+  async filterPolizas(event) {
+    const response = await this.polizasService.obtenerPolizasByAseguradora(
+      this.aseguradora.id,
+      0,
+      10,
+      event.query
+    );
 
-    this.filteredPolizas = filtered;
-  }
-
-  filterAseguradoras(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.aseguradoras.length; i++) {
-      let aseguradora = this.aseguradoras[i];
-      if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(aseguradora);
-      }
-    }
-
-    this.filteredAseguradoras = filtered;
+    this.filteredPolizas = response.data
   }
 
   async changeAseguradora(aseguradora){
 
-    this.polizas = await this.polizasService.obtenerPolizasByAseguradora(
-      aseguradora.id
-    );
+    if (aseguradora.id) {
+      const response = await this.polizasService.obtenerPolizasByAseguradora(
+        aseguradora.id,
+        0,
+        10,
+        ""
+      );
 
+      this.polizas = response.data
+      this.poliza = null
+    }
   }
 
-  filterAsesores(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.asesores.length; i++) {
-      let asesor = this.asesores[i];
-      if (
-        asesor.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(asesor);
-      }
-    }
+  async filterAseguradoras(event) {
+    const responseAseguradora = await this.aseguradorasService.obtenerAseguradorasByEstado(
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      event.query
+    )
 
-    this.filteredAsesores = filtered;
+    this.filteredAseguradoras = responseAseguradora.data;
   }
 
-  filterClientes(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.clientes.length; i++) {
-      let cliente = this.clientes[i];
-      if (
-        cliente.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(cliente);
-      }
-    }
+  async filterAsesores(event) {
+    const responseAsesor = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_ASESOR_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      event.query
+    )
 
-    this.filteredClientes = filtered;
+    this.filteredAsesores = responseAsesor.data;
   }
 
-  filterBrokers(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.brokers.length; i++) {
-      let broker = this.brokers[i];
-      if (
-        broker.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(broker);
-      }
-    }
+  async filterClientes(event) {
+    const responseAsesor = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      event.query
+    )
 
-    this.filteredBrokers = filtered;
+    this.filteredClientes = responseAsesor.data;
+  }
+
+  async filterBrokers(event) {
+    const responseBroker = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_BROKER_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      event.query
+    )
+
+    this.filteredBrokers = responseBroker.data;
   }
 
   async deletePoliza(polizaCliente: any) {
@@ -262,6 +293,7 @@ export class ClientesPolizasComponent implements OnInit {
         await this.clientesPolizasService.eliminarClientePoliza(
           polizaCliente.id
         );
+        this.first = 0
         this.refrescarListado();
         this.messageService.add({
           severity: 'success',
@@ -317,6 +349,7 @@ export class ClientesPolizasComponent implements OnInit {
         );
       }
 
+      this.first = 0
       this.refrescarListado();
       this.polizaDialog = false;
       this.polizaCliente = {};
@@ -331,9 +364,16 @@ export class ClientesPolizasComponent implements OnInit {
   }
 
   async refrescarListado() {
-    this.clientePolizas =
-      await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
-        this.clienteId
-      );
+    const response = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
+      this.clienteId,
+      this.first / this.pageSize,
+      this.pageSize,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder
+    );
+
+    this.clientePolizas = response.data
+    this.totalRecords = response.totalRecords;
   }
 }

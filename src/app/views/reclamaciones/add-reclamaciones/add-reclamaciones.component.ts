@@ -25,7 +25,7 @@ export class AddReclamacionesComponent implements OnInit {
   submitted: boolean;
   reclamacion: any;
   loading: boolean = false;
-  
+
   clientes: any[]; // Lista de clientes para el autocompletado
   aseguradoras: any[]; // Lista de aseguradoras para el autocompletado
   clientePolizas: any[]; // Lista de polizas para el autocompletado
@@ -69,25 +69,39 @@ export class AddReclamacionesComponent implements OnInit {
     private sanitizer: DomSanitizer
   ) { }
 
+
+
   async ngOnInit() {
     this.loading = true;
     this.openNew();
     await this.prepareData();
+    console.log(this.reclamacion)
 
     if (await this.getRouteParams('reclamacionId')) {
       this.nombreDocumento = 'Cargando ...'
       const reclamacion = JSON.parse(localStorage.getItem('reclamacion'));
 
       this.reclamacionId = +(await this.getRouteParams('reclamacionId'));
-     
+
       this.reclamacion = reclamacion
       // this.reclamacion = await this.reclamacionesService.getReclamacion(this.reclamacionId);
 
       this.selectedCliente = this.reclamacion.clientePoliza.cliente
-      await this.loadPolizas();
-      this.selectedClientePoliza = this.clientePolizas.find(x => x.id === this.reclamacion.clientePoliza.id);
-      this.comentarios = await this.comentariosService.getComentariosByReclamacion(this.reclamacionId);
 
+      const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+        this.ROL_CLIENTE_ID,
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        this.selectedCliente.nombreUsuario
+      );
+
+      this.clientes = responseCliente.data
+
+      this.selectedClientePoliza = JSON.parse(localStorage.getItem("clientePoliza"))
+      await this.loadPolizas(true);
+
+      this.comentarios = await this.comentariosService.getComentariosByReclamacion(this.reclamacionId);
 
       this.loading = false;
 
@@ -96,8 +110,8 @@ export class AddReclamacionesComponent implements OnInit {
         this.imagen =  foto.documento
         this.nombreDocumento = foto.nombreDocumento
       }
-      // this.reclamacion.fotoReclamo = reclamacionFoto.fotoReclamo 
-      
+      // this.reclamacion.fotoReclamo = reclamacionFoto.fotoReclamo
+
       if (this.imagen) {
         this.imagePreview = this.imagen;
       }else{
@@ -106,7 +120,7 @@ export class AddReclamacionesComponent implements OnInit {
 
       if (reclamacion.estado == 'C')
         this.readOnlyForm = true
-      
+
       return
     }
 
@@ -143,30 +157,6 @@ export class AddReclamacionesComponent implements OnInit {
     }
   }
 
-  // async cerrarTramite() {
-  //   this.loading = true
-  //   let currentUser = await this.authService.obtenerUsuarioLoggeado();
-  //   const comentario = {
-  //     citaMedicaId: this.citaMedicaId,
-  //     contenido: this.nuevoComentario,
-  //     usuarioComentaId: currentUser.id,
-  //     estado: 'C' // Estado activo
-  //   };
-
-  //   await this.citasMedicasService.partiallyUpdateCitaMedica(this.citaMedica.id, 'C')
-
-  //   try {
-  //     await this.comentariosCitasMedicasService.createComentario(comentario);
-  //     this.nuevoComentario = '';
-  //     await this.loadComentarios();
-  //     this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Cita médica cerrada con éxito' });
-  //     this.loading = false
-  //   } catch (error) {
-  //     this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });
-  //     this.loading = false
-  //   }
-  // }
-
   async cerrarReclamo() {
     this.loading = true
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
@@ -178,7 +168,7 @@ export class AddReclamacionesComponent implements OnInit {
     };
 
     await this.reclamacionesService.partiallyUpdateReclamacion(this.reclamacion.id, 'C')
-    
+
     this.readOnlyForm = true
 
     try {
@@ -214,7 +204,7 @@ export class AddReclamacionesComponent implements OnInit {
   onFileSelect(event) {
     if (this.reclamacion)
       this.editImage = true;
-    
+
     const file = event.files[0];
     this.imagen = file;
     this.nombreDocumento = this.imagen.name
@@ -253,13 +243,15 @@ export class AddReclamacionesComponent implements OnInit {
 
 
   async prepareData() {
-    this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+    const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO,
       0,
       10,
       ""
     );
+
+    this.clientes = responseCliente.data
   }
 
   private getRouteParams(param: string): Promise<string> {
@@ -268,57 +260,10 @@ export class AddReclamacionesComponent implements OnInit {
     });
   }
 
-
-  filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
-
   openNew() {
     this.reclamacion = {};
     this.submitted = false;
     this.reclamacionDialog = true;
-  }
-
-  deleteSelectedReclamaciones() {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete the selected claims?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        // Implementar lógica para eliminar reclamaciones seleccionadas
-        this.selectedReclamaciones = [];
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Claims Deleted',
-          life: 3000,
-        });
-      },
-    });
-  }
-
-  async editReclamacion(reclamacion: any) {
-    this.reclamacion = { ...reclamacion };
-    this.reclamacionDialog = true;
-  }
-
-  async deleteReclamacion(reclamacion: any) {
-    this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar el reclamo?',
-      header: 'Confirmar',
-      icon: 'pi pi-exclamation-triangle',
-      accept: async () => {
-        await this.reclamacionesService.eliminarReclamacion(reclamacion.id);
-        await this.manageListado()
-        
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Enhorabuena!',
-          detail: 'Reclamo eliminada exitosamente',
-          life: 3000,
-        });
-      },
-    });
   }
 
   hideDialog() {
@@ -328,7 +273,7 @@ export class AddReclamacionesComponent implements OnInit {
 
   async saveReclamacion() {
     this.submitted = true;
-    
+
     if (!this.imagen){
       this.messageService.add({
         severity: 'error',
@@ -336,7 +281,7 @@ export class AddReclamacionesComponent implements OnInit {
         detail: 'Imagen es requerido',
         life: 3000,
       });
-      return 
+      return
     }
 
     this.loading = true; // Mostrar spinner
@@ -365,54 +310,63 @@ export class AddReclamacionesComponent implements OnInit {
   }
 
 
-  async refrescarListado(type) {
-    console.log(this.selectedClientePoliza, this.selectedCliente)
-    if (type == "ALL")
-      this.reclamaciones = await this.reclamacionesService.obtenerReclamaciones(this.ESTADO_ACTIVO, null);
-    else
-      this.reclamaciones = await this.reclamacionesService.obtenerReclamaciones(undefined, this.selectedClientePoliza.id);
+  async filterClientes(event){
+    let query = event.query;
+
+    const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      query
+    );
+
+    this.filteredClientes = responseCliente.data
   }
 
-  filterClientes(event): void {
+
+  async filterPolizas(event) {
     let query = event.query;
-    this.filteredClientes = this.clientes.filter(cliente =>
-      cliente.nombres.toLowerCase().indexOf(query.toLowerCase()) === 0);
+
+    const responseClientePoliza = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
+      this.selectedCliente.id,
+      0,
+      10,
+      query);
+
+    let clientePolizas = responseClientePoliza.data
+    if (clientePolizas) {
+      clientePolizas = clientePolizas.map(obj => ({
+        ...obj,
+        displayName: `${obj.id}-${obj.poliza.nombre}`
+      }));
+      console.log(clientePolizas)
+
+      this.filteredPolizas = clientePolizas;
     }
-  
-    filterAseguradoras(event): void {
-      let query = event.query;
-      this.filteredAseguradoras = this.aseguradoras.filter(aseguradora =>
-        aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) === 0);
-    }
-  
-    filterPolizas(event): void {
-      let query = event.query;
-      this.filteredPolizas = this.clientePolizas.filter(obj =>
-        obj.displayName.toLowerCase().indexOf(query.toLowerCase()) === 0);
-    }
-  
-    async loadPolizas() {
-      console.log(this.clientePolizaId)
+
+  }
+
+    async loadPolizas(esEdicion: boolean | null = false) {
       if (this.selectedCliente) {
-        let clientePolizas = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(this.selectedCliente.id);
-        
+        const responseClientePoliza = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
+          this.selectedCliente.id,
+          0,
+          10,
+          esEdicion ? this.selectedClientePoliza.nombre : "");
+
+        let clientePolizas = responseClientePoliza.data
         if (clientePolizas) {
           clientePolizas = clientePolizas.map(obj => ({
             ...obj,
             displayName: `${obj.id}-${obj.poliza.nombre}`
           }));
           console.log(clientePolizas)
-          
-          this.clientePolizas = clientePolizas; 
+
+          this.clientePolizas = clientePolizas;
         }
       }
     }
-  
-    async manageListado(){
-      if (this.selectedClientePoliza)
-        await this.refrescarListado("CLIENTE_POLIZA");
-      else
-        await this.refrescarListado("ALL");
-    }
+
   }
-  
+

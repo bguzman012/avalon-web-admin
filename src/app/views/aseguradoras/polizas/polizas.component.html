@@ -2,22 +2,32 @@
 
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
-    <ng-template pTemplate="left"> </ng-template>
+    <ng-template pTemplate="left">
+      <div>
+        <h5><strong>Aseguradora:</strong> {{ aseguradora?.nombre }}</h5>
+      </div>
+    </ng-template>
     <ng-template pTemplate="right">
       <button pButton pRipple label="Nueva" icon="pi pi-plus" class="p-button-success p-mr-2"
-        (click)="openNew()"></button>
+              (click)="openNew()"></button>
     </ng-template>
   </p-toolbar>
 
-  <p-table #dt [value]="polizas" [rows]="10" [paginator]="true" [globalFilterFields]="['nombre', 'descripcion']"
-    [(selection)]="selectedPolizas" [rowHover]="true" dataKey="id"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" [showCurrentPageReport]="true">
+  <p-table #dt
+           [value]="polizas"
+           [(selection)]="selectedPolizas"
+           [rowHover]="true"
+           dataKey="id"
+           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+           [showCurrentPageReport]="true"
+           (onSort)="onSort($event)"
+           [customSort]="true">
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
         <h5 class="p-m-0">Administrar Pólizas</h5>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..." />
+          <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..."/>
         </span>
       </div>
     </ng-template>
@@ -27,16 +37,20 @@
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
         <th pSortableColumn="nombre">
-          Nombre <p-sortIcon field="nombre"></p-sortIcon>
+          Nombre
+          <p-sortIcon field="nombre"></p-sortIcon>
         </th>
         <th pSortableColumn="descripcion">
-          Descripción <p-sortIcon field="descripcion"></p-sortIcon>
+          Descripción
+          <p-sortIcon field="descripcion"></p-sortIcon>
         </th>
         <th pSortableColumn="vigenciaMeses">
-          Vigencia (meses) <p-sortIcon field="vigenciaMeses"></p-sortIcon>
+          Vigencia (meses)
+          <p-sortIcon field="vigenciaMeses"></p-sortIcon>
         </th>
-        <th pSortableColumn="aseguradora.nombres">
-          Aseguradora <p-sortIcon field="aseguradora.nombre"></p-sortIcon>
+        <th pSortableColumn="aseguradora">
+          Aseguradora
+          <p-sortIcon field="aseguradora"></p-sortIcon>
         </th>
         <th style="width: 200px;"></th>
       </tr>
@@ -56,33 +70,52 @@
             pRipple
             class="p-button-rounded p-button-primary p-mr-2 small-button"
             (click)="redirectToCoberturasPage(poliza); $event.stopPropagation()"
-          >Coberturas</button>
+          >Coberturas
+          </button>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
-            (click)="editPoliza(poliza); $event.stopPropagation()"></button>
+                  (click)="editPoliza(poliza); $event.stopPropagation()"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
-            (click)="deletePoliza(poliza); $event.stopPropagation()"></button>
+                  (click)="deletePoliza(poliza); $event.stopPropagation()"></button>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{ polizas ? polizas.length : 0 }} registros.
+        En total existen {{totalRecords ? totalRecords : 0 }} registros.
       </div>
     </ng-template>
-    <p-blockUI [blocked]="loading">
-      <div class="p-field" *ngIf="loading">
-        <p-progressSpinner></p-progressSpinner>
-      </div>
-    </p-blockUI>
   </p-table>
 </div>
 
 <p-dialog [(visible)]="polizaDialog" [style]="{ width: '500px' }" header="Detalle de Póliza" [modal]="true"
-  styleClass="p-fluid">
+          styleClass="p-fluid">
   <ng-template pTemplate="content">
     <div class="p-field">
+      <label for="asesoresId">Aseguradora</label>
+      <p-autoComplete
+        [(ngModel)]="aseguradora"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredAseguradoras"
+        (completeMethod)="filterAseguradoras($event)"
+        field="nombre"
+        [minLength]="1"
+        [readonly]="aseguradoraId"
+        [appendTo]="'body'"
+        required
+      ></p-autoComplete>
+      <small class="p-invalid" *ngIf="submitted && !aseguradora"
+      >Asesor es requerido.</small
+      >
+    </div>
+    <div class="p-field">
       <label for="nombre">Nombre</label>
-      <input pInputText id="nombre" [(ngModel)]="poliza.nombre" required autofocus class="p-invalid" />
+      <input pInputText id="nombre" [(ngModel)]="poliza.nombre" required autofocus class="p-invalid"/>
 
     </div>
     <div class="p-field">
@@ -91,26 +124,10 @@
     </div>
     <div class="p-field">
       <label for="vigenciaMeses">Vigencia (meses)</label>
-      <input pInputText id="vigenciaMeses" [(ngModel)]="poliza.vigenciaMeses" required />
+      <input pInputText id="vigenciaMeses" [(ngModel)]="poliza.vigenciaMeses" required/>
     </div>
 
-  <div class="p-field">
-    <label for="asesoresId">Aseguradora</label>
-    <p-autoComplete
-      [(ngModel)]="aseguradora"
-      [showEmptyMessage]="true"
-      [suggestions]="filteredAseguradoras"
-      (completeMethod)="filterAseguradoras($event)"
-      field="nombre"
-      [minLength]="1"
-      [readonly] = "aseguradoraId"
-      [appendTo]="'body'"
-      required
-    ></p-autoComplete>
-    <small class="p-invalid" *ngIf="submitted && !aseguradora"
-      >Asesor es requerido.</small
-    >
-  </div>
+
 
   </ng-template>
   <ng-template pTemplate="footer">

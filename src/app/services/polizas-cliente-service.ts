@@ -30,9 +30,18 @@ export class ClientePolizaService {
     }
   }
 
-  async obtenerClientesPolizasPorPoliza(polizaId: number): Promise<any[]> {
+  async obtenerClientesPolizasPorPoliza(
+    polizaId: number,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1): Promise<any> {
     try {
-      const clientesPolizas = await this.http.get<any[]>(`${this.apiUrl}/polizas/${polizaId}/clientesPolizas`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+      const clientesPolizas = await this.http.get<any[]>(`${this.apiUrl}/polizas/${polizaId}/clientesPolizas?page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       return clientesPolizas;
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -40,9 +49,19 @@ export class ClientePolizaService {
     }
   }
 
-  async obtenerClientesPolizasPorCliente(clienteId: number): Promise<any[]> {
+  async obtenerClientesPolizasPorCliente(
+    clienteId: number,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1
+    ): Promise<any> {
     try {
-      const clientesPolizas = await this.http.get<any[]>(`${this.apiUrl}/clientes/${clienteId}/clientesPolizas`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+      const clientesPolizas = await this.http.get<any[]>(`${this.apiUrl}/clientes/${clienteId}/clientesPolizas?page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       return clientesPolizas;
     } catch (error) {
       console.error('Error en la solicitud:', error);

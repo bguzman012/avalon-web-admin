@@ -74,15 +74,11 @@ export class ClientesMembresiasComponent implements OnInit {
 
   constructor(
     private messageService: MessageService,
-    // private clientesMembresiaService: ClientesMembresiaService,
-    private aseguradorasService: AseguradorasService,
     private membresiasService: MembresiasService,
     private usuarioService: UsuariosService,
     private clientesMembresiasService: ClientesMembresiasService,
-    private confirmationService: ConfirmationService,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private router: Router
   ) {
   }
 
@@ -106,9 +102,7 @@ export class ClientesMembresiasComponent implements OnInit {
     this.first = 0;
     this.busqueda = (event.target as HTMLInputElement).value;
     if (this.busqueda.length == 0 || this.busqueda.length >= 3) {
-      this.loading = true
       await this.refrescarListado();
-      this.loading = false
     }
     // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
@@ -149,10 +143,13 @@ export class ClientesMembresiasComponent implements OnInit {
     this.clienteMembresia.fechaInicio = new Date(this.clienteMembresia.fechaInicio + 'T23:59:00Z');
     this.clienteMembresia.fechaFin = new Date(this.clienteMembresia.fechaFin + 'T23:59:00Z');
 
-    await this.prepareData()
+
     this.membresia = this.clienteMembresia.membresia;
     this.cliente = this.clienteMembresia.cliente;
     this.asesor = this.clienteMembresia.asesor;
+
+    await this.prepareData()
+
     this.vigenciaMeses = this.membresia.vigenciaMeses;
     this.clienteMembresiaDialog = true;
   }
@@ -163,7 +160,7 @@ export class ClientesMembresiasComponent implements OnInit {
       this.ESTADO_ACTIVO,
       0,
       10,
-      ""
+      this.cliente ? this.cliente.nombreUsuario : ""
     );
 
     const responseAsesor =
@@ -172,7 +169,7 @@ export class ClientesMembresiasComponent implements OnInit {
         this.ESTADO_ACTIVO,
         0,
         10,
-        ""
+        this.user.rol.id == this.ROL_ASESOR_ID || this.asesor ? this.asesor.nombreUsuario : ""
       );
 
     const responseMembresia =

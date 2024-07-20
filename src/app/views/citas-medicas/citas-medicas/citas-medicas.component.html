@@ -34,10 +34,12 @@
         </div>
     </p-panel>
 
-    <p-table #dt [value]="citasMedicas" [rows]="10" [paginator]="true" [globalFilterFields]="['id','razon','estado']"
-        [(selection)]="selectedCitaMedicas" [rowHover]="true" dataKey="id"
+    <p-table #dt [value]="citasMedicas"
+        [(selection)]="selectedCitasMedicas" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-        [showCurrentPageReport]="true">
+        [showCurrentPageReport]="true"
+             (onSort)="onSort($event)"
+             [customSort]="true">
         <ng-template pTemplate="caption">
 
         </ng-template>
@@ -69,16 +71,18 @@
                 </td>
             </tr>
         </ng-template>
-        <ng-template pTemplate="summary">
-            <div class="p-d-flex p-ai-center p-jc-between">
-                En total existen {{citasMedicas ? citasMedicas.length : 0 }} registros.
-            </div>
-        </ng-template>
+      <ng-template pTemplate="summary">
         <p-blockUI [blocked]="loading">
-            <div class="p-field" *ngIf="loading">
-                <p-progressSpinner></p-progressSpinner>
-            </div>
+          <div class="p-field" *ngIf="loading">
+            <p-progressSpinner></p-progressSpinner>
+          </div>
         </p-blockUI>
+        <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first"
+                     (onPageChange)="onPageChange($event)"></p-paginator>
+        <div class="p-d-flex p-ai-center p-jc-between">
+          En total existen {{ totalRecords ? totalRecords : 0 }} registros.
+        </div>
+      </ng-template>
     </p-table>
 </div>
 

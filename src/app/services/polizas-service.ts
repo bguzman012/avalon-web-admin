@@ -21,9 +21,19 @@ export class PolizasService {
     }
   }
 
-  async obtenerPolizasByAseguradora(aseguradoraId: number): Promise<any[]> {
+  async obtenerPolizasByAseguradora(
+    aseguradoraId: number,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1
+  ): Promise<any> {
     try {
-      const polizas = await this.http.get<any[]>(`${this.apiUrl}/aseguradoras/${aseguradoraId}/polizas`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+      
+      const polizas = await this.http.get<any[]>(`${this.apiUrl}/aseguradoras/${aseguradoraId}/polizas?page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de pólizas por aseguradora:', polizas);
       return polizas;
     } catch (error) {

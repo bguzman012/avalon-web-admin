@@ -51,8 +51,7 @@ export class BrokersComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private brokersService: BrokersService,
     private agentesService: AgentesService,
-    private route: ActivatedRoute,
-    private filterService: FilterService
+    private route: ActivatedRoute
   ) {}
 
   async ngOnInit() {
@@ -73,20 +72,22 @@ export class BrokersComponent implements OnInit {
     });
   }
 
-  filterGlobal(event: Event, dt: any) {
+  async  filterGlobal(event: Event, dt: any) {
     this.first = 0;
     this.busqueda = (event.target as HTMLInputElement).value;
     if (this.busqueda.length == 0 || this.busqueda.length >= 3)
-      this.refrescarListado(this.ESTADO_ACTIVO);
+      await this.refrescarListado(this.ESTADO_ACTIVO);
 
     // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  onSort(event: SortEvent) {
+  async onSort(event: SortEvent) {
     if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.loading = true
       this.sortField = event.field;
       this.sortOrder = event.order;
-      this.refrescarListado(this.ESTADO_ACTIVO);
+      await this.refrescarListado(this.ESTADO_ACTIVO);
+      this.loading = false
     }
   }
 
@@ -100,7 +101,6 @@ export class BrokersComponent implements OnInit {
 
     this.brokers = responseBrokers.data
 
-    this.broker = this.brokers.find((x) => x.id === this.brokerId);
     this.usuarioDialog = true;
   }
 

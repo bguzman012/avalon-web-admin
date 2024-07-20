@@ -11,10 +11,21 @@ export class CitasMedicasService {
   private apiUrl = `${environment.api_base}:8086`;
 
   constructor(private http: HttpClient) { }
-  
-  async obtenerCitasMedicas(estado: string, clientePolizaId: string): Promise<any[]> {
+
+  async obtenerCitasMedicas(
+    estado: string,
+    clientePolizaId: string,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1
+  ): Promise<any> {
     try {
-      const citasMedicas = await this.http.get<any[]>(`${this.apiUrl}/citasMedicas?estado=${estado}&clientePolizaId=${clientePolizaId}`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+      const citasMedicas = await this.http.get<any[]>(`${this.apiUrl}/citasMedicas?estado=${estado}&clientePolizaId=${clientePolizaId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de citasMedicas:', citasMedicas);
       return citasMedicas;
     } catch (error) {

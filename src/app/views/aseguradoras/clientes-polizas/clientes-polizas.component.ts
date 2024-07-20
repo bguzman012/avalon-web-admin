@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import {MessageService, SortEvent} from 'primeng/api';
 import { PolizasService } from '../../../services/polizas-service';
 import { ConfirmationService } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth-service';
@@ -53,16 +53,22 @@ export class ClientesPolizasComponent implements OnInit {
 
   vigenciaMeses
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+  busqueda: string = '';
+  sortField
+  sortOrder
+
   constructor(
     private messageService: MessageService,
     private polizasService: PolizasService,
     private clientesPolizasService: ClientePolizaService,
     private confirmationService: ConfirmationService,
     private usuariosService: UsuariosService,
-    private aseguradorasService: AseguradorasService,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -78,7 +84,9 @@ export class ClientesPolizasComponent implements OnInit {
     if (!this.aseguradoraId)
       this.aseguradoraId = localStorage.getItem('aseguradoraId');
 
-    this.refrescarListado();
+    this.poliza = JSON.parse(localStorage.getItem('poliza'));
+
+    await this.refrescarListado();
     this.loading = false;
   }
 
@@ -89,38 +97,46 @@ export class ClientesPolizasComponent implements OnInit {
   }
 
   async prepareData() {
-    this.polizas = await this.polizasService.obtenerPolizasByAseguradora(
-      this.aseguradoraId
-    );
+    if (this.user.rol.id == this.ROL_ASESOR_ID) this.asesor = this.user;
 
-    this.aseguradoras =
-      await this.aseguradorasService.obtenerAseguradorasByEstado(
-        this.ESTADO_ACTIVO, 0, 10, ""
-      );
-
-    this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-      this.ROL_CLIENTE_ID,
-      this.ESTADO_ACTIVO,
-      0,
-      100,
-      ""
-    );
-
-    this.asesores = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-      this.ROL_ASESOR_ID,
-      this.ESTADO_ACTIVO,
+    const response = await this.polizasService.obtenerPolizasByAseguradora(
+      this.aseguradoraId,
       0,
       10,
-      ""
+      this.poliza.nombre
     );
 
-    this.brokers = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+    const responseCliente =
+      await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+        this.ROL_CLIENTE_ID,
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        this.cliente ? this.cliente.nombreUsuario : ""
+      );
+
+    const responseAsesor =
+      await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+        this.ROL_ASESOR_ID,
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        this.user.rol.id == this.ROL_ASESOR_ID || this.asesor ? this.asesor.nombreUsuario : ""
+      );
+
+    const responseBroker = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_BROKER_ID,
       this.ESTADO_ACTIVO,
       0,
       10,
-      ""
+      this.broker ? this.broker.nombreUsuario : ""
     );
+
+    this.polizas = response.data
+    this.clientes = responseCliente.data;
+    this.asesores = responseAsesor.data;
+    this.brokers = responseBroker.data;
+
   }
 
   async openNew() {
@@ -131,105 +147,105 @@ export class ClientesPolizasComponent implements OnInit {
 
     await this.prepareData();
 
-    if (this.polizaId)
-      this.poliza = this.polizas.find((x) => x.id == this.polizaId);
-
-    console.log(this.poliza)
     this.vigenciaMeses = this.poliza.vigenciaMeses;
-    if (this.user.rol.id == this.ROL_ASESOR_ID) this.asesor = this.user;
 
     this.calcularFechaFin()
     this.loading = false;
     this.polizaDialog = true;
   }
 
-  filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  async filterGlobal(event: Event, dt: any) {
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      await this.refrescarListado();
+
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado();
+    this.loading = false;
+  }
+
+  async onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.loading = true
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      await this.refrescarListado();
+      this.loading = false
+    }
   }
 
   async editPoliza(poliza: any) {
+    this.loading = true
     this.polizaCliente = { ...poliza };
     this.polizaCliente.fechaInicio = new Date(this.polizaCliente.fechaInicio + 'T23:59:00Z');
     this.polizaCliente.fechaFin = new Date(this.polizaCliente.fechaFin + 'T23:59:00Z');
-    await this.prepareData();
 
     this.poliza = this.polizaCliente.poliza
     this.cliente = this.polizaCliente.cliente
     this.asesor = this.polizaCliente.asesor
     this.broker = this.polizaCliente.agente
+
+    await this.prepareData();
+
     this.vigenciaMeses = this.polizaCliente.poliza.vigenciaMeses;
+    this.loading = false
     this.polizaDialog = true;
   }
 
-  filterPolizas(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.polizas.length; i++) {
-      let poliza = this.polizas[i];
-      if (poliza.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(poliza);
-      }
-    }
 
-    this.filteredPolizas = filtered;
+  async filterPolizas(event) {
+    const response = await this.polizasService.obtenerPolizasByAseguradora(
+      this.aseguradoraId,
+      0,
+      10,
+      event.query
+    );
+
+    this.filteredPolizas = response.data
   }
 
-  filterAseguradoras(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.aseguradoras.length; i++) {
-      let aseguradora = this.aseguradoras[i];
-      if (aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(aseguradora);
-      }
-    }
 
-    this.filteredAseguradoras = filtered;
+  async filterAsesores(event) {
+    const responseAsesor = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_ASESOR_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      event.query
+    )
+
+    this.filteredAsesores = responseAsesor.data;
   }
 
-  filterAsesores(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.asesores.length; i++) {
-      let asesor = this.asesores[i];
-      if (
-        asesor.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(asesor);
-      }
-    }
+  async filterClientes(event) {
+    const responseAsesor = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      event.query
+    )
 
-    this.filteredAsesores = filtered;
+    this.filteredClientes = responseAsesor.data;
   }
 
-  filterClientes(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.clientes.length; i++) {
-      let cliente = this.clientes[i];
-      if (
-        cliente.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(cliente);
-      }
-    }
+  async filterBrokers(event) {
+    const responseBroker = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_BROKER_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      event.query
+    )
 
-    this.filteredClientes = filtered;
-  }
-
-  filterBrokers(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.brokers.length; i++) {
-      let broker = this.brokers[i];
-      if (
-        broker.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(broker);
-      }
-    }
-
-    this.filteredBrokers = filtered;
+    this.filteredBrokers = responseBroker.data;
   }
 
   async deletePoliza(polizaCliente: any) {
@@ -244,7 +260,8 @@ export class ClientesPolizasComponent implements OnInit {
         await this.clientesPolizasService.eliminarClientePoliza(
           polizaCliente.id
         );
-        this.refrescarListado();
+        this.first = 0
+        await this.refrescarListado();
         this.messageService.add({
           severity: 'success',
           summary: 'Enhorabuena!',
@@ -299,7 +316,8 @@ export class ClientesPolizasComponent implements OnInit {
         );
       }
 
-      this.refrescarListado();
+      this.first = 0
+      await this.refrescarListado();
       this.polizaDialog = false;
       this.polizaCliente = {};
       this.messageService.add({
@@ -313,9 +331,18 @@ export class ClientesPolizasComponent implements OnInit {
   }
 
   async refrescarListado() {
-    this.clientePolizas =
-      await this.clientesPolizasService.obtenerClientesPolizasPorPoliza(
-        this.polizaId
-      );
+    const response = await this.clientesPolizasService.obtenerClientesPolizasPorPoliza(
+      this.polizaId,
+      this.first / this.pageSize,
+      this.pageSize,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder
+    );
+
+    console.log(response)
+
+    this.clientePolizas = response.data
+    this.totalRecords = response.totalRecords;
   }
 }

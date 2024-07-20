@@ -15,17 +15,26 @@
     <p-panel header="Cliente Póliza">
       <div class="filter-container">
         <!-- Filtro por Cliente -->
-        <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
-          (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="!clienteId && !citaMedica"
-          (ngModelChange)="loadPolizas()" [readonly]="clienteId || citaMedica" placeholder="Filtrar por Cliente"
-          [size]="30" [minLength]="1" [disabled]="false" [forceSelection]="true" [maxlength]="50">
+        <p-autoComplete
+          [(ngModel)]="selectedCliente"
+          [suggestions]="filteredClientes"
+          (completeMethod)="filterClientes($event)"
+          field="nombreUsuario"
+          [dropdown]="!citaMedica?.id"
+          (ngModelChange)="loadPolizas()"
+          [readonly]="citaMedica?.id" placeholder="Filtrar por Cliente">
         </p-autoComplete>
 
         <!-- Filtro por Póliza -->
-        <p-autoComplete [(ngModel)]="selectedClientePoliza" [suggestions]="filteredPolizas"
-          (completeMethod)="filterPolizas($event)" field="displayName" [dropdown]="!clientePolizaId && !citaMedica"
-          placeholder="Filtrar por Póliza" [size]="30" [minLength]="1" [disabled]="!selectedCliente"
-          [readonly]="clientePolizaId || citaMedica" [forceSelection]="true" [maxlength]="50">
+        <p-autoComplete
+          [(ngModel)]="selectedClientePoliza"
+          [suggestions]="filteredPolizas"
+          (completeMethod)="filterPolizas($event)"
+          field="displayName"
+          [dropdown]="!citaMedica?.id"
+          placeholder="Filtrar por Póliza"
+          [disabled]="!selectedCliente?.id"
+          [readonly]="citaMedica?.id">
         </p-autoComplete>
       </div>
     </p-panel>

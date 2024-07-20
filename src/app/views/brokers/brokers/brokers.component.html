@@ -3,6 +3,9 @@
 <div class="card">
     <p-toolbar styleClass="p-mb-4">
         <ng-template pTemplate="left">
+          <div>
+          <h5><strong>Broker:</strong> {{ broker?.nombre }}</h5>
+          </div>
         </ng-template>
 
         <ng-template pTemplate="right">
@@ -11,9 +14,9 @@
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="usuarios" 
-        [(selection)]="selectedUsuarios" 
-        [rowHover]="true" 
+    <p-table #dt [value]="usuarios"
+        [(selection)]="selectedUsuarios"
+        [rowHover]="true"
         dataKey="id"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
         [showCurrentPageReport]="true"
@@ -47,7 +50,7 @@
             <tr>
                 <td >               <p-tableCheckbox [value]="usuario"></p-tableCheckbox>
                 </td>
-        
+
                 <td>{{ usuario.nombres }} {{ usuario.nombresDos }}</td>
                 <td>{{ usuario.apellidos }} {{ usuario.apellidosDos }}</td>
                 <td>{{usuario.correoElectronico}}</td>
@@ -103,7 +106,7 @@
                     <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombre uno is required.</small>
                 </div>
             </div>
-            
+
             <div class="p-col-12 p-md-6">
                 <div class="p-field">
                     <label for="nombres">Nombre Dos</label>
@@ -126,7 +129,7 @@
                     <input type="text" pInputText id="apellidosDos" [(ngModel)]="usuario.apellidosDos" required autofocus />
                     <small class="p-invalid" *ngIf="submitted && !usuario.apellidosDos">Apellido dos is required.</small>
                 </div>
-            </div>            
+            </div>
         </div>
 
         <div class="p-field">
@@ -143,7 +146,7 @@
             <label class="p-mb-3">Nombre Usuario</label>
             <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
         </div>
-       
+
 
         <p-blockUI [blocked]="loading">
             <div class="p-field" *ngIf="loading">

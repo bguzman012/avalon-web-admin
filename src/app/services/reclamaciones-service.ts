@@ -11,10 +11,21 @@ export class ReclamacionesService {
   private apiUrl = `${environment.api_base}:8086`;
 
   constructor(private http: HttpClient) { }
-  
-  async obtenerReclamaciones(estado: string, clientePolizaId: string): Promise<any[]> {
+
+  async obtenerReclamaciones(
+    estado: string,
+    clientePolizaId: string,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1
+  ): Promise<any> {
     try {
-      const reclamaciones = await this.http.get<any[]>(`${this.apiUrl}/reclamaciones?estado=${estado}&clientePolizaId=${clientePolizaId}`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+      const reclamaciones = await this.http.get<any[]>(`${this.apiUrl}/reclamaciones?estado=${estado}&clientePolizaId=${clientePolizaId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de reclamaciones:', reclamaciones);
       return reclamaciones;
     } catch (error) {

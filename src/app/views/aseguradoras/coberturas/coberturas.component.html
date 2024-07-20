@@ -2,7 +2,12 @@
 
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
-    <ng-template pTemplate="left"> </ng-template>
+    <ng-template pTemplate="left">
+      <div>
+      <h5><strong>Aseguradora:</strong> {{ poliza?.aseguradora?.nombre }}</h5>
+      <h5><strong>Poliza:</strong> {{ poliza?.nombre }}</h5>
+      </div>
+    </ng-template>
     <ng-template pTemplate="right">
       <button
         pButton
@@ -19,14 +24,13 @@
   <p-table
     #dt
     [value]="coberturas"
-    [rows]="10"
-    [paginator]="true"
-    [globalFilterFields]="['nombre', 'descripcion']"
     [(selection)]="selectedCoberturas"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
     [showCurrentPageReport]="true"
+    (onSort)="onSort($event)"
+    [customSort]="true"
   >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
@@ -83,15 +87,16 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{ coberturas ? coberturas.length : 0 }} registros.
+        En total existen {{totalRecords ? totalRecords : 0  }} registros.
       </div>
     </ng-template>
-    <p-blockUI [blocked]="loading">
-      <div class="p-field" *ngIf="loading">
-        <p-progressSpinner></p-progressSpinner>
-      </div>
-    </p-blockUI>
   </p-table>
 </div>
 
@@ -145,7 +150,7 @@
         Descripción es requerida.
       </small>
     </div>
-   
+
     <p-blockUI [blocked]="loading">
       <div class="p-field" *ngIf="loading">
         <p-progressSpinner></p-progressSpinner>

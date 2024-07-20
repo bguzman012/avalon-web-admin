@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, SortEvent } from 'primeng/api';
 import { CitasMedicasService } from '../../../services/citas-medicas-service';
 import { UsuariosService } from '../../../services/usuarios-service';
 import { environment } from '../../../../environments/environment';
@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 export class CitasMedicasComponent implements OnInit {
   citaMedicaDialog: boolean;
   citasMedicas: any[];
-  selectedCitaMedicas: any[];
+  selectedCitasMedicas: any[];
   submitted: boolean;
   citaMedica: any;
   loading: boolean = false;
@@ -37,6 +37,14 @@ export class CitasMedicasComponent implements OnInit {
   ROL_CLIENTE_ID = 3;
   ESTADO_ACTIVO = 'A';
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+  busqueda: string = '';
+  sortField
+  sortOrder
+
   constructor(
     private messageService: MessageService,
     private citasMedicasService: CitasMedicasService,
@@ -44,56 +52,38 @@ export class CitasMedicasComponent implements OnInit {
     private usuariosService: UsuariosService,
     private confirmationService: ConfirmationService,
     private router: Router,
-    private polizasService: PolizasService,
-    private clientesPolizasService: ClientePolizaService,
-    private filterService: FilterService
+    private clientesPolizasService: ClientePolizaService
   ) { }
 
   async ngOnInit() {
 
     this.loading = true
     this.prepareData();
-    this.citasMedicas = await this.citasMedicasService.obtenerCitasMedicas("", "");
+    const response = await this.citasMedicasService.obtenerCitasMedicas(
+      "",
+      "",
+      0,
+      10,
+      "",
+      this.sortField,
+      this.sortOrder);
+
+    this.citasMedicas = response.data;
+    this.totalRecords = response.totalRecords;
+
     this.loading = false
   }
 
   async prepareData() {
-    this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+    const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO,
       0,
       10,
       ""
     );
-  }
 
-
-  filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
-
-  openNew() {
-    this.citaMedica = {};
-    this.submitted = false;
-    this.citaMedicaDialog = true;
-  }
-
-  deleteSelectedCitasMedicass() {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete the selected claims?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        // Implementar lógica para eliminar citasMedicas seleccionadas
-        this.selectedCitaMedicas = [];
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Claims Deleted',
-          life: 3000,
-        });
-      },
-    });
+    this.clientes = responseCliente.data
   }
 
   async editCitaMedica(citaMedica: any) {
@@ -104,7 +94,7 @@ export class CitasMedicasComponent implements OnInit {
         clientePolizaId: this.selectedClientePoliza.id,
         clienteId: this.selectedCliente.id
       };
-    } 
+    }
 
     if (this.citaMedica && this.citaMedica.id) {
       localStorage.setItem('citaMedica', JSON.stringify(this.citaMedica));
@@ -113,7 +103,7 @@ export class CitasMedicasComponent implements OnInit {
         queryParams: queryParamsClientePoliza,
       });
     }
- 
+
     this.citaMedicaDialog = true;
   }
 
@@ -124,6 +114,7 @@ export class CitasMedicasComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         await this.citasMedicasService.eliminarCitaMedica(citaMedica.id);
+        this.first = 0
         await this.manageListado()
 
         this.messageService.add({
@@ -136,61 +127,96 @@ export class CitasMedicasComponent implements OnInit {
     });
   }
 
-  hideDialog() {
-    this.citaMedicaDialog = false;
-    this.submitted = false;
+  async refrescarListado(type) {
+    let response;
+    if (type == "ALL")
+
+      response = await this.citasMedicasService.obtenerCitasMedicas(
+        "",
+        "",
+        0,
+        10,
+        "",
+        this.sortField,
+        this.sortOrder);
+    else
+      response = await this.citasMedicasService.obtenerCitasMedicas(
+        "",
+        this.selectedClientePoliza.id,
+        0,
+        10,
+        "",
+        this.sortField,
+        this.sortOrder);
+
+    this.citasMedicas = response.data
   }
 
-  async saveCitaMedica() {
-    this.submitted = true;
-    this.loading = true; // Mostrar spinner
-    try {
-      if (this.citaMedica.id) {
-        await this.citasMedicasService.actualizarCitaMedica(this.citaMedica.id, this.citaMedica);
-      } else {
-        let citaMedicaSaved = await this.citasMedicasService.guardarCitaMedica(this.citaMedica);
-      }
+  async filterClientes(event){
+    let query = event.query;
 
-      await this.manageListado()
+    const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      query
+    );
 
-      this.citaMedicaDialog = false;
-      this.citaMedica = {};
-      this.loading = false;
-      this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
-    } finally {
-      this.loading = false; // Ocultar spinner
+    this.filteredClientes = responseCliente.data
+  }
+
+  async filterPolizas(event) {
+    let query = event.query;
+
+    const responseClientePoliza = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
+      this.selectedCliente.id,
+      0,
+      10,
+      query);
+
+    let clientePolizas = responseClientePoliza.data
+    if (clientePolizas) {
+      clientePolizas = clientePolizas.map(obj => ({
+        ...obj,
+        displayName: `${obj.id}-${obj.poliza.nombre}`
+      }));
+      console.log(clientePolizas)
+
+      this.filteredPolizas = clientePolizas;
+    }
+
+  }
+
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.manageListado();
+    this.loading = false;
+  }
+
+
+  async onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.loading = true
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      await this.manageListado();
+      this.loading = false
     }
   }
 
-  async refrescarListado(type) {
-    if (type == "ALL")
-      this.citasMedicas = await this.citasMedicasService.obtenerCitasMedicas("", "");
-    else
-      this.citasMedicas = await this.citasMedicasService.obtenerCitasMedicas("", this.selectedClientePoliza.id);
-  }
-
-  filterClientes(event): void {
-    let query = event.query;
-    this.filteredClientes = this.clientes.filter(cliente =>
-      cliente.nombreUsuario.toLowerCase().indexOf(query.toLowerCase()) === 0);
-  }
-
-  filterAseguradoras(event): void {
-    let query = event.query;
-    this.filteredAseguradoras = this.aseguradoras.filter(aseguradora =>
-      aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) === 0);
-  }
-
-  filterPolizas(event): void {
-    let query = event.query;
-    this.filteredPolizas = this.clientePolizas.filter(obj =>
-      obj.displayName.toLowerCase().indexOf(query.toLowerCase()) === 0);
-  }
 
   async loadPolizas() {
-    if (this.selectedCliente) {
-      let clientePolizas = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(this.selectedCliente.id);
-      console.log(clientePolizas)
+    if (this.selectedCliente?.id) {
+      const responseClientePoliza = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
+        this.selectedCliente.id,
+        0,
+        10,
+        "");
+
+      let clientePolizas = responseClientePoliza.data
       if (clientePolizas) {
         clientePolizas = clientePolizas.map(obj => ({
           ...obj,
@@ -212,6 +238,7 @@ export class CitasMedicasComponent implements OnInit {
 
   redirectToDetailCitaMedicaPage() {
     if (this.selectedClientePoliza && this.selectedClientePoliza.id) {
+      localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
       const queryParamsClientePoliza = {
         clientePolizaId: this.selectedClientePoliza.id,
         clienteId: this.selectedCliente.id
@@ -220,6 +247,7 @@ export class CitasMedicasComponent implements OnInit {
         queryParams: queryParamsClientePoliza,
       });
     } else {
+      localStorage.removeItem("clientePoliza");
       this.router.navigate(['citas-medicas/detalle-cita-medica']);
     }
   }

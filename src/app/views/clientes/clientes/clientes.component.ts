@@ -75,7 +75,7 @@ export class ClientesComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
-    await await this.refrescarListado(this.ESTADO_BUSQUEDA);
+    await this.refrescarListado(this.ESTADO_BUSQUEDA);
     let user = await this.authService.obtenerUsuarioLoggeado();
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true;
     this.loading = false;
@@ -127,7 +127,7 @@ export class ClientesComponent implements OnInit {
 
   redirectToClientePolizaPage(cliente: any) {
     localStorage.setItem('clienteId', cliente.id);
-
+    localStorage.setItem("cliente", JSON.stringify(cliente));
     this.router.navigate(['clientes/polizas'], {
       queryParams: {
         clienteId: cliente.id,

@@ -42,6 +42,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import {PanelModule} from 'primeng/panel';
 import { ReclamacionesComponent } from './reclamaciones/reclamaciones.component';
 import { AddReclamacionesComponent } from './add-reclamaciones/add-reclamaciones.component';
+import {PaginatorModule} from "primeng/paginator";
 // import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
@@ -50,47 +51,48 @@ import { AddReclamacionesComponent } from './add-reclamaciones/add-reclamaciones
     ReclamacionesComponent,
     AddReclamacionesComponent
   ],
-  imports: [
-    CommonModule,
-    ReclamacionesRoutingModule,
-    CardModule,
-    FormModule,
-    GridModule,
-    FormsModule,
-    PanelModule,
-    ReactiveFormsModule,
-    FormModule,
-    ButtonGroupModule,
-    DropdownModule,
-    AlertModule,
-    TableModule,
-    SharedModule,
-    ListGroupModule,
-    AutoCompleteModule,
-    
-    
-    TableModule,
-    CalendarModule,
-		SliderModule,
-		DialogModule,
-    BlockUIModule,
-    ProgressSpinnerModule,
-		MultiSelectModule,
-		ContextMenuModule,
-		DropdownModule,
-		ButtonModule,
-		ToastModule,
-    InputTextModule,
-    ProgressBarModule,
-    FileUploadModule,
-    ToolbarModule,
-    RatingModule,
-    FormsModule,
-    RadioButtonModule,
-    InputNumberModule,
-    ConfirmDialogModule,
-    InputTextareaModule,
-  ]
+    imports: [
+        CommonModule,
+        ReclamacionesRoutingModule,
+        CardModule,
+        FormModule,
+        GridModule,
+        FormsModule,
+        PanelModule,
+        ReactiveFormsModule,
+        FormModule,
+        ButtonGroupModule,
+        DropdownModule,
+        AlertModule,
+        TableModule,
+        SharedModule,
+        ListGroupModule,
+        AutoCompleteModule,
+
+
+        TableModule,
+        CalendarModule,
+        SliderModule,
+        DialogModule,
+        BlockUIModule,
+        ProgressSpinnerModule,
+        MultiSelectModule,
+        ContextMenuModule,
+        DropdownModule,
+        ButtonModule,
+        ToastModule,
+        InputTextModule,
+        ProgressBarModule,
+        FileUploadModule,
+        ToolbarModule,
+        RatingModule,
+        FormsModule,
+        RadioButtonModule,
+        InputNumberModule,
+        ConfirmDialogModule,
+        InputTextareaModule,
+        PaginatorModule,
+    ]
 })
 export class ReclamacionesModule {
 }

@@ -59,26 +59,28 @@ export class BeneficiosComponent implements OnInit {
     this.loading = false;
   }
 
-  filterGlobal(event: Event, dt: any) {
+  async filterGlobal(event: Event, dt: any) {
     this.first = 0;
     this.busqueda = (event.target as HTMLInputElement).value;
     if (this.busqueda.length == 0 || this.busqueda.length >= 3)
-      this.refrescarListado();
+      await this.refrescarListado();
 
     // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  onSort(event: SortEvent) {
+  async onSort(event: SortEvent) {
     if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.loading = true
       this.sortField = event.field;
       this.sortOrder = event.order;
-      this.refrescarListado();
+      await this.refrescarListado();
+      this.loading = false
     }
   }
 
+
   async openNew() {
     this.beneficio = {};
-    this.membresia = {};
     this.submitted = false;
     const responseMembresias = await this.membresiasService.obtenerMembresiasByEstado(
       this.ESTADO_ACTIVO,

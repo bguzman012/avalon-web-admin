@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import {ConfirmationService, MessageService, SortEvent} from 'primeng/api';
 import { CargaFamiliarService } from '../../../services/cargas-familiares-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
@@ -26,6 +26,14 @@ export class CargasFamiliaresComponent implements OnInit {
   clientePolizaId;
   clientePoliza
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+  busqueda: string = '';
+  sortField
+  sortOrder
+
   constructor(
     private messageService: MessageService,
     private cargasFamiliaresService: CargaFamiliarService,
@@ -36,14 +44,15 @@ export class CargasFamiliaresComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    
+
     this.clientePolizaId = +(await this.getRouteParams('clienteId'));
-    
+
     if (!this.clientePolizaId) this.clientePolizaId = localStorage.getItem('clientePolizaId');
 
-    this.clientePoliza = await this.clientePolizaService.obtenerClientePoliza(this.clientePolizaId)
+    this.clientePoliza = JSON.parse(localStorage.getItem('clientePoliza'));
+
     console.log(this.clientePoliza)
-    
+
     await this.refrescarListado();
   }
 
@@ -53,8 +62,22 @@ export class CargasFamiliaresComponent implements OnInit {
     });
   }
 
-  filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  async filterGlobal(event: Event, dt: any) {
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      await this.refrescarListado();
+
+  }
+
+  async onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.loading = true
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      await this.refrescarListado();
+      this.loading = false
+    }
   }
 
   openNew() {
@@ -63,23 +86,14 @@ export class CargasFamiliaresComponent implements OnInit {
     this.cargaFamiliarDialog = true;
   }
 
-  deleteSelectedCargasFamiliares() {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete the selected family members?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        // Implementar lógica para eliminar cargas familiares seleccionadas
-        this.selectedCargasFamiliares = [];
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Family Members Deleted',
-          life: 3000,
-        });
-      },
-    });
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado();
+    this.loading = false;
   }
+
 
   async editCargaFamiliar(cargaFamiliar: any) {
     this.cargaFamiliar = { ...cargaFamiliar };
@@ -93,7 +107,8 @@ export class CargasFamiliaresComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         await this.cargasFamiliaresService.deleteCargaFamiliar(cargaFamiliar.id);
-        this.refrescarListado();
+        this.first = 0
+        await this.refrescarListado();
 
         this.messageService.add({
           severity: 'success',
@@ -121,7 +136,8 @@ export class CargasFamiliaresComponent implements OnInit {
       } else {
         await this.cargasFamiliaresService.createCargaFamiliar(this.cargaFamiliar);
       }
-      this.refrescarListado();
+      this.first = 0
+      await this.refrescarListado();
       this.cargaFamiliarDialog = false;
       this.cargaFamiliar = {};
       this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
@@ -131,6 +147,16 @@ export class CargasFamiliaresComponent implements OnInit {
   }
 
   async refrescarListado() {
-    this.cargasFamiliares = await this.cargasFamiliaresService.getCargasFamiliaresByClientePoliza(this.clientePolizaId);
+    const response = await this.cargasFamiliaresService.getCargasFamiliaresByClientePoliza(
+      this.clientePolizaId,
+      this.first / this.pageSize,
+      this.pageSize,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder)
+
+    this.cargasFamiliares = response.data;
+    this.totalRecords = response.totalRecords;
+
   }
 }

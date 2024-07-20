@@ -1,120 +1,162 @@
 <p-toast></p-toast>
 
 <div class="card">
-    <p-toolbar styleClass="p-mb-4">
-        <ng-template pTemplate="left">
-            <div>
-                <h5><strong>Cliente:</strong> {{clientePoliza?.cliente?.nombreUsuario}}</h5>
-                <h5><strong>Poliza:</strong> {{clientePoliza?.poliza?.nombre}}</h5>
-            </div>
-        </ng-template>
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left">
+      <div>
+        <h5><strong>Cliente:</strong> {{ clientePoliza?.cliente?.nombreUsuario }}</h5>
+        <h5><strong>Poliza:</strong> {{ clientePoliza?.poliza?.nombre }}</h5>
+      </div>
+    </ng-template>
 
-        <ng-template pTemplate="right">
-            <button pButton pRipple label="Nueva Carga Familiar" icon="pi pi-plus" class="p-button-success p-mr-2"
-                (click)="openNew()"></button>
-        </ng-template>
-    </p-toolbar>
+    <ng-template pTemplate="right">
+      <button pButton pRipple label="Nueva Carga Familiar" icon="pi pi-plus" class="p-button-success p-mr-2"
+              (click)="openNew()"></button>
+    </ng-template>
+  </p-toolbar>
 
-    <p-table #dt [value]="cargasFamiliares" [rows]="10" [paginator]="true"
-        [globalFilterFields]="['nombres','apellidos','correoElectronico','numeroTelefono']"
-        [(selection)]="selectedCargasFamiliares" [rowHover]="true" dataKey="id"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-        [showCurrentPageReport]="true">
-        <ng-template pTemplate="caption">
-            <div class="p-d-flex p-ai-center p-jc-between">
-                <h5 class="p-m-0">Administrar Cargas Familiares</h5>
-                <span class="p-input-icon-left">
+  <p-table #dt [value]="cargasFamiliares"
+           [(selection)]="selectedCargasFamiliares"
+           [rowHover]="true" dataKey="id"
+           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+           [showCurrentPageReport]="true"
+           (onSort)="onSort($event)"
+           [customSort]="true">
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <h5 class="p-m-0">Administrar Cargas Familiares</h5>
+        <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
-                    <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..." />
+                    <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..."/>
                 </span>
-            </div>
-        </ng-template>
-        <ng-template pTemplate="header">
-            <tr>
-                <th style="width: 3rem">
-                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                </th>
-                <th pSortableColumn="nombres">Nombres <p-sortIcon field="nombres"></p-sortIcon></th>
-                <th pSortableColumn="apellidos">Apellidos <p-sortIcon field="apellidos"></p-sortIcon></th>
-                <th pSortableColumn="correoElectronico">Correo Electrónico <p-sortIcon
-                        field="correoElectronico"></p-sortIcon></th>
-                <th pSortableColumn="numeroTelefono">Número Teléfono <p-sortIcon field="numeroTelefono"></p-sortIcon>
-                </th>
-                <th pSortableColumn="parentesco">Parentesco <p-sortIcon field="parentesco"></p-sortIcon></th>
-                <th></th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-cargaFamiliar>
-            <tr>
-                <td>
-                    <p-tableCheckbox [value]="cargaFamiliar"></p-tableCheckbox>
-                </td>
-                <td>{{cargaFamiliar.nombres}}</td>
-                <td>{{cargaFamiliar.apellidos}}</td>
-                <td>{{cargaFamiliar.correoElectronico}}</td>
-                <td>{{cargaFamiliar.numeroTelefono}}</td>
-                <td>{{cargaFamiliar.parentesco}}</td>
-                <td style="text-align: right;">
-                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
-                        (click)="editCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
-                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
-                        (click)="deleteCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
-                </td>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="summary">
-            <div class="p-d-flex p-ai-center p-jc-between">
-                En total existen {{cargasFamiliares ? cargasFamiliares.length : 0 }} registros.
-            </div>
-        </ng-template>
-    </p-table>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="nombres">Nombres
+          <p-sortIcon field="nombres"></p-sortIcon>
+        </th>
+        <th pSortableColumn="apellidos">Apellidos
+          <p-sortIcon field="apellidos"></p-sortIcon>
+        </th>
+        <th pSortableColumn="correoElectronico">Correo Electrónico
+          <p-sortIcon
+            field="correoElectronico"></p-sortIcon>
+        </th>
+        <th pSortableColumn="numeroTelefono">Número Teléfono
+          <p-sortIcon field="numeroTelefono"></p-sortIcon>
+        </th>
+        <th pSortableColumn="parentesco">Parentesco
+          <p-sortIcon field="parentesco"></p-sortIcon>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-cargaFamiliar>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="cargaFamiliar"></p-tableCheckbox>
+        </td>
+        <td>{{ cargaFamiliar.nombres }} {{ cargaFamiliar.nombresDos }}</td>
+        <td>{{ cargaFamiliar.apellidos }} {{ cargaFamiliar.apellidosDos }}</td>
+        <td>{{ cargaFamiliar.correoElectronico }}</td>
+        <td>{{ cargaFamiliar.numeroTelefono }}</td>
+        <td>{{ cargaFamiliar.parentesco }}</td>
+        <td style="text-align: right;">
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
+                  (click)="editCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
+                  (click)="deleteCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{totalRecords ? totalRecords : 0 }} registros.
+      </div>
+    </ng-template>
+  </p-table>
 </div>
 
 <p-dialog [(visible)]="cargaFamiliarDialog" [style]="{width: '600px'}" header="Detalle de Carga Familiar" [modal]="true"
-    styleClass="p-fluid">
-    <ng-template pTemplate="content">
-        <div class="p-field">
-            <label for="nombres">Nombres</label>
-            <input type="text" pInputText id="nombres" [(ngModel)]="cargaFamiliar.nombres" required autofocus />
-            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombres">Nombres es requerido.</small>
-        </div>
-        <div class="p-field">
-            <label for="apellidos">Apellidos</label>
-            <input type="text" pInputText id="apellidos" [(ngModel)]="cargaFamiliar.apellidos" required />
-            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidos">Apellidos es requerido.</small>
-        </div>
-        <div class="p-field">
-            <label class="p-mb-3">Correo Electrónico</label>
-            <input type="text" pInputText [(ngModel)]="cargaFamiliar.correoElectronico" required />
-            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.correoElectronico">Correo Electrónico es
-                requerido.</small>
-        </div>
-        <div class="p-field">
-            <label class="p-mb-3">Número Teléfono</label>
-            <input type="text" pInputText [(ngModel)]="cargaFamiliar.numeroTelefono" required />
-            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.numeroTelefono">Número Teléfono es
-                requerido.</small>
-        </div>
-        <div class="p-field">
-            <label class="p-mb-3">Parentesco</label>
-            <input type="text" pInputText [(ngModel)]="cargaFamiliar.parentesco" required />
-            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.parentesco">Parentesco es requerido.</small>
-        </div>
+          styleClass="p-fluid">
+  <ng-template pTemplate="content">
 
-        <p-blockUI [blocked]="loading">
-            <div class="p-field" *ngIf="loading">
-                <p-progressSpinner></p-progressSpinner>
-            </div>
-        </p-blockUI>
+    <div class="p-grid p-fluid">
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="nombres">Nombre Uno</label>
+          <input type="text" pInputText id="nombres" [(ngModel)]="cargaFamiliar.nombres" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombres">Nombre uno is required.</small>
+        </div>
+      </div>
 
-    </ng-template>
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="nombres">Nombre Dos</label>
+          <input type="text" pInputText id="nombresDos" [(ngModel)]="cargaFamiliar.nombresDos" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombresDos">Nombre dos is required.</small>
+        </div>
+      </div>
+    </div>
+    <div class="p-grid p-fluid">
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="apellidos">Apellido Uno</label>
+          <input type="text" pInputText id="apellidos" [(ngModel)]="cargaFamiliar.apellidos" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidos">Apellido uno is required.</small>
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="apellidosDos">Apellido Dos</label>
+          <input type="text" pInputText id="apellidosDos" [(ngModel)]="cargaFamiliar.apellidosDos" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidosDos">Apellido dos is required.</small>
+        </div>
+      </div>
+    </div>
 
-    <ng-template pTemplate="footer">
-        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+    <div class="p-field">
+      <label class="p-mb-3">Correo Electrónico</label>
+      <input type="text" pInputText [(ngModel)]="cargaFamiliar.correoElectronico" required/>
+      <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.correoElectronico">Correo Electrónico es
+        requerido.</small>
+    </div>
+    <div class="p-field">
+      <label class="p-mb-3">Número Teléfono</label>
+      <input type="text" pInputText [(ngModel)]="cargaFamiliar.numeroTelefono" required/>
+      <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.numeroTelefono">Número Teléfono es
+        requerido.</small>
+    </div>
+    <div class="p-field">
+      <label class="p-mb-3">Parentesco</label>
+      <input type="text" pInputText [(ngModel)]="cargaFamiliar.parentesco" required/>
+      <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.parentesco">Parentesco es requerido.</small>
+    </div>
+
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
             (click)="hideDialog()"></button>
-        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
+    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
             (click)="saveCargaFamiliar()"></button>
-    </ng-template>
+  </ng-template>
 </p-dialog>
 
 <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

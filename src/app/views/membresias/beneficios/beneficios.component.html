@@ -2,7 +2,11 @@
 
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
-    <ng-template pTemplate="left"> </ng-template>
+    <ng-template pTemplate="left">
+      <div>
+        <h5><strong>Membresía:</strong> {{ membresia?.nombres }}</h5>
+      </div>
+    </ng-template>
     <ng-template pTemplate="right">
       <button
         pButton
@@ -52,9 +56,6 @@
         <th pSortableColumn="descripcion">
           Descripción <p-sortIcon field="descripcion"></p-sortIcon>
             </th>
-        <th pSortableColumn="membresia">
-          Membresia <p-sortIcon field="membresia"></p-sortIcon>
-        </th>
             <th></th>
           </tr>
         </ng-template>
@@ -65,7 +66,6 @@
             </td>
             <td>{{ beneficio.nombre }}</td>
             <td>{{ beneficio.descripcion }}</td>
-            <td>{{ beneficio.membresia.nombres }}</td>
             <td>
               <button
                 pButton

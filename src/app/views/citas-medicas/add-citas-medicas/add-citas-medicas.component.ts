@@ -25,7 +25,7 @@ export class AddCitasMedicasComponent implements OnInit {
   submitted: boolean;
   citaMedica: any;
   loading: boolean = false;
-  
+
   clientes: any[]; // Lista de clientes para el autocompletado
   aseguradoras: any[]; // Lista de aseguradoras para el autocompletado
   clientePolizas: any[]; // Lista de polizas para el autocompletado
@@ -80,13 +80,23 @@ export class AddCitasMedicasComponent implements OnInit {
       const citaMedica = JSON.parse(localStorage.getItem('citaMedica'));
 
       this.citaMedicaId = +(await this.getRouteParams('citaMedicaId'));
-     
+
       this.citaMedica = citaMedica
-      // this.citaMedica = await this.citasMedicasService.getCitaMedica(this.citaMedicaId);
 
       this.selectedCliente = this.citaMedica.clientePoliza.cliente
-      await this.loadPolizas();
-      this.selectedClientePoliza = this.clientePolizas.find(x => x.id === this.citaMedica.clientePoliza.id);
+
+      const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+        this.ROL_CLIENTE_ID,
+        this.ESTADO_ACTIVO,
+        0,
+        10,
+        this.selectedCliente.nombreUsuario
+      );
+
+      this.clientes = responseCliente.data
+
+      this.selectedClientePoliza = JSON.parse(localStorage.getItem("clientePoliza"))
+      await this.loadPolizas(true);
       this.comentarios = await this.comentariosCitasMedicasService.getComentariosByCitaMedica(this.citaMedicaId);
 
 
@@ -97,8 +107,8 @@ export class AddCitasMedicasComponent implements OnInit {
         this.imagen =  foto.documento
         this.nombreDocumento = foto.nombreDocumento
       }
-      // this.citaMedica.fotoReclamo = citaMedicaFoto.fotoReclamo 
-      
+      // this.citaMedica.fotoReclamo = citaMedicaFoto.fotoReclamo
+
       if (this.imagen) {
         this.imagePreview = this.imagen;
       }else{
@@ -107,7 +117,7 @@ export class AddCitasMedicasComponent implements OnInit {
 
       if (citaMedica.estado == 'C')
         this.readOnlyForm = true
-      
+
       return
     }
 
@@ -191,7 +201,7 @@ export class AddCitasMedicasComponent implements OnInit {
   onFileSelect(event) {
     if (this.citaMedica)
       this.editImage = true;
-    
+
     const file = event.files[0];
     this.imagen = file;
     this.nombreDocumento = this.imagen.name
@@ -230,13 +240,15 @@ export class AddCitasMedicasComponent implements OnInit {
 
 
   async prepareData() {
-    this.clientes = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+    const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
       this.ESTADO_ACTIVO,
       0,
       10,
       ""
     );
+
+    this.clientes = responseCliente.data
   }
 
   private getRouteParams(param: string): Promise<string> {
@@ -245,57 +257,10 @@ export class AddCitasMedicasComponent implements OnInit {
     });
   }
 
-
-  filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
-
   openNew() {
     this.citaMedica = {};
     this.submitted = false;
     this.citaMedicaDialog = true;
-  }
-
-  deleteSelectedCitasMedicas() {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete the selected claims?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        // Implementar lógica para eliminar citasMedicas seleccionadas
-        this.selectedCitasMedicas = [];
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Claims Deleted',
-          life: 3000,
-        });
-      },
-    });
-  }
-
-  async editCitaMedica(citaMedica: any) {
-    this.citaMedica = { ...citaMedica };
-    this.citaMedicaDialog = true;
-  }
-
-  async deleteCitaMedica(citaMedica: any) {
-    this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar la cita médica?',
-      header: 'Confirmar',
-      icon: 'pi pi-exclamation-triangle',
-      accept: async () => {
-        await this.citasMedicasService.eliminarCitaMedica(citaMedica.id);
-        await this.manageListado()
-        
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Enhorabuena!',
-          detail: 'Cita médica eliminada exitosamente',
-          life: 3000,
-        });
-      },
-    });
   }
 
   hideDialog() {
@@ -305,7 +270,7 @@ export class AddCitasMedicasComponent implements OnInit {
 
   async saveCitaMedica() {
     this.submitted = true;
-    
+
     if (!this.imagen){
       this.messageService.add({
         severity: 'error',
@@ -313,7 +278,7 @@ export class AddCitasMedicasComponent implements OnInit {
         detail: 'Imagen es requerido',
         life: 3000,
       });
-      return 
+      return
     }
 
     this.loading = true; // Mostrar spinner
@@ -341,55 +306,63 @@ export class AddCitasMedicasComponent implements OnInit {
     }
   }
 
+  async filterClientes(event){
+    let query = event.query;
 
-  async refrescarListado(type) {
-    console.log(this.selectedClientePoliza, this.selectedCliente)
-    if (type == "ALL")
-      this.citasMedicas = await this.citasMedicasService.obtenerCitasMedicas(this.ESTADO_ACTIVO, null);
-    else
-      this.citasMedicas = await this.citasMedicasService.obtenerCitasMedicas(undefined, this.selectedClientePoliza.id);
+    const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      query
+    );
+
+    this.filteredClientes = responseCliente.data
   }
 
-  filterClientes(event): void {
+
+  async filterPolizas(event) {
     let query = event.query;
-    this.filteredClientes = this.clientes.filter(cliente =>
-      cliente.nombres.toLowerCase().indexOf(query.toLowerCase()) === 0);
+
+    const responseClientePoliza = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
+      this.selectedCliente.id,
+      0,
+      10,
+      query);
+
+    let clientePolizas = responseClientePoliza.data
+    if (clientePolizas) {
+      clientePolizas = clientePolizas.map(obj => ({
+        ...obj,
+        displayName: `${obj.id}-${obj.poliza.nombre}`
+      }));
+      console.log(clientePolizas)
+
+      this.filteredPolizas = clientePolizas;
     }
-  
-    filterAseguradoras(event): void {
-      let query = event.query;
-      this.filteredAseguradoras = this.aseguradoras.filter(aseguradora =>
-        aseguradora.nombre.toLowerCase().indexOf(query.toLowerCase()) === 0);
-    }
-  
-    filterPolizas(event): void {
-      let query = event.query;
-      this.filteredPolizas = this.clientePolizas.filter(obj =>
-        obj.displayName.toLowerCase().indexOf(query.toLowerCase()) === 0);
-    }
-  
-    async loadPolizas() {
-      console.log(this.clientePolizaId)
-      if (this.selectedCliente) {
-        let clientePolizas = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(this.selectedCliente.id);
-        
-        if (clientePolizas) {
-          clientePolizas = clientePolizas.map(obj => ({
-            ...obj,
-            displayName: `${obj.id}-${obj.poliza.nombre}`
-          }));
-          console.log(clientePolizas)
-          
-          this.clientePolizas = clientePolizas; 
-        }
+
+  }
+
+  async loadPolizas(esEdicion: boolean | null = false) {
+    if (this.selectedCliente) {
+      const responseClientePoliza = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
+        this.selectedCliente.id,
+        0,
+        10,
+        esEdicion ? this.selectedClientePoliza.nombre : "");
+
+      let clientePolizas = responseClientePoliza.data
+      if (clientePolizas) {
+        clientePolizas = clientePolizas.map(obj => ({
+          ...obj,
+          displayName: `${obj.id}-${obj.poliza.nombre}`
+        }));
+        console.log(clientePolizas)
+
+        this.clientePolizas = clientePolizas;
       }
     }
-  
-    async manageListado(){
-      if (this.selectedClientePoliza)
-        await this.refrescarListado("CLIENTE_POLIZA");
-      else
-        await this.refrescarListado("ALL");
-    }
   }
-  
+
+  }
+

@@ -10,9 +10,18 @@ export class CoberturasService {
 
   constructor(private http: HttpClient) { }
 
-  async obtenerCoberturasByPoliza(polizaId: number): Promise<any[]> {
+  async obtenerCoberturasByPoliza(
+    polizaId: number,
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1): Promise<any> {
     try {
-      const coberturas = await this.http.get<any[]>(`${this.apiUrl}/polizas/${polizaId}/coberturas`).toPromise();
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+      const coberturas = await this.http.get<any[]>(`${this.apiUrl}/polizas/${polizaId}/coberturas?page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de coberturas:', coberturas);
       return coberturas;
     } catch (error) {

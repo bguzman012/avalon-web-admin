@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import {MessageService, SortEvent} from 'primeng/api';
 import { CoberturasService } from '../../../services/coberturas-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth-service';
@@ -28,6 +28,15 @@ export class CoberturasComponent implements OnInit {
   aseguradoraId: number;
   aseguradora: any;
 
+  first: number = 0;
+  pageSize: number = 10;
+  totalRecords: number = 0;
+
+  busqueda: string = '';
+  sortField
+  sortOrder
+
+
   constructor(
     private messageService: MessageService,
     private coberturaService: CoberturasService,
@@ -39,7 +48,7 @@ export class CoberturasComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
-    
+
     this.aseguradoraId = +(await this.getRouteParams('aseguradoraId'));
 
     if (!this.aseguradoraId) {
@@ -52,34 +61,67 @@ export class CoberturasComponent implements OnInit {
       this.polizaId = +localStorage.getItem('polizaId');
     }
 
-    this.polizas = await this.polizasService.obtenerPolizasByAseguradora(this.aseguradoraId);
+    this.poliza = JSON.parse(localStorage.getItem('poliza'));
 
-    this.poliza = this.polizas.find(x => x.id === this.polizaId);
-
-    this.refrescarListado();
+    await this.refrescarListado();
     let user = await this.authService.obtenerUsuarioLoggeado();
     if (user.rol.id === 1) this.activarCreate = true;
     this.loading = false;
   }
 
-  filterGlobal(event: Event, dt: any) {
-    dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+ async  filterGlobal(event: Event, dt: any) {
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      await this.refrescarListado();
+
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  openNew() {
+  async onSort(event: SortEvent) {
+    if (event.field !== this.sortField || event.order !== this.sortOrder) {
+      this.loading = true
+      this.sortField = event.field;
+      this.sortOrder = event.order;
+      await this.refrescarListado();
+      this.loading = false
+
+    }
+  }
+
+  async openNew() {
     this.cobertura = {};
     this.submitted = false;
+
+    const response = await this.polizasService.obtenerPolizasByAseguradora(
+      this.aseguradoraId,
+      0,
+      10,
+      this.poliza.nombre
+    );
+
+    this.polizas = response.data
+
     this.coberturaDialog = true;
   }
 
-  editCobertura(cobertura: any) {
+  async editCobertura(cobertura: any) {
     this.cobertura = { ...cobertura };
+    const response = await this.polizasService.obtenerPolizasByAseguradora(
+      this.aseguradoraId,
+      0,
+      10,
+      this.poliza.nombre
+    );
+
+    this.polizas = response.data
     this.coberturaDialog = true;
   }
 
   async deleteCobertura(cobertura: any) {
     await this.coberturaService.eliminarCobertura(cobertura.id);
-    this.refrescarListado();
+    this.first = 0
+    await this.refrescarListado();
     this.messageService.add({
       severity: 'success',
       summary: 'Enhorabuena!',
@@ -103,7 +145,8 @@ export class CoberturasComponent implements OnInit {
       } else {
         await this.coberturaService.guardarCobertura(this.cobertura);
       }
-      this.refrescarListado();
+      this.first = 0
+      await this.refrescarListado();
       this.coberturaDialog = false;
       this.cobertura = {};
       this.messageService.add({
@@ -117,8 +160,26 @@ export class CoberturasComponent implements OnInit {
     }
   }
 
+  async onPageChange(event) {
+    this.loading = true;
+    this.first = event.first;
+    this.pageSize = event.rows;
+    await this.refrescarListado();
+    this.loading = false;
+  }
+
   async refrescarListado() {
-    this.coberturas = await this.coberturaService.obtenerCoberturasByPoliza(this.polizaId);
+    const response = await this.coberturaService.obtenerCoberturasByPoliza(
+      this.polizaId,
+      this.first / this.pageSize,
+      this.pageSize,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder);
+
+    this.coberturas = response.data
+    this.totalRecords = response.totalRecords
+
   }
 
   private getRouteParams(param: string): Promise<string> {

@@ -91,25 +91,25 @@ export class ClientesMembresiasComponent implements OnInit {
 
     this.user = await this.authService.obtenerUsuarioLoggeado()
 
-    this.refrescarListado();
+    await this.refrescarListado();
     this.loading = false
 
   }
 
-  filterGlobal(event: Event, dt: any) {
+  async filterGlobal(event: Event, dt: any) {
     this.first = 0;
     this.busqueda = (event.target as HTMLInputElement).value;
     if (this.busqueda.length == 0 || this.busqueda.length >= 3)
-      this.refrescarListado();
+      await this.refrescarListado();
 
     // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  onSort(event: SortEvent) {
+  async onSort(event: SortEvent) {
     if (event.field !== this.sortField || event.order !== this.sortOrder) {
       this.sortField = event.field;
       this.sortOrder = event.order;
-      this.refrescarListado();
+      await this.refrescarListado();
     }
   }
 
@@ -128,7 +128,7 @@ export class ClientesMembresiasComponent implements OnInit {
         this.ESTADO_ACTIVO,
         0,
         10,
-        ""
+        this.user.rol.id == this.ROL_ASESOR_ID || this.asesor ? this.asesor.nombreUsuario : ""
       );
 
     const responseMembresia =
@@ -136,7 +136,7 @@ export class ClientesMembresiasComponent implements OnInit {
         this.ESTADO_ACTIVO,
         0,
         10,
-        ""
+        this.membresia ? this.membresia.nombres : ""
       );
 
     this.clientes = responseCliente.data;
@@ -186,10 +186,12 @@ export class ClientesMembresiasComponent implements OnInit {
     this.clienteMembresia.fechaInicio = new Date(this.clienteMembresia.fechaInicio + 'T23:59:00Z');
     this.clienteMembresia.fechaFin = new Date(this.clienteMembresia.fechaFin + 'T23:59:00Z');
 
-    await this.prepareData()
     this.membresia = this.clienteMembresia.membresia;
     this.cliente = this.clienteMembresia.cliente;
     this.asesor = this.clienteMembresia.asesor;
+
+    await this.prepareData()
+
     this.vigenciaMeses = this.membresia.vigenciaMeses;
     this.clienteMembresiaDialog = true;
   }
@@ -253,7 +255,7 @@ export class ClientesMembresiasComponent implements OnInit {
         );
       }
       this.first = 0;
-      this.refrescarListado();
+      await this.refrescarListado();
       this.clienteMembresiaDialog = false;
       this.clienteMembresia = {};
       this.messageService.add({

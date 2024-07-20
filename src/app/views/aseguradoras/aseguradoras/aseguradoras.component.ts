@@ -37,7 +37,7 @@ export class AseguradorasComponent implements OnInit {
   busqueda: string = '';
   sortField
   sortOrder
-  
+
   activarCreate = false
 
   constructor(
@@ -77,7 +77,7 @@ export class AseguradorasComponent implements OnInit {
     this.submitted = false;
     this.aseguradoraDialog = true;
   }
-  
+
   editAseguradora(aseguradora: any) {
     this.aseguradora = { ...aseguradora };
     this.aseguradoraDialog = true;
@@ -107,7 +107,7 @@ export class AseguradorasComponent implements OnInit {
     this.aseguradoraDialog = false;
     this.submitted = false;
   }
-  
+
   async saveAseguradora() {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
@@ -138,7 +138,7 @@ export class AseguradorasComponent implements OnInit {
 
   async refrescarListado(estado){
     const response = await this.aseguradorasService.obtenerAseguradorasByEstado(
-      estado, 
+      estado,
       this.first / this.pageSize,
       this.pageSize,
       this.busqueda,
@@ -152,6 +152,8 @@ export class AseguradorasComponent implements OnInit {
 
   redirectToMembresiasPage(aseguradora: any) {
     localStorage.setItem("aseguradoraId", aseguradora.id);
+    localStorage.setItem("aseguradora", JSON.stringify(aseguradora));
+
     this.router.navigate(['aseguradoras/polizas'], { queryParams: { aseguradoraId: aseguradora.id } });
   }
 }

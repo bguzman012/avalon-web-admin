@@ -42,6 +42,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import {PanelModule} from 'primeng/panel';
 import { CitasMedicasComponent } from './citas-medicas/citas-medicas.component';
 import { AddCitasMedicasComponent } from './add-citas-medicas/add-citas-medicas.component';
+import {PaginatorModule} from "primeng/paginator";
 // import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
@@ -50,47 +51,48 @@ import { AddCitasMedicasComponent } from './add-citas-medicas/add-citas-medicas.
     CitasMedicasComponent,
     AddCitasMedicasComponent
   ],
-  imports: [
-    CommonModule,
-    CitasMedicasRoutingModule,
-    CardModule,
-    FormModule,
-    GridModule,
-    FormsModule,
-    PanelModule,
-    ReactiveFormsModule,
-    FormModule,
-    ButtonGroupModule,
-    DropdownModule,
-    AlertModule,
-    TableModule,
-    SharedModule,
-    ListGroupModule,
-    AutoCompleteModule,
-    
-    
-    TableModule,
-    CalendarModule,
-		SliderModule,
-		DialogModule,
-    BlockUIModule,
-    ProgressSpinnerModule,
-		MultiSelectModule,
-		ContextMenuModule,
-		DropdownModule,
-		ButtonModule,
-		ToastModule,
-    InputTextModule,
-    ProgressBarModule,
-    FileUploadModule,
-    ToolbarModule,
-    RatingModule,
-    FormsModule,
-    RadioButtonModule,
-    InputNumberModule,
-    ConfirmDialogModule,
-    InputTextareaModule,
-  ]
+    imports: [
+        CommonModule,
+        CitasMedicasRoutingModule,
+        CardModule,
+        FormModule,
+        GridModule,
+        FormsModule,
+        PanelModule,
+        ReactiveFormsModule,
+        FormModule,
+        ButtonGroupModule,
+        DropdownModule,
+        AlertModule,
+        TableModule,
+        SharedModule,
+        ListGroupModule,
+        AutoCompleteModule,
+
+
+        TableModule,
+        CalendarModule,
+        SliderModule,
+        DialogModule,
+        BlockUIModule,
+        ProgressSpinnerModule,
+        MultiSelectModule,
+        ContextMenuModule,
+        DropdownModule,
+        ButtonModule,
+        ToastModule,
+        InputTextModule,
+        ProgressBarModule,
+        FileUploadModule,
+        ToolbarModule,
+        RatingModule,
+        FormsModule,
+        RadioButtonModule,
+        InputNumberModule,
+        ConfirmDialogModule,
+        InputTextareaModule,
+        PaginatorModule,
+    ]
 })
 export class CitasMedicasModule {
 }
