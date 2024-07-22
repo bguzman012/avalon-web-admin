@@ -10,7 +10,7 @@ import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'citas-medicas',
+  selector: 'casos',
   templateUrl: './citas-medicas.component.html',
   styleUrls: ['./citas-medicas.component.scss'],
 })
@@ -86,6 +86,14 @@ export class CitasMedicasComponent implements OnInit {
     this.clientes = responseCliente.data
   }
 
+  async filterGlobal(event: Event, dt: any) {
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      await this.manageListado()
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
   async editCitaMedica(citaMedica: any) {
     this.citaMedica = { ...citaMedica };
     let queryParamsClientePoliza = {}
@@ -134,18 +142,18 @@ export class CitasMedicasComponent implements OnInit {
       response = await this.citasMedicasService.obtenerCitasMedicas(
         "",
         "",
-        0,
+        this.first / this.pageSize,
         10,
-        "",
+        this.busqueda,
         this.sortField,
         this.sortOrder);
     else
       response = await this.citasMedicasService.obtenerCitasMedicas(
         "",
         this.selectedClientePoliza.id,
-        0,
+        this.first / this.pageSize,
         10,
-        "",
+        this.busqueda,
         this.sortField,
         this.sortOrder);
 
@@ -179,7 +187,7 @@ export class CitasMedicasComponent implements OnInit {
     if (clientePolizas) {
       clientePolizas = clientePolizas.map(obj => ({
         ...obj,
-        displayName: `${obj.id}-${obj.poliza.nombre}`
+        displayName: `${obj.codigo}-${obj.poliza.nombre}`
       }));
       console.log(clientePolizas)
 
@@ -220,7 +228,7 @@ export class CitasMedicasComponent implements OnInit {
       if (clientePolizas) {
         clientePolizas = clientePolizas.map(obj => ({
           ...obj,
-          displayName: `${obj.id}-${obj.poliza.nombre}`
+          displayName: `${obj.codigo}-${obj.poliza.nombre}`
         }));
         console.log(clientePolizas)
 

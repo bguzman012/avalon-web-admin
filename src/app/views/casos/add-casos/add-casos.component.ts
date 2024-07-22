@@ -5,8 +5,8 @@ import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
 import { AseguradorasService } from 'src/app/services/aseguradoras-service';
 import { PolizasService } from 'src/app/services/polizas-service';
-import { ComentariosCitasMedicasService } from 'src/app/services/comentarios-citas-medicas-service';
-import { CitasMedicasService } from 'src/app/services/citas-medicas-service';
+import { ComentariosCasosService } from 'src/app/services/comentarios-casos-service';
+import { CasosService } from 'src/app/services/casos-service';
 import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
 import { ImagenesService } from 'src/app/services/imagenes-service';
 import { ActivatedRoute } from '@angular/router';
@@ -15,15 +15,15 @@ import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
   selector: 'add-casos',
-  templateUrl: './add-citas-medicas.component.html',
-  styleUrls: ['./add-citas-medicas.component.scss'],
+  templateUrl: './add-casos.component.html',
+  styleUrls: ['./add-casos.component.scss'],
 })
-export class AddCitasMedicasComponent implements OnInit {
-  citaMedicaDialog: boolean;
-  citasMedicas: any[];
-  selectedCitasMedicas: any[];
+export class AddCasosComponent implements OnInit {
+  casoDialog: boolean;
+  casos: any[];
+  selectedCasos: any[];
   submitted: boolean;
-  citaMedica: any;
+  caso: any;
   loading: boolean = false;
 
   clientes: any[]; // Lista de clientes para el autocompletado
@@ -42,7 +42,7 @@ export class AddCitasMedicasComponent implements OnInit {
   ESTADO_ACTIVO = 'A';
   clientePolizaId: number;
   clienteId: number;
-  citaMedicaId: number;
+  casoId: number;
   displayDialog: boolean = false;
   editImage = false
   readOnlyForm = false
@@ -54,14 +54,14 @@ export class AddCitasMedicasComponent implements OnInit {
   imagen
   nombreDocumento
 
-  codigoDocumento: string = 'Nueva Cita Médica'
+  codigoDocumento: string = 'Nuevo Caso'
 
   constructor(
     private messageService: MessageService,
-    private citasMedicasService: CitasMedicasService,
+    private casosService: CasosService,
     private aseguradorasService: AseguradorasService,
     private usuariosService: UsuariosService,
-    private comentariosCitasMedicasService: ComentariosCitasMedicasService,
+    private comentariosCasosService: ComentariosCasosService,
     private confirmationService: ConfirmationService,
     private imagenService: ImagenesService,
     private polizasService: PolizasService,
@@ -77,15 +77,16 @@ export class AddCitasMedicasComponent implements OnInit {
     this.openNew();
     await this.prepareData();
 
-    if (await this.getRouteParams('citaMedicaId')) {
+    if (await this.getRouteParams('casoId')) {
       this.nombreDocumento = 'Cargando ...'
-      const citaMedica = JSON.parse(localStorage.getItem('citaMedica'));
+      const caso = JSON.parse(localStorage.getItem('caso'));
 
-      this.citaMedicaId = +(await this.getRouteParams('citaMedicaId'));
-      this.citaMedica = citaMedica
+      this.casoId = +(await this.getRouteParams('casoId'));
+      this.caso = caso
 
-      this.codigoDocumento = "# " + this.citaMedica.codigo
-      this.selectedCliente = this.citaMedica.clientePoliza.cliente
+      this.codigoDocumento = "# " + this.caso.codigo
+
+      this.selectedCliente = this.caso.clientePoliza.cliente
 
       const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
         this.ROL_CLIENTE_ID,
@@ -98,22 +99,24 @@ export class AddCitasMedicasComponent implements OnInit {
       this.clientes = responseCliente.data
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
-      this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.citaMedica.clientePoliza
+      this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.caso.clientePoliza
 
       if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName){
         this.selectedClientePoliza.displayName = `${this.selectedClientePoliza.codigo}-${this.selectedClientePoliza.poliza.nombre}`
       }
 
       await this.loadPolizas(true);
-      this.comentarios = await this.comentariosCitasMedicasService.getComentariosByCitaMedica(this.citaMedicaId);
+      console.log(this.caso.clientePoliza)
+      console.log(this.clientePolizas )
+      this.comentarios = await this.comentariosCasosService.getComentariosByCaso(this.casoId);
       this.loading = false;
 
-      if (citaMedica.imagenId){
-        let foto = await this.imagenService.getImagen(citaMedica.imagenId);
+      if (caso.imagenId){
+        let foto = await this.imagenService.getImagen(caso.imagenId);
         this.imagen =  foto.documento
         this.nombreDocumento = foto.nombreDocumento
       }
-      // this.citaMedica.fotoReclamo = citaMedicaFoto.fotoReclamo
+      // this.caso.fotoReclamo = casoFoto.fotoReclamo
 
       if (this.imagen) {
         this.imagePreview = this.imagen;
@@ -121,7 +124,7 @@ export class AddCitasMedicasComponent implements OnInit {
         this.nombreDocumento = undefined
       }
 
-      if (citaMedica.estado == 'C')
+      if (caso.estado == 'C')
         this.readOnlyForm = true
 
       return
@@ -142,14 +145,14 @@ export class AddCitasMedicasComponent implements OnInit {
     this.loading = true
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
     const comentario = {
-      citaMedicaId: this.citaMedicaId,
+      casoId: this.casoId,
       contenido: this.nuevoComentario,
       usuarioComentaId: currentUser.id,
       estado: 'A' // Estado activo
     };
 
     try {
-      await this.comentariosCitasMedicasService.createComentario(comentario);
+      await this.comentariosCasosService.createComentario(comentario);
       this.nuevoComentario = '';
       await this.loadComentarios();
       this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Comentario añadido con éxito' });
@@ -164,18 +167,18 @@ export class AddCitasMedicasComponent implements OnInit {
     this.loading = true
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
     const comentario = {
-      citaMedicaId: this.citaMedicaId,
+      casoId: this.casoId,
       contenido: this.nuevoComentario,
       usuarioComentaId: currentUser.id,
       estado: 'C' // Estado activo
     };
 
-    await this.citasMedicasService.partiallyUpdateCitaMedica(this.citaMedica.id, 'C')
+    await this.casosService.partiallyUpdateCaso(this.caso.id, 'C')
 
     this.readOnlyForm = true
 
     try {
-      await this.comentariosCitasMedicasService.createComentario(comentario);
+      await this.comentariosCasosService.createComentario(comentario);
       this.nuevoComentario = '';
       await this.loadComentarios();
       this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Cita médica cerrada con éxito' });
@@ -188,7 +191,7 @@ export class AddCitasMedicasComponent implements OnInit {
 
   async deleteComentario(comentarioId: number) {
     try {
-      await this.comentariosCitasMedicasService.deleteComentario(comentarioId);
+      await this.comentariosCasosService.deleteComentario(comentarioId);
       await this.loadComentarios();
       this.messageService.add({ severity: 'success', summary: 'Comentario eliminado', detail: 'Comentario eliminado con éxito' });
     } catch (error) {
@@ -198,14 +201,14 @@ export class AddCitasMedicasComponent implements OnInit {
 
   async loadComentarios() {
     try {
-      this.comentarios = await this.comentariosCitasMedicasService.getComentariosByCitaMedica(this.citaMedicaId);
+      this.comentarios = await this.comentariosCasosService.getComentariosByCaso(this.casoId);
     } catch (error) {
       console.error('Error al cargar los comentarios', error);
     }
   }
 
   onFileSelect(event) {
-    if (this.citaMedica)
+    if (this.caso)
       this.editImage = true;
 
     const file = event.files[0];
@@ -221,7 +224,7 @@ export class AddCitasMedicasComponent implements OnInit {
   }
 
   clearImageSelection(fileUploadRef) {
-    if (this.citaMedica)
+    if (this.caso)
       this.editImage = true;
 
     this.imagen = null;
@@ -264,17 +267,17 @@ export class AddCitasMedicasComponent implements OnInit {
   }
 
   openNew() {
-    this.citaMedica = {};
+    this.caso = {};
     this.submitted = false;
-    this.citaMedicaDialog = true;
+    this.casoDialog = true;
   }
 
   hideDialog() {
-    this.citaMedicaDialog = false;
+    this.casoDialog = false;
     this.submitted = false;
   }
 
-  async saveCitaMedica() {
+  async saveCaso() {
     this.submitted = true;
 
     if (!this.imagen){
@@ -289,25 +292,25 @@ export class AddCitasMedicasComponent implements OnInit {
 
     this.loading = true; // Mostrar spinner
     const formData = new FormData();
-    this.citaMedica.clientePolizaId = this.selectedClientePoliza.id
-    this.citaMedica.nombreDocumento = this.nombreDocumento
-    formData.append('citaMedica', new Blob([JSON.stringify(this.citaMedica)], { type: 'application/json' }));
+    this.caso.clientePolizaId = this.selectedClientePoliza.id
+    this.caso.nombreDocumento = this.nombreDocumento
+    formData.append('caso', new Blob([JSON.stringify(this.caso)], { type: 'application/json' }));
     if (this.imagen) {
-      formData.append('fotoCitaMedica', this.imagen);
+      formData.append('fotoCaso', this.imagen);
     }
 
     try {
-      if (this.citaMedica.id) {
-        await this.citasMedicasService.actualizarCitaMedica(this.citaMedica.id, formData);
+      if (this.caso.id) {
+        await this.casosService.actualizarCaso(this.caso.id, formData);
       } else {
-        let citaSaved = await this.citasMedicasService.guardarCitaMedica(formData);
-        this.codigoDocumento = "# " + citaSaved.codigo
+        let casoSaved = await this.casosService.guardarCaso(formData);
+        this.codigoDocumento = "# " + casoSaved.codigo
       }
 
       this.loading = false;
       this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar la cita médica' });
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar el caso' });
     } finally {
       this.loading = false; // Ocultar spinner
     }
@@ -359,6 +362,8 @@ export class AddCitasMedicasComponent implements OnInit {
         esEdicion ? this.selectedClientePoliza.codigo : "");
 
       let clientePolizas = responseClientePoliza.data
+      console.log(this.selectedClientePoliza)
+      console.log(clientePolizas)
       if (clientePolizas) {
         clientePolizas = clientePolizas.map(obj => ({
           ...obj,

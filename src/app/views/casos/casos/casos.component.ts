@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {ConfirmationService, MessageService, SortEvent} from 'primeng/api';
-import { ReclamacionesService } from '../../../services/reclamaciones-service';
+import { ConfirmationService, MessageService, SortEvent } from 'primeng/api';
+import { CasosService } from '../../../services/casos-service';
 import { UsuariosService } from '../../../services/usuarios-service';
 import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
@@ -10,16 +10,16 @@ import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'reclamaciones',
-  templateUrl: './reclamaciones.component.html',
-  styleUrls: ['./reclamaciones.component.scss'],
+  selector: 'casos',
+  templateUrl: './casos.component.html',
+  styleUrls: ['./casos.component.scss'],
 })
-export class ReclamacionesComponent implements OnInit {
-  reclamacionDialog: boolean;
-  reclamaciones: any[];
-  selectedReclamaciones: any[];
+export class CasosComponent implements OnInit {
+  casoDialog: boolean;
+  casos: any[];
+  selectedCasos: any[];
   submitted: boolean;
-  reclamacion: any;
+  caso: any;
   loading: boolean = false;
 
   clientes: any[]; // Lista de clientes para el autocompletado
@@ -47,8 +47,7 @@ export class ReclamacionesComponent implements OnInit {
 
   constructor(
     private messageService: MessageService,
-    private reclamacionesService: ReclamacionesService,
-    private aseguradorasService: AseguradorasService,
+    private casosService: CasosService,
     private usuariosService: UsuariosService,
     private confirmationService: ConfirmationService,
     private router: Router,
@@ -59,7 +58,7 @@ export class ReclamacionesComponent implements OnInit {
 
     this.loading = true
     this.prepareData();
-    const response = await this.reclamacionesService.obtenerReclamaciones(
+    const response = await this.casosService.obtenerCasos(
       "",
       "",
       0,
@@ -68,18 +67,10 @@ export class ReclamacionesComponent implements OnInit {
       this.sortField,
       this.sortOrder);
 
-    this.reclamaciones = response.data;
+    this.casos = response.data;
     this.totalRecords = response.totalRecords;
 
     this.loading = false
-  }
-
-  async filterGlobal(event: Event, dt: any) {
-    this.first = 0;
-    this.busqueda = (event.target as HTMLInputElement).value;
-    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
-      await this.manageListado()
-    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
   async prepareData() {
@@ -94,8 +85,16 @@ export class ReclamacionesComponent implements OnInit {
     this.clientes = responseCliente.data
   }
 
-  async editReclamacion(reclamacion: any) {
-    this.reclamacion = { ...reclamacion };
+  async filterGlobal(event: Event, dt: any) {
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      await this.manageListado()
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  async editCaso(caso: any) {
+    this.caso = { ...caso };
     let queryParamsClientePoliza = {}
     if (this.selectedClientePoliza && this.selectedClientePoliza.id) {
       queryParamsClientePoliza = {
@@ -104,31 +103,31 @@ export class ReclamacionesComponent implements OnInit {
       };
     }
 
-    if (this.reclamacion && this.reclamacion.id) {
-      localStorage.setItem('reclamacion', JSON.stringify(this.reclamacion));
-      queryParamsClientePoliza['reclamacionId']= this.reclamacion.id
-      this.router.navigate(['reclamaciones/detalle-reclamacion'], {
+    if (this.caso && this.caso.id) {
+      localStorage.setItem('caso', JSON.stringify(this.caso));
+      queryParamsClientePoliza['casoId']= this.caso.id
+      this.router.navigate(['casos/detalle-caso'], {
         queryParams: queryParamsClientePoliza,
       });
     }
 
-    this.reclamacionDialog = true;
+    this.casoDialog = true;
   }
 
-  async deleteReclamacion(reclamacion: any) {
+  async deleteCaso(caso: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar la reclamo?',
+      message: 'Estás seguro de eliminar el caso?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
-        await this.reclamacionesService.eliminarReclamacion(reclamacion.id);
+        await this.casosService.eliminarCaso(caso.id);
         this.first = 0
         await this.manageListado()
 
         this.messageService.add({
           severity: 'success',
           summary: 'Enhorabuena!',
-          detail: 'Reclamo eliminado exitosamente',
+          detail: 'Cita médica eliminada exitosamente',
           life: 3000,
         });
       },
@@ -139,7 +138,7 @@ export class ReclamacionesComponent implements OnInit {
     let response;
     if (type == "ALL")
 
-      response = await this.reclamacionesService.obtenerReclamaciones(
+      response = await this.casosService.obtenerCasos(
         "",
         "",
         this.first / this.pageSize,
@@ -148,7 +147,7 @@ export class ReclamacionesComponent implements OnInit {
         this.sortField,
         this.sortOrder);
     else
-      response = await this.reclamacionesService.obtenerReclamaciones(
+      response = await this.casosService.obtenerCasos(
         "",
         this.selectedClientePoliza.id,
         this.first / this.pageSize,
@@ -157,7 +156,7 @@ export class ReclamacionesComponent implements OnInit {
         this.sortField,
         this.sortOrder);
 
-    this.reclamaciones = response.data
+    this.casos = response.data
   }
 
   async filterClientes(event){
@@ -234,7 +233,6 @@ export class ReclamacionesComponent implements OnInit {
 
         this.clientePolizas = clientePolizas;
       }
-      console.log(this.clientePolizas, " CLIPIIE")
     }
   }
 
@@ -245,19 +243,19 @@ export class ReclamacionesComponent implements OnInit {
       await this.refrescarListado("ALL");
   }
 
-  redirectToDetailReclamacionPage() {
+  redirectToDetailCasoPage() {
     if (this.selectedClientePoliza && this.selectedClientePoliza.id) {
       localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
       const queryParamsClientePoliza = {
         clientePolizaId: this.selectedClientePoliza.id,
         clienteId: this.selectedCliente.id
       };
-      this.router.navigate(['reclamaciones/detalle-reclamacion'], {
+      this.router.navigate(['casos/detalle-caso'], {
         queryParams: queryParamsClientePoliza,
       });
     } else {
       localStorage.removeItem("clientePoliza");
-      this.router.navigate(['reclamaciones/detalle-reclamacion']);
+      this.router.navigate(['casos/detalle-caso']);
     }
   }
 

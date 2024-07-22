@@ -1,4 +1,4 @@
-import { INavData } from '@coreui/angular';
+import {INavData} from '@coreui/angular';
 
 export const navItemsAdmin: INavData[] = [
 
@@ -7,54 +7,59 @@ export const navItemsAdmin: INavData[] = [
 //     url: '/usuarios',
 //     iconComponent: { }
 //  },
-{
-  name: 'Aseguradoras',
-  url: '/aseguradoras',
-  iconComponent: { }
-  
-},
-{
-  name: 'Membresias',
-  url: '/membresias',
-  iconComponent: { }
-  
-},{
-  name: 'Brokers',
-  url: '/brokers',
-  iconComponent: { }
-  
-},
-{
-  name: 'Asesores',
-  url: '/asesores',
-  iconComponent: { }
-  
-},{
-  name: 'Clientes',
-  url: '/clientes',
-  iconComponent: { }
-  
-},{
-  name: 'Reclamos',
-  url: '/reclamaciones',
-  iconComponent: { }
-  
-},{
-  name: 'Citas Médicas',
-  url: '/citas-medicas',
-  iconComponent: { }
-  
-},{
-  name: 'Árbol de Preguntas',
-  url: '/preguntas',
-  iconComponent: { }
-  
-},{
-  name: 'Notificaciones',
-  url: '/notificaciones',
-  iconComponent: { }
-  
-}
+  {
+    name: 'Aseguradoras',
+    url: '/aseguradoras',
+    iconComponent: {}
+
+  },
+  {
+    name: 'Membresias',
+    url: '/membresias',
+    iconComponent: {}
+
+  }, {
+    name: 'Brokers',
+    url: '/brokers',
+    iconComponent: {}
+
+  },
+  {
+    name: 'Asesores',
+    url: '/asesores',
+    iconComponent: {}
+
+  }, {
+    name: 'Clientes',
+    url: '/clientes',
+    iconComponent: {}
+
+  }, {
+    name: 'Reclamos',
+    url: '/reclamaciones',
+    iconComponent: {}
+
+  }, {
+    name: 'Citas Médicas',
+    url: '/citas-medicas',
+    iconComponent: {}
+
+  }, {
+    name: 'Casos',
+    url: '/casos',
+    iconComponent: {}
+
+  }, {
+    name: 'Árbol de Preguntas',
+    url: '/preguntas',
+    iconComponent: {}
+
+  }, {
+    name: 'Notificaciones',
+    url: '/notificaciones',
+    iconComponent: {}
+
+  }
 ];
 
 export const navItems: INavData[] = [
@@ -62,14 +67,14 @@ export const navItems: INavData[] = [
   {
     name: 'Usuarios',
     url: '/usuarios',
-    iconComponent: { }
- },
- {
-  name: 'Aseguradoras',
-  url: '/aseguradoras',
-  iconComponent: { }
-  
-}
+    iconComponent: {}
+  },
+  {
+    name: 'Aseguradoras',
+    url: '/aseguradoras',
+    iconComponent: {}
+
+  }
 ];
 
 

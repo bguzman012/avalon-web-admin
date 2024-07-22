@@ -3,14 +3,14 @@
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left">
 
-      <h5 class="p-m-0">Administrar Citas Médicas</h5>
+      <h5 class="p-m-0">Administrar Casos</h5>
 
 
     </ng-template>
 
     <ng-template pTemplate="right">
       <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
-              (click)="redirectToDetailCitaMedicaPage()"></button>
+              (click)="redirectToDetailCasoPage()"></button>
     </ng-template>
   </p-toolbar>
   <p-panel>
@@ -37,8 +37,8 @@
     </div>
   </p-panel>
 
-  <p-table #dt [value]="citasMedicas"
-           [(selection)]="selectedCitasMedicas" [rowHover]="true" dataKey="id"
+  <p-table #dt [value]="casos"
+           [(selection)]="selectedCasos" [rowHover]="true" dataKey="id"
            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
            [showCurrentPageReport]="true"
            (onSort)="onSort($event)"
@@ -76,19 +76,19 @@
         <th></th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-citaMedica>
+    <ng-template pTemplate="body" let-caso>
       <tr>
         <td>
-          <p-tableCheckbox [value]="citaMedica"></p-tableCheckbox>
+          <p-tableCheckbox [value]="caso"></p-tableCheckbox>
         </td>
-        <td>{{ citaMedica.codigo }}</td>
-        <td>{{ citaMedica.razon }}</td>
-        <td>{{ citaMedica.estado }}</td>
+        <td>{{ caso.codigo }}</td>
+        <td>{{ caso.razon }}</td>
+        <td>{{ caso.estado }}</td>
         <td>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 medium-button"
-                  (click)="editCitaMedica(citaMedica)"></button>
+                  (click)="editCaso(caso)"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning medium-button"
-                  (click)="deleteCitaMedica(citaMedica)"></button>
+                  (click)="deleteCaso(caso)"></button>
         </td>
       </tr>
     </ng-template>

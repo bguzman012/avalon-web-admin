@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { ReclamacionesService } from '../../../services/reclamaciones-service';
-import { UsuariosService } from '../../../services/usuarios-service';
-import { environment } from '../../../../environments/environment';
-import { FilterService } from "primeng/api";
-import { AseguradorasService } from 'src/app/services/aseguradoras-service';
-import { PolizasService } from 'src/app/services/polizas-service';
-import { ComentariosService } from 'src/app/services/comentarios-service';
-import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
-import { ImagenesService } from 'src/app/services/imagenes-service';
-import { ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { AuthService } from 'src/app/services/auth-service';
+import {Component, OnInit} from '@angular/core';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {ReclamacionesService} from '../../../services/reclamaciones-service';
+import {UsuariosService} from '../../../services/usuarios-service';
+import {environment} from '../../../../environments/environment';
+import {FilterService} from "primeng/api";
+import {AseguradorasService} from 'src/app/services/aseguradoras-service';
+import {PolizasService} from 'src/app/services/polizas-service';
+import {ComentariosService} from 'src/app/services/comentarios-service';
+import {ClientePolizaService} from 'src/app/services/polizas-cliente-service';
+import {ImagenesService} from 'src/app/services/imagenes-service';
+import {ActivatedRoute} from '@angular/router';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {AuthService} from 'src/app/services/auth-service';
 
 @Component({
   selector: 'add-reclamaciones',
@@ -52,6 +52,7 @@ export class AddReclamacionesComponent implements OnInit {
   nuevoComentario: string = '';
   imagen
   nombreDocumento
+  codigoDocumento: string = 'Nuevo Reclamo'
 
   constructor(
     private messageService: MessageService,
@@ -67,8 +68,8 @@ export class AddReclamacionesComponent implements OnInit {
     private authService: AuthService,
     private filterService: FilterService,
     private sanitizer: DomSanitizer
-  ) { }
-
+  ) {
+  }
 
 
   async ngOnInit() {
@@ -80,12 +81,10 @@ export class AddReclamacionesComponent implements OnInit {
     if (await this.getRouteParams('reclamacionId')) {
       this.nombreDocumento = 'Cargando ...'
       const reclamacion = JSON.parse(localStorage.getItem('reclamacion'));
-
       this.reclamacionId = +(await this.getRouteParams('reclamacionId'));
-
       this.reclamacion = reclamacion
-      // this.reclamacion = await this.reclamacionesService.getReclamacion(this.reclamacionId);
 
+      this.codigoDocumento = "# " + this.reclamacion.codigo
       this.selectedCliente = this.reclamacion.clientePoliza.cliente
 
       const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
@@ -98,23 +97,27 @@ export class AddReclamacionesComponent implements OnInit {
 
       this.clientes = responseCliente.data
 
-      this.selectedClientePoliza = JSON.parse(localStorage.getItem("clientePoliza"))
+      const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
+      this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.reclamacion.clientePoliza
+
+      if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName){
+        this.selectedClientePoliza.displayName = `${this.selectedClientePoliza.codigo}-${this.selectedClientePoliza.poliza.nombre}`
+      }
+
       await this.loadPolizas(true);
-
       this.comentarios = await this.comentariosService.getComentariosByReclamacion(this.reclamacionId);
-
       this.loading = false;
 
-      if (reclamacion.imagenId){
+      if (reclamacion.imagenId) {
         let foto = await this.imagenService.getImagen(reclamacion.imagenId);
-        this.imagen =  foto.documento
+        this.imagen = foto.documento
         this.nombreDocumento = foto.nombreDocumento
       }
       // this.reclamacion.fotoReclamo = reclamacionFoto.fotoReclamo
 
       if (this.imagen) {
         this.imagePreview = this.imagen;
-      }else{
+      } else {
         this.nombreDocumento = undefined
       }
 
@@ -149,10 +152,14 @@ export class AddReclamacionesComponent implements OnInit {
       await this.comentariosService.createComentario(comentario);
       this.nuevoComentario = '';
       await this.loadComentarios();
-      this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Comentario añadido con éxito' });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Comentario añadido',
+        detail: 'Comentario añadido con éxito'
+      });
       this.loading = false
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
       this.loading = false
     }
   }
@@ -175,10 +182,14 @@ export class AddReclamacionesComponent implements OnInit {
       await this.comentariosService.createComentario(comentario);
       this.nuevoComentario = '';
       await this.loadComentarios();
-      this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Reclamo cerrado con éxito' });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Comentario añadido',
+        detail: 'Reclamo cerrado con éxito'
+      });
       this.loading = false
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
       this.loading = false
     }
   }
@@ -187,9 +198,13 @@ export class AddReclamacionesComponent implements OnInit {
     try {
       await this.comentariosService.deleteComentario(comentarioId);
       await this.loadComentarios();
-      this.messageService.add({ severity: 'success', summary: 'Comentario eliminado', detail: 'Comentario eliminado con éxito' });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Comentario eliminado',
+        detail: 'Comentario eliminado con éxito'
+      });
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar el comentario' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar el comentario'});
     }
   }
 
@@ -274,7 +289,7 @@ export class AddReclamacionesComponent implements OnInit {
   async saveReclamacion() {
     this.submitted = true;
 
-    if (!this.imagen){
+    if (!this.imagen) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error!',
@@ -288,7 +303,7 @@ export class AddReclamacionesComponent implements OnInit {
     const formData = new FormData();
     this.reclamacion.clientePolizaId = this.selectedClientePoliza.id
     this.reclamacion.nombreDocumento = this.nombreDocumento
-    formData.append('reclamacion', new Blob([JSON.stringify(this.reclamacion)], { type: 'application/json' }));
+    formData.append('reclamacion', new Blob([JSON.stringify(this.reclamacion)], {type: 'application/json'}));
     if (this.imagen) {
       formData.append('fotoReclamo', this.imagen);
     }
@@ -297,20 +312,21 @@ export class AddReclamacionesComponent implements OnInit {
       if (this.reclamacion.id) {
         await this.reclamacionesService.actualizarReclamacion(this.reclamacion.id, formData);
       } else {
-        await this.reclamacionesService.guardarReclamacion(formData);
+        let reclamoSaved = await this.reclamacionesService.guardarReclamacion(formData);
+        this.codigoDocumento = "# " + reclamoSaved.codigo
       }
 
       this.loading = false;
-      this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
+      this.messageService.add({severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito'});
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar el reclamo' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al guardar el reclamo'});
     } finally {
       this.loading = false; // Ocultar spinner
     }
   }
 
 
-  async filterClientes(event){
+  async filterClientes(event) {
     let query = event.query;
 
     const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
@@ -338,7 +354,7 @@ export class AddReclamacionesComponent implements OnInit {
     if (clientePolizas) {
       clientePolizas = clientePolizas.map(obj => ({
         ...obj,
-        displayName: `${obj.id}-${obj.poliza.nombre}`
+        displayName: `${obj.codigo}-${obj.poliza.nombre}`
       }));
       console.log(clientePolizas)
 
@@ -347,26 +363,26 @@ export class AddReclamacionesComponent implements OnInit {
 
   }
 
-    async loadPolizas(esEdicion: boolean | null = false) {
-      if (this.selectedCliente) {
-        const responseClientePoliza = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
-          this.selectedCliente.id,
-          0,
-          10,
-          esEdicion ? this.selectedClientePoliza.nombre : "");
+  async loadPolizas(esEdicion: boolean | null = false) {
+    if (this.selectedCliente) {
+      const responseClientePoliza = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
+        this.selectedCliente.id,
+        0,
+        10,
+        esEdicion ? this.selectedClientePoliza.codigo : "");
 
-        let clientePolizas = responseClientePoliza.data
-        if (clientePolizas) {
-          clientePolizas = clientePolizas.map(obj => ({
-            ...obj,
-            displayName: `${obj.id}-${obj.poliza.nombre}`
-          }));
-          console.log(clientePolizas)
+      let clientePolizas = responseClientePoliza.data
+      if (clientePolizas) {
+        clientePolizas = clientePolizas.map(obj => ({
+          ...obj,
+          displayName: `${obj.codigo}-${obj.poliza.nombre}`
+        }));
+        console.log(clientePolizas)
 
-          this.clientePolizas = clientePolizas;
-        }
+        this.clientePolizas = clientePolizas;
       }
     }
-
   }
+
+}
 

@@ -1,3 +1,4 @@
+
 <p-toast></p-toast>
 
 <div class="card">
@@ -20,9 +21,9 @@
           [suggestions]="filteredClientes"
           (completeMethod)="filterClientes($event)"
           field="nombreUsuario"
-          [dropdown]="!citaMedica?.id"
+          [dropdown]="!caso?.id"
           (ngModelChange)="loadPolizas()"
-          [readonly]="citaMedica?.id" placeholder="Filtrar por Cliente">
+          [readonly]="caso?.id" placeholder="Filtrar por Cliente">
         </p-autoComplete>
 
         <!-- Filtro por Póliza -->
@@ -31,38 +32,38 @@
           [suggestions]="filteredPolizas"
           (completeMethod)="filterPolizas($event)"
           field="displayName"
-          [dropdown]="!citaMedica?.id"
+          [dropdown]="!caso?.id"
           placeholder="Filtrar por Póliza"
           [disabled]="!selectedCliente?.id"
-          [readonly]="citaMedica?.id">
+          [readonly]="caso?.id">
         </p-autoComplete>
       </div>
     </p-panel>
   </div>
 
   <div class="card">
-    <p-panel styleClass="p-fluid" header="Detalles de Cita Médica">
+    <p-panel styleClass="p-fluid" header="Detalles de Caso">
       <div class="p-field">
         <label for="razon">Razón  (*)</label>
-        <input type="text" pInputText id="razon" [(ngModel)]="citaMedica.razon" [readonly]="readOnlyForm" required autofocus />
-        <small class="p-invalid" *ngIf="submitted && !citaMedica.razon">Razón es requerida.</small>
+        <input type="text" pInputText id="razon" [(ngModel)]="caso.razon" [readonly]="readOnlyForm" required autofocus />
+        <small class="p-invalid" *ngIf="submitted && !caso.razon">Razón es requerida.</small>
       </div>
 
       <div class="p-field">
         <label for="estado">Estado</label>
-        <input type="text" pInputText id="estado" readonly [(ngModel)]="citaMedica.estado" />
+        <input type="text" pInputText id="estado" readonly [(ngModel)]="caso.estado" />
       </div>
       <div class="p-field">
-        <label for="fotoCitaMedica">Foto Cita Médica (*)</label>
+        <label for="fotoCaso">Foto Cita Médica (*)</label>
         <div class="upload-container">
-          <p-fileUpload [disabled]="readOnlyForm" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)" mode="basic" [auto]="false"
+          <p-fileUpload [disabled]="readOnlyForm" name="fotoCaso" #fileUploadRef (onSelect)="onFileSelect($event)" mode="basic" [auto]="false"
             accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'" customUpload="true"></p-fileUpload>
           <button *ngIf="imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash" class="p-button-danger p-button-icon-only"
             (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
-        <img *ngIf="(imagePreview && !citaMedica.id) || (imagePreview && editImage)" [src]="imagePreview"
+        <img *ngIf="(imagePreview && !caso.id) || (imagePreview && editImage)" [src]="imagePreview"
           alt="Vista Previa" class="image-preview" (click)="showDialogImage()"    loading="lazy"  />
-        <img *ngIf="imagePreview && citaMedica.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
+        <img *ngIf="imagePreview && caso.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
           alt="Vista Previa" class="image-preview" (click)="showDialogImage()"    loading="lazy" />
 
         <br />
@@ -72,7 +73,7 @@
         <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm" class="p-button-secondary" style="width: 30%;"
           (click)="hideDialog()"></button>
         <button pButton pRipple label="Guardar" icon="pi pi-check" [disabled]="readOnlyForm" class="p-button-primary" style="width: 30%;"
-          (click)="saveCitaMedica()"></button>
+          (click)="saveCaso()"></button>
       </div>
 
       <p-blockUI [blocked]="loading">
@@ -108,9 +109,9 @@
 
 <!-- Agrega el siguiente código al final de tu plantilla -->
 <p-dialog header="Vista Previa de la Imagen" [(visible)]="displayDialog" [modal]="true" [style]="{width: '50vw'}">
-  <img *ngIf="(imagePreview && !citaMedica.id) || (imagePreview && editImage)" [src]="imagePreview"
+  <img *ngIf="(imagePreview && !caso.id) || (imagePreview && editImage)" [src]="imagePreview"
     alt="Vista Previa Completa" class="full-image-preview" />
-  <img *ngIf="imagePreview && citaMedica.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
+  <img *ngIf="imagePreview && caso.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
     alt="Vista Previa Completa" class="full-image-preview" />
 </p-dialog>
 

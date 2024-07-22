@@ -70,6 +70,10 @@ const routes: Routes = [
         loadChildren: () =>
           import('./views/citas-medicas/citas-medicas.module').then((m) => m.CitasMedicasModule)
       },{
+        path: 'casos',
+        loadChildren: () =>
+          import('./views/casos/casos.module').then((m) => m.CasosModule)
+      },{
         path: 'preguntas',
         loadChildren: () =>
           import('./views/arbol-preguntas/arbol-preguntas.module').then((m) => m.PreguntasModule)
@@ -78,13 +82,13 @@ const routes: Routes = [
       //   path: 'aseguradoras',
       //   loadChildren: () =>
       //     import('./views/aseguradoras/aseguradoras.module').then((m) => m.AseguradorasModule)
-      // }, 
+      // },
       {
         path: 'notificaciones',
         loadChildren: () =>
           import('./views/notificaciones/notificaciones.module').then((m) => m.NotificacionesModule)
       },
-      
+
       // {
       //   path: 'base',
       //   loadChildren: () =>

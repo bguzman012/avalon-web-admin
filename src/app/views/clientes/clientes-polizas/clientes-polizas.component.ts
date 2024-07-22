@@ -63,6 +63,8 @@ export class ClientesPolizasComponent implements OnInit {
   sortField
   sortOrder
 
+  codigoDocumento: string = 'Nueva Póliza de Cliente'
+
   constructor(
     private messageService: MessageService,
     private polizasService: PolizasService,
@@ -202,6 +204,8 @@ export class ClientesPolizasComponent implements OnInit {
     );
 
     this.polizas = response.data
+
+    this.codigoDocumento = "# " + this.polizaCliente.codigo
 
     this.vigenciaMeses = this.polizaCliente.poliza.vigenciaMeses;
     this.loading = false
