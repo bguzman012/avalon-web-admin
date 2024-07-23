@@ -5,8 +5,8 @@ import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
 import { AseguradorasService } from 'src/app/services/aseguradoras-service';
 import { PolizasService } from 'src/app/services/polizas-service';
-import { ComentariosCasosService } from 'src/app/services/comentarios-casos-service';
-import { CasosService } from 'src/app/services/casos-service';
+import { ComentariosEmergenciasService } from 'src/app/services/comentarios-emergencias-service';
+import { EmergenciasService } from '../../../services/emergencias-service';
 import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
 import { ImagenesService } from 'src/app/services/imagenes-service';
 import { ActivatedRoute } from '@angular/router';
@@ -14,16 +14,16 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
-  selector: 'add-casos',
-  templateUrl: './add-casos.component.html',
-  styleUrls: ['./add-casos.component.scss'],
+  selector: 'add-emergencias',
+  templateUrl: './add-emergencias.component.html',
+  styleUrls: ['./add-emergencias.component.scss'],
 })
-export class AddCasosComponent implements OnInit {
-  casoDialog: boolean;
-  casos: any[];
-  selectedCasos: any[];
+export class AddEmergenciasComponent implements OnInit {
+  emergenciaDialog: boolean;
+  emergencias: any[];
+  selectedEmergencias: any[];
   submitted: boolean;
-  caso: any;
+  emergencia: any;
   loading: boolean = false;
 
   clientes: any[]; // Lista de clientes para el autocompletado
@@ -42,7 +42,7 @@ export class AddCasosComponent implements OnInit {
   ESTADO_ACTIVO = 'A';
   clientePolizaId: number;
   clienteId: number;
-  casoId: number;
+  emergenciaId: number;
   displayDialog: boolean = false;
   editImage = false
   readOnlyForm = false
@@ -54,14 +54,14 @@ export class AddCasosComponent implements OnInit {
   imagen
   nombreDocumento
 
-  codigoDocumento: string = 'Nuevo Caso'
+  codigoDocumento: string = 'Nuevo Emergencia'
 
   constructor(
     private messageService: MessageService,
-    private casosService: CasosService,
+    private emergenciasService: EmergenciasService,
     private aseguradorasService: AseguradorasService,
     private usuariosService: UsuariosService,
-    private comentariosCasosService: ComentariosCasosService,
+    private comentariosEmergenciasService: ComentariosEmergenciasService,
     private confirmationService: ConfirmationService,
     private imagenService: ImagenesService,
     private polizasService: PolizasService,
@@ -77,16 +77,16 @@ export class AddCasosComponent implements OnInit {
     this.openNew();
     await this.prepareData();
 
-    if (await this.getRouteParams('casoId')) {
+    if (await this.getRouteParams('emergenciaId')) {
       this.nombreDocumento = 'Cargando ...'
-      const caso = JSON.parse(localStorage.getItem('caso'));
+      const emergencia = JSON.parse(localStorage.getItem('emergencia'));
 
-      this.casoId = +(await this.getRouteParams('casoId'));
-      this.caso = caso
+      this.emergenciaId = +(await this.getRouteParams('emergenciaId'));
+      this.emergencia = emergencia
 
-      this.codigoDocumento = "# " + this.caso.codigo
+      this.codigoDocumento = "# " + this.emergencia.codigo
 
-      this.selectedCliente = this.caso.clientePoliza.cliente
+      this.selectedCliente = this.emergencia.clientePoliza.cliente
 
       const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
         this.ROL_CLIENTE_ID,
@@ -99,24 +99,24 @@ export class AddCasosComponent implements OnInit {
       this.clientes = responseCliente.data
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
-      this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.caso.clientePoliza
+      this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.emergencia.clientePoliza
 
       if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName){
         this.selectedClientePoliza.displayName = `${this.selectedClientePoliza.codigo}-${this.selectedClientePoliza.poliza.nombre}`
       }
 
       await this.loadPolizas(true);
-      console.log(this.caso.clientePoliza)
+      console.log(this.emergencia.clientePoliza)
       console.log(this.clientePolizas )
-      this.comentarios = await this.comentariosCasosService.getComentariosByCaso(this.casoId);
+      this.comentarios = await this.comentariosEmergenciasService.getComentariosByEmergencia(this.emergenciaId);
       this.loading = false;
 
-      if (caso.imagenId){
-        let foto = await this.imagenService.getImagen(caso.imagenId);
+      if (emergencia.imagenId){
+        let foto = await this.imagenService.getImagen(emergencia.imagenId);
         this.imagen =  foto.documento
         this.nombreDocumento = foto.nombreDocumento
       }
-      // this.caso.fotoReclamo = casoFoto.fotoReclamo
+      // this.emergencia.fotoReclamo = emergenciaFoto.fotoReclamo
 
       if (this.imagen) {
         this.imagePreview = this.imagen;
@@ -124,7 +124,7 @@ export class AddCasosComponent implements OnInit {
         this.nombreDocumento = undefined
       }
 
-      if (caso.estado == 'C')
+      if (emergencia.estado == 'C')
         this.readOnlyForm = true
 
       return
@@ -145,14 +145,14 @@ export class AddCasosComponent implements OnInit {
     this.loading = true
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
     const comentario = {
-      casoId: this.casoId,
+      emergenciaId: this.emergenciaId,
       contenido: this.nuevoComentario,
       usuarioComentaId: currentUser.id,
       estado: 'A' // Estado activo
     };
 
     try {
-      await this.comentariosCasosService.createComentario(comentario);
+      await this.comentariosEmergenciasService.createComentario(comentario);
       this.nuevoComentario = '';
       await this.loadComentarios();
       this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Comentario añadido con éxito' });
@@ -167,18 +167,18 @@ export class AddCasosComponent implements OnInit {
     this.loading = true
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
     const comentario = {
-      casoId: this.casoId,
+      emergenciaId: this.emergenciaId,
       contenido: this.nuevoComentario,
       usuarioComentaId: currentUser.id,
       estado: 'C' // Estado activo
     };
 
-    await this.casosService.partiallyUpdateCaso(this.caso.id, 'C')
+    await this.emergenciasService.partiallyUpdateEmergencia(this.emergencia.id, 'C')
 
     this.readOnlyForm = true
 
     try {
-      await this.comentariosCasosService.createComentario(comentario);
+      await this.comentariosEmergenciasService.createComentario(comentario);
       this.nuevoComentario = '';
       await this.loadComentarios();
       this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Cita médica cerrada con éxito' });
@@ -191,7 +191,7 @@ export class AddCasosComponent implements OnInit {
 
   async deleteComentario(comentarioId: number) {
     try {
-      await this.comentariosCasosService.deleteComentario(comentarioId);
+      await this.comentariosEmergenciasService.deleteComentario(comentarioId);
       await this.loadComentarios();
       this.messageService.add({ severity: 'success', summary: 'Comentario eliminado', detail: 'Comentario eliminado con éxito' });
     } catch (error) {
@@ -201,14 +201,14 @@ export class AddCasosComponent implements OnInit {
 
   async loadComentarios() {
     try {
-      this.comentarios = await this.comentariosCasosService.getComentariosByCaso(this.casoId);
+      this.comentarios = await this.comentariosEmergenciasService.getComentariosByEmergencia(this.emergenciaId);
     } catch (error) {
       console.error('Error al cargar los comentarios', error);
     }
   }
 
   onFileSelect(event) {
-    if (this.caso)
+    if (this.emergencia)
       this.editImage = true;
 
     const file = event.files[0];
@@ -224,7 +224,7 @@ export class AddCasosComponent implements OnInit {
   }
 
   clearImageSelection(fileUploadRef) {
-    if (this.caso)
+    if (this.emergencia)
       this.editImage = true;
 
     this.imagen = null;
@@ -267,17 +267,17 @@ export class AddCasosComponent implements OnInit {
   }
 
   openNew() {
-    this.caso = {};
+    this.emergencia = {};
     this.submitted = false;
-    this.casoDialog = true;
+    this.emergenciaDialog = true;
   }
 
   hideDialog() {
-    this.casoDialog = false;
+    this.emergenciaDialog = false;
     this.submitted = false;
   }
 
-  async saveCaso() {
+  async saveEmergencia() {
     this.submitted = true;
 
     if (!this.imagen){
@@ -292,25 +292,25 @@ export class AddCasosComponent implements OnInit {
 
     this.loading = true; // Mostrar spinner
     const formData = new FormData();
-    this.caso.clientePolizaId = this.selectedClientePoliza.id
-    this.caso.nombreDocumento = this.nombreDocumento
-    formData.append('caso', new Blob([JSON.stringify(this.caso)], { type: 'application/json' }));
+    this.emergencia.clientePolizaId = this.selectedClientePoliza.id
+    this.emergencia.nombreDocumento = this.nombreDocumento
+    formData.append('emergencia', new Blob([JSON.stringify(this.emergencia)], { type: 'application/json' }));
     if (this.imagen) {
-      formData.append('fotoCaso', this.imagen);
+      formData.append('fotoEmergencia', this.imagen);
     }
 
     try {
-      if (this.caso.id) {
-        await this.casosService.actualizarCaso(this.caso.id, formData);
+      if (this.emergencia.id) {
+        await this.emergenciasService.actualizarEmergencia(this.emergencia.id, formData);
       } else {
-        let casoSaved = await this.casosService.guardarCaso(formData);
-        this.codigoDocumento = "# " + casoSaved.codigo
+        let emergenciaSaved = await this.emergenciasService.guardarEmergencia(formData);
+        this.codigoDocumento = "# " + emergenciaSaved.codigo
       }
 
       this.loading = false;
       this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar el caso' });
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar el emergencia' });
     } finally {
       this.loading = false; // Ocultar spinner
     }

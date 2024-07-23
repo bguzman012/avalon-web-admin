@@ -13,7 +13,7 @@ import {
 } from '@coreui/angular';
 
 
-import { CasosRoutingModule } from './casos-routing.module';
+import { EmergenciasRoutingModule } from './emergencias-routing.module';
 
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
@@ -39,19 +39,19 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import {PanelModule} from 'primeng/panel';
-import { CasosComponent } from './casos/casos.component';
-import { AddCasosComponent } from './add-casos/add-casos.component';
+import { EmergenciasComponent } from './emergencias/emergencias.component';
+import { AddEmergenciasComponent } from './add-emergencias/add-emergencias.component';
 import {PaginatorModule} from "primeng/paginator";
 
 
 @NgModule({
   declarations: [
-    CasosComponent,
-    AddCasosComponent
+    EmergenciasComponent,
+    AddEmergenciasComponent
   ],
     imports: [
         CommonModule,
-        CasosRoutingModule,
+        EmergenciasRoutingModule,
         CardModule,
         FormModule,
         GridModule,
@@ -92,5 +92,5 @@ import {PaginatorModule} from "primeng/paginator";
         PaginatorModule,
     ]
 })
-export class CasosModule {
+export class EmergenciasModule {
 }

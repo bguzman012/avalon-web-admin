@@ -45,8 +45,8 @@ export const navItemsAdmin: INavData[] = [
     iconComponent: {}
 
   }, {
-    name: 'Casos',
-    url: '/casos',
+    name: 'Emergencias',
+    url: '/emergencias',
     iconComponent: {}
 
   }, {

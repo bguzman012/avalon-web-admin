@@ -10,7 +10,7 @@ import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'casos',
+  selector: 'emergencias',
   templateUrl: './citas-medicas.component.html',
   styleUrls: ['./citas-medicas.component.scss'],
 })

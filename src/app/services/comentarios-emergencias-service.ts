@@ -5,25 +5,25 @@ import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class ComentariosCasosService {
+export class ComentariosEmergenciasService {
 
   private apiUrl = `${environment.api_base}:8086`;
 
   constructor(private http: HttpClient) { }
 
-  async getComentariosByCaso(citaMedicaId: number): Promise<any[]> {
+  async getComentariosByEmergencia(citaMedicaId: number): Promise<any[]> {
     try {
-      const comentariosCasos = await this.http.get<any[]>(`${this.apiUrl}/casos/${citaMedicaId}/comentariosCasos`).toPromise();
-      return comentariosCasos;
+      const comentariosEmergencias = await this.http.get<any[]>(`${this.apiUrl}/emergencias/${citaMedicaId}/comentariosEmergencias`).toPromise();
+      return comentariosEmergencias;
     } catch (error) {
-      console.error('Error al obtener comentariosCasos:', error);
+      console.error('Error al obtener comentariosEmergencias:', error);
       throw error;
     }
   }
 
   async createComentario(comentarioData: any): Promise<any> {
     try {
-      const response = await this.http.post<any>(`${this.apiUrl}/comentariosCasos`, comentarioData).toPromise();
+      const response = await this.http.post<any>(`${this.apiUrl}/comentariosEmergencias`, comentarioData).toPromise();
       return response;
     } catch (error) {
       console.error('Error al crear comentario:', error);
@@ -33,7 +33,7 @@ export class ComentariosCasosService {
 
   async updateComentario(comentarioId: number, comentarioData: any): Promise<any> {
     try {
-      const response = await this.http.put<any>(`${this.apiUrl}/comentariosCasos/${comentarioId}`, comentarioData).toPromise();
+      const response = await this.http.put<any>(`${this.apiUrl}/comentariosEmergencias/${comentarioId}`, comentarioData).toPromise();
       return response;
     } catch (error) {
       console.error('Error al actualizar comentario:', error);
@@ -43,7 +43,7 @@ export class ComentariosCasosService {
 
   async deleteComentario(comentarioId: number): Promise<any> {
     try {
-      const response = await this.http.delete<any>(`${this.apiUrl}/comentariosCasos/${comentarioId}`).toPromise();
+      const response = await this.http.delete<any>(`${this.apiUrl}/comentariosEmergencias/${comentarioId}`).toPromise();
       return response;
     } catch (error) {
       console.error('Error al eliminar comentario:', error);

@@ -70,9 +70,9 @@ const routes: Routes = [
         loadChildren: () =>
           import('./views/citas-medicas/citas-medicas.module').then((m) => m.CitasMedicasModule)
       },{
-        path: 'casos',
+        path: 'emergencias',
         loadChildren: () =>
-          import('./views/casos/casos.module').then((m) => m.CasosModule)
+          import('./views/emergencias/emergencias.module').then((m) => m.EmergenciasModule)
       },{
         path: 'preguntas',
         loadChildren: () =>

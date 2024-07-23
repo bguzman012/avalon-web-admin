@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, MessageService, SortEvent } from 'primeng/api';
-import { CasosService } from '../../../services/casos-service';
+import { EmergenciasService } from '../../../services/emergencias-service';
 import { UsuariosService } from '../../../services/usuarios-service';
 import { environment } from '../../../../environments/environment';
 import { FilterService } from "primeng/api";
@@ -10,16 +10,16 @@ import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'casos',
-  templateUrl: './casos.component.html',
-  styleUrls: ['./casos.component.scss'],
+  selector: 'emergencias',
+  templateUrl: './emergencias.component.html',
+  styleUrls: ['./emergencias.component.scss'],
 })
-export class CasosComponent implements OnInit {
-  casoDialog: boolean;
-  casos: any[];
-  selectedCasos: any[];
+export class EmergenciasComponent implements OnInit {
+  emergenciaDialog: boolean;
+  emergencias: any[];
+  selectedEmergencias: any[];
   submitted: boolean;
-  caso: any;
+  emergencia: any;
   loading: boolean = false;
 
   clientes: any[]; // Lista de clientes para el autocompletado
@@ -47,7 +47,7 @@ export class CasosComponent implements OnInit {
 
   constructor(
     private messageService: MessageService,
-    private casosService: CasosService,
+    private emergenciasService: EmergenciasService,
     private usuariosService: UsuariosService,
     private confirmationService: ConfirmationService,
     private router: Router,
@@ -58,7 +58,7 @@ export class CasosComponent implements OnInit {
 
     this.loading = true
     this.prepareData();
-    const response = await this.casosService.obtenerCasos(
+    const response = await this.emergenciasService.obtenerEmergencias(
       "",
       "",
       0,
@@ -67,7 +67,7 @@ export class CasosComponent implements OnInit {
       this.sortField,
       this.sortOrder);
 
-    this.casos = response.data;
+    this.emergencias = response.data;
     this.totalRecords = response.totalRecords;
 
     this.loading = false
@@ -93,8 +93,8 @@ export class CasosComponent implements OnInit {
     // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  async editCaso(caso: any) {
-    this.caso = { ...caso };
+  async editEmergencia(emergencia: any) {
+    this.emergencia = { ...emergencia };
     let queryParamsClientePoliza = {}
     if (this.selectedClientePoliza && this.selectedClientePoliza.id) {
       queryParamsClientePoliza = {
@@ -103,24 +103,24 @@ export class CasosComponent implements OnInit {
       };
     }
 
-    if (this.caso && this.caso.id) {
-      localStorage.setItem('caso', JSON.stringify(this.caso));
-      queryParamsClientePoliza['casoId']= this.caso.id
-      this.router.navigate(['casos/detalle-caso'], {
+    if (this.emergencia && this.emergencia.id) {
+      localStorage.setItem('emergencia', JSON.stringify(this.emergencia));
+      queryParamsClientePoliza['emergenciaId']= this.emergencia.id
+      this.router.navigate(['emergencias/detalle-emergencia'], {
         queryParams: queryParamsClientePoliza,
       });
     }
 
-    this.casoDialog = true;
+    this.emergenciaDialog = true;
   }
 
-  async deleteCaso(caso: any) {
+  async deleteEmergencia(emergencia: any) {
     this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar el caso?',
+      message: 'Estás seguro de eliminar el emergencia?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
-        await this.casosService.eliminarCaso(caso.id);
+        await this.emergenciasService.eliminarEmergencia(emergencia.id);
         this.first = 0
         await this.manageListado()
 
@@ -138,7 +138,7 @@ export class CasosComponent implements OnInit {
     let response;
     if (type == "ALL")
 
-      response = await this.casosService.obtenerCasos(
+      response = await this.emergenciasService.obtenerEmergencias(
         "",
         "",
         this.first / this.pageSize,
@@ -147,7 +147,7 @@ export class CasosComponent implements OnInit {
         this.sortField,
         this.sortOrder);
     else
-      response = await this.casosService.obtenerCasos(
+      response = await this.emergenciasService.obtenerEmergencias(
         "",
         this.selectedClientePoliza.id,
         this.first / this.pageSize,
@@ -156,7 +156,7 @@ export class CasosComponent implements OnInit {
         this.sortField,
         this.sortOrder);
 
-    this.casos = response.data
+    this.emergencias = response.data
   }
 
   async filterClientes(event){
@@ -243,19 +243,19 @@ export class CasosComponent implements OnInit {
       await this.refrescarListado("ALL");
   }
 
-  redirectToDetailCasoPage() {
+  redirectToDetailEmergenciaPage() {
     if (this.selectedClientePoliza && this.selectedClientePoliza.id) {
       localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
       const queryParamsClientePoliza = {
         clientePolizaId: this.selectedClientePoliza.id,
         clienteId: this.selectedCliente.id
       };
-      this.router.navigate(['casos/detalle-caso'], {
+      this.router.navigate(['emergencias/detalle-emergencia'], {
         queryParams: queryParamsClientePoliza,
       });
     } else {
       localStorage.removeItem("clientePoliza");
-      this.router.navigate(['casos/detalle-caso']);
+      this.router.navigate(['emergencias/detalle-emergencia']);
     }
   }
 

@@ -6,14 +6,14 @@ import {environment} from '../../environments/environment'
 @Injectable({
   providedIn: 'root'
 })
-export class CasosService {
+export class EmergenciasService {
 
   private apiUrl = `${environment.api_base}:8086`;
 
   constructor(private http: HttpClient) {
   }
 
-  async obtenerCasos(
+  async obtenerEmergencias(
     estado: string,
     clientePolizaId: string,
     page: number,
@@ -26,18 +26,18 @@ export class CasosService {
       const order = sortOrder === 1 ? 'asc' : 'desc';
       const sort = `&sortField=${sortField}&sortOrder=${order}`;
 
-      const casos = await this.http.get<any[]>(`${this.apiUrl}/casos?estado=${estado}&clientePolizaId=${clientePolizaId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
-      console.log('Resultado de casos:', casos);
-      return casos;
+      const emergencias = await this.http.get<any[]>(`${this.apiUrl}/emergencias?estado=${estado}&clientePolizaId=${clientePolizaId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
+      console.log('Resultado de emergencias:', emergencias);
+      return emergencias;
     } catch (error) {
       console.error('Error en la solicitud:', error);
       throw error;
     }
   }
 
-  async guardarCaso(casoData: FormData): Promise<any> {
+  async guardarEmergencia(emergenciaData: FormData): Promise<any> {
     try {
-      const response = await this.http.post<any>(`${this.apiUrl}/casos`, casoData).toPromise();
+      const response = await this.http.post<any>(`${this.apiUrl}/emergencias`, emergenciaData).toPromise();
       return response;
     } catch (error) {
       console.error('Error al guardar cita medica:', error);
@@ -46,9 +46,9 @@ export class CasosService {
   }
 
 
-  async actualizarCaso(casoId: number, casoData: FormData): Promise<any> {
+  async actualizarEmergencia(emergenciaId: number, emergenciaData: FormData): Promise<any> {
     try {
-      const response = await this.http.put<any>(`${this.apiUrl}/casos/${casoId}`, casoData).toPromise();
+      const response = await this.http.put<any>(`${this.apiUrl}/emergencias/${emergenciaId}`, emergenciaData).toPromise();
       return response;
     } catch (error) {
       console.error('Error al actualizar cita medica:', error);
@@ -56,9 +56,9 @@ export class CasosService {
     }
   }
 
-  async getCaso(casoId: number): Promise<any> {
+  async getEmergencia(emergenciaId: number): Promise<any> {
     try {
-      const response = await this.http.get<any>(`${this.apiUrl}/casos/${casoId}`).toPromise();
+      const response = await this.http.get<any>(`${this.apiUrl}/emergencias/${emergenciaId}`).toPromise();
       return response;
     } catch (error) {
       console.error('Error al actualizar cita medica:', error);
@@ -66,9 +66,9 @@ export class CasosService {
     }
   }
 
-  async eliminarCaso(casoId: number): Promise<any> {
+  async eliminarEmergencia(emergenciaId: number): Promise<any> {
     try {
-      const response = await this.http.patch<any>(`${this.apiUrl}/casos/${casoId}`, {estado: 'I'}).toPromise();
+      const response = await this.http.patch<any>(`${this.apiUrl}/emergencias/${emergenciaId}`, {estado: 'I'}).toPromise();
       return response;
     } catch (error) {
       console.error('Error al eliminar cita medica:', error);
@@ -76,9 +76,9 @@ export class CasosService {
     }
   }
 
-  async partiallyUpdateCaso(casoId: number, estado: string): Promise<any> {
+  async partiallyUpdateEmergencia(emergenciaId: number, estado: string): Promise<any> {
     try {
-      const response = await this.http.patch<any>(`${this.apiUrl}/casos/${casoId}`, {estado: estado}).toPromise();
+      const response = await this.http.patch<any>(`${this.apiUrl}/emergencias/${emergenciaId}`, {estado: estado}).toPromise();
       return response;
     } catch (error) {
       console.error('Error al actualizar  part. cita medica:', error);

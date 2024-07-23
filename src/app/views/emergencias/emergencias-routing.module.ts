@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CasosComponent } from './casos/casos.component';
-import { AddCasosComponent } from './add-casos/add-casos.component';
+import { EmergenciasComponent } from './emergencias/emergencias.component';
+import { AddEmergenciasComponent } from './add-emergencias/add-emergencias.component';
 // import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 
 const routes: Routes = [
   {
     path: '',
     data: {
-      breadcrumb: 'Casos'
+      breadcrumb: 'Emergencias'
     },
     children: [
       {
@@ -16,12 +16,12 @@ const routes: Routes = [
         data: {
           breadcrumb: null
         },
-        component: CasosComponent,
+        component: EmergenciasComponent,
       },
       {
-        path: 'detalle-caso',
+        path: 'detalle-emergencia',
         data: {
-          breadcrumb: 'Detalle Caso'
+          breadcrumb: 'Detalle Emergencia'
         },
         children: [
           {
@@ -29,7 +29,7 @@ const routes: Routes = [
             data: {
               breadcrumb: null
             },
-            component: AddCasosComponent,
+            component: AddEmergenciasComponent,
           },
         ]
       }
@@ -52,5 +52,5 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class CasosRoutingModule {
+export class EmergenciasRoutingModule {
 }

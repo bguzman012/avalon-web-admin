@@ -14,7 +14,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
-  selector: 'add-casos',
+  selector: 'add-emergencias',
   templateUrl: './add-citas-medicas.component.html',
   styleUrls: ['./add-citas-medicas.component.scss'],
 })
