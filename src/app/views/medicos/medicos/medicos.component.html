@@ -1,0 +1,266 @@
+<p-toast></p-toast>
+
+<div class="card">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left">
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <button pButton pRipple label="Nuevo Médico" icon="pi pi-plus" class="p-button-success p-mr-2"
+              (click)="openNew()"></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table #dt [value]="medicos"
+           [(selection)]="selectedMedicos"
+           [rowHover]="true" dataKey="id"
+           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+           [showCurrentPageReport]="true"
+           (onSort)="onSort($event)"
+           [customSort]="true">
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <h5 class="p-m-0">Administrar Médicos</h5>
+        <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Buscar..."/>
+                </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="nombres">Nombres
+          <p-sortIcon field="nombres"></p-sortIcon>
+        </th>
+        <th pSortableColumn="apellidos">Apellidos
+          <p-sortIcon field="apellidos"></p-sortIcon>
+        </th>
+        <th pSortableColumn="correoElectronico">Correo Electrónico
+          <p-sortIcon
+            field="correoElectronico"></p-sortIcon>
+        </th>
+        <th pSortableColumn="numeroTelefono">Número Teléfono
+          <p-sortIcon field="numeroTelefono"></p-sortIcon>
+        </th>
+        <th pSortableColumn="especialidad">Especialidad
+          <p-sortIcon field="especialidad"></p-sortIcon>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-medico>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="medico"></p-tableCheckbox>
+        </td>
+        <td>{{ medico.nombres }} {{ medico.nombresDos }}</td>
+        <td>{{ medico.apellidos }} {{ medico.apellidosDos }}</td>
+        <td>{{ medico.correoElectronico }}</td>
+        <td>{{ medico.numeroTelefono }}</td>
+        <td>{{ medico.especialidad.nombre }}</td>
+        <td style="text-align: right;">
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
+                  (click)="editMedico(medico); $event.stopPropagation()"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
+                  (click)="deleteMedico(medico); $event.stopPropagation()"></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{totalRecords ? totalRecords : 0 }} registros.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog [(visible)]="medicoDialog" [style]="{width: '600px'}" header="Detalle Médico" [modal]="true"
+          styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <label for="especialidadId">Especialidad</label>
+      <p-autoComplete
+        dropdown = "true"
+        [(ngModel)]="especialidad"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredEspecialidades"
+        (completeMethod)="filterEspecialidad($event)"
+        field="nombre"
+        [minLength]="1"
+        [appendTo]="'body'"
+        required>
+      </p-autoComplete>
+      <small class="p-invalid" *ngIf="submitted && !especialidad">Membresia es requerido.</small>
+    </div>
+
+    <div class="p-grid p-fluid">
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="nombres">Nombre Uno</label>
+          <input type="text" pInputText id="nombres" [(ngModel)]="medico.nombres" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !medico.nombres">Nombre uno is required.</small>
+        </div>
+      </div>
+
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="nombres">Nombre Dos</label>
+          <input type="text" pInputText id="nombresDos" [(ngModel)]="medico.nombresDos" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !medico.nombresDos">Nombre dos is required.</small>
+        </div>
+      </div>
+    </div>
+    <div class="p-grid p-fluid">
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="apellidos">Apellido Uno</label>
+          <input type="text" pInputText id="apellidos" [(ngModel)]="medico.apellidos" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !medico.apellidos">Apellido uno is required.</small>
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="apellidosDos">Apellido Dos</label>
+          <input type="text" pInputText id="apellidosDos" [(ngModel)]="medico.apellidosDos" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !medico.apellidosDos">Apellido dos is required.</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-field">
+      <label class="p-mb-3">Correo Electrónico</label>
+      <input type="text" pInputText [(ngModel)]="medico.correoElectronico" required/>
+      <small class="p-invalid" *ngIf="submitted && !medico.correoElectronico">Correo Electrónico es
+        requerido.</small>
+    </div>
+    <div class="p-field">
+      <label class="p-mb-3">Número Teléfono</label>
+      <input type="text" pInputText [(ngModel)]="medico.numeroTelefono" required/>
+      <small class="p-invalid" *ngIf="submitted && !medico.numeroTelefono">Número Teléfono es
+        requerido.</small>
+    </div>
+
+    <div class="p-field">
+      <label for="direccionUno">Dirección</label>
+      <input
+        type="text"
+        pInputText
+        id="direccionUno"
+        [(ngModel)]="direccion.direccionUno"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !direccion.direccionUno"
+      >Dirección uno es required.</small
+      >
+    </div>
+
+    <div class="p-field">
+      <label for="direccionDos">Dirección (2)</label>
+      <input
+        type="text"
+        pInputText
+        id="direccionDos"
+        [(ngModel)]="direccion.direccionDos"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !direccion.direccionDos"
+      >Dirección dos es required.</small
+      >
+    </div>
+
+    <div class="p-field">
+      <label for="paisesId">País</label>
+      <p-autoComplete
+        [(ngModel)]="pais"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredPaises"
+        (completeMethod)="filterPaises($event)"
+        dropdown="true"
+        field="nombre"
+        (ngModelChange)="loadEstados()"
+        [minLength]="1"
+        [appendTo]="'body'"
+        required
+      ></p-autoComplete>
+      <small class="p-invalid" *ngIf="submitted && !pais"
+      >País es requerido.</small
+      >
+    </div>
+
+    <div class="p-field">
+      <label for="asesoresId">Estado</label>
+      <p-autoComplete
+        [(ngModel)]="estado"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredEstados"
+        (completeMethod)="filterEstados($event)"
+        [readonly]="!pais"
+        dropdown="true"
+        field="nombre"
+        [minLength]="1"
+        [appendTo]="'body'"
+        required
+      ></p-autoComplete>
+      <small class="p-invalid" *ngIf="submitted && !estado">
+        Estado es requerido.</small
+      >
+    </div>
+
+    <div class="p-field">
+      <label for="ciudad">Ciudad</label>
+      <input
+        type="text"
+        pInputText
+        id="ciudad"
+        [(ngModel)]="direccion.ciudad"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
+      >Ciudad es required.</small
+      >
+    </div>
+
+    <div class="p-field">
+      <label for="codigoPostal">Código Postal</label>
+      <input
+        type="text"
+        pInputText
+        id="codigoPostal"
+        [(ngModel)]="direccion.codigoPostal"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
+      >Código Postal es required.</small
+      >
+    </div>
+
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+            (click)="hideDialog()"></button>
+    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
+            (click)="saveMedico()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

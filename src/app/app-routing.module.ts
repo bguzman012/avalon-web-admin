@@ -61,6 +61,16 @@ const routes: Routes = [
           import('./views/aseguradoras/aseguradoras.module').then((m) => m.AseguradorasModule)
       },
       {
+        path: 'medicos',
+        loadChildren: () =>
+          import('./views/medicos/medicos.module').then((m) => m.MedicosModule)
+      },
+      {
+        path: 'centros-medicos',
+        loadChildren: () =>
+          import('./views/centros-medicos/centro-medicos.module').then((m) => m.CentroMedicosModule)
+      },
+      {
         path: 'reclamaciones',
         loadChildren: () =>
           import('./views/reclamaciones/reclamaciones.module').then((m) => m.ReclamacionesModule)

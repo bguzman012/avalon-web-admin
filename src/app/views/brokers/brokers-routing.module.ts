@@ -39,7 +39,7 @@ const routes: Routes = [
 // const routes: Routes = [
 //   {
 //     path: '#',
-//     component: AseguradorasComponent,
+//     component: CentrosMedicosComponent,
 //     data: {
 //       title: 'Aseguradoras',
 //       breadcrumb: 'Aseguradoras'
