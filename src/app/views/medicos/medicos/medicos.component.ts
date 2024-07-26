@@ -59,6 +59,7 @@ export class MedicosComponent implements OnInit {
     private estadosService: EstadosService,
     private especialidadesService: EspecialidadService,
     private route: ActivatedRoute,
+    private router: Router,
   ) { }
 
   async ngOnInit() {
@@ -216,5 +217,15 @@ export class MedicosComponent implements OnInit {
     this.medicos = response.data;
     this.totalRecords = response.totalRecords;
 
+  }
+
+  redirectToCentroMedicoAseguradorasPage(medico: any) {
+    localStorage.setItem('medicoId', medico.id);
+    localStorage.setItem("medico", JSON.stringify(medico));
+    this.router.navigate(['medicos/centros-medicos-aseguradoras'], {
+      queryParams: {
+        medicoId: medico.id,
+      },
+    });
   }
 }

@@ -43,7 +43,7 @@ import {PanelModule} from 'primeng/panel';
 import { CitasMedicasComponent } from './citas-medicas/citas-medicas.component';
 import { AddCitasMedicasComponent } from './add-citas-medicas/add-citas-medicas.component';
 import {PaginatorModule} from "primeng/paginator";
-// import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+// import { MedCentrosMedicosAseguradorasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
 @NgModule({

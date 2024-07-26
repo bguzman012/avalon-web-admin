@@ -44,7 +44,7 @@ import { PolizasComponent } from './polizas/polizas.component';
 import { ClientesPolizasComponent } from './clientes-polizas/clientes-polizas.component';
 import { CoberturasComponent } from './coberturas/coberturas.component';
 import { AutoCompleteModule } from 'primeng/autocomplete';
-// import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+// import { MedCentrosMedicosAseguradorasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
 @NgModule({
@@ -71,7 +71,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
     SharedModule,
     ListGroupModule,
     AutoCompleteModule,
-    
+
     TableModule,
     CalendarModule,
 		SliderModule,

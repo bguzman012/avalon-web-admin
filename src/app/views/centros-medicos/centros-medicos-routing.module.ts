@@ -42,7 +42,7 @@ const routes: Routes = [
       //       data: {
       //         breadcrumb: null
       //       },
-      //       component: ClientesMembresiasComponent,
+      //       component: MedCentrosMedicosAseguradorasComponent,
       //     },
       //   ]
       // }

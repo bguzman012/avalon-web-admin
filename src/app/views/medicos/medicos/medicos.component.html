@@ -52,7 +52,9 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-medico>
-      <tr>
+      <tr (click)="
+              redirectToCentroMedicoAseguradorasPage(medico); $event.stopPropagation()
+            ">
         <td>
           <p-tableCheckbox [value]="medico"></p-tableCheckbox>
         </td>

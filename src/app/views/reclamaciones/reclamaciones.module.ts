@@ -43,7 +43,7 @@ import {PanelModule} from 'primeng/panel';
 import { ReclamacionesComponent } from './reclamaciones/reclamaciones.component';
 import { AddReclamacionesComponent } from './add-reclamaciones/add-reclamaciones.component';
 import {PaginatorModule} from "primeng/paginator";
-// import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+// import { MedCentrosMedicosAseguradorasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
 @NgModule({

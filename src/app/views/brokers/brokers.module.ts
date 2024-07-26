@@ -41,7 +41,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { AseguradorasComponent } from './aseguradoras/aseguradoras.component';
 import { BrokersComponent } from './brokers/brokers.component';
 import { AutoCompleteModule } from 'primeng/autocomplete';
-// import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+// import { MedCentrosMedicosAseguradorasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
 @NgModule({

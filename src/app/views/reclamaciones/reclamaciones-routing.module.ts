@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ReclamacionesComponent } from './reclamaciones/reclamaciones.component';
 import { AddReclamacionesComponent } from './add-reclamaciones/add-reclamaciones.component';
-// import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+// import { MedCentrosMedicosAseguradorasComponent } from './clientes-membresias/clientes-membresias.component';
 
 const routes: Routes = [
   {

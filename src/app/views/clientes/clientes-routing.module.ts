@@ -4,7 +4,7 @@ import { ClientesComponent } from './clientes/clientes.component';
 import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
 import { ClientesPolizasComponent } from './clientes-polizas/clientes-polizas.component';
 import { CargasFamiliaresComponent } from './cargas-familiares/cargas-familiares.component';
-// import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
+// import { MedCentrosMedicosAseguradorasComponent } from './clientes-membresias/clientes-membresias.component';
 
 const routes: Routes = [
   {

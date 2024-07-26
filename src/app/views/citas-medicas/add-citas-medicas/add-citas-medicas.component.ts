@@ -12,6 +12,8 @@ import { ImagenesService } from 'src/app/services/imagenes-service';
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AuthService } from 'src/app/services/auth-service';
+import {CentrosMedicosService} from "../../../services/centros-medicos-service";
+import {MedicoCentroMedicoAseguradorasService} from "../../../services/med-centros-medicos-aseguradoras-service";
 
 @Component({
   selector: 'add-emergencias',
@@ -53,23 +55,26 @@ export class AddCitasMedicasComponent implements OnInit {
   nuevoComentario: string = '';
   imagen
   nombreDocumento
+  filteredCentrosMedicos
+  filteredMedicoCentroMedicoAseguradoras
+
+  medicoCentroMedicoAseguradora: any;
+  centroMedico: any;
+
 
   codigoDocumento: string = 'Nueva Cita Médica'
 
   constructor(
     private messageService: MessageService,
     private citasMedicasService: CitasMedicasService,
-    private aseguradorasService: AseguradorasService,
     private usuariosService: UsuariosService,
     private comentariosCitasMedicasService: ComentariosCitasMedicasService,
-    private confirmationService: ConfirmationService,
+    private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService,
     private imagenService: ImagenesService,
-    private polizasService: PolizasService,
+    private centrosMedicosService: CentrosMedicosService,
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
-    private authService: AuthService,
-    private filterService: FilterService,
-    private sanitizer: DomSanitizer
+    private authService: AuthService
   ) { }
 
   async ngOnInit() {
@@ -99,6 +104,8 @@ export class AddCitasMedicasComponent implements OnInit {
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
       this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.citaMedica.clientePoliza
+      this.medicoCentroMedicoAseguradora = this.citaMedica.medicoCentroMedicoAseguradora
+      this.centroMedico = this.citaMedica.medicoCentroMedicoAseguradora.centroMedico
 
       if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName){
         this.selectedClientePoliza.displayName = `${this.selectedClientePoliza.codigo}-${this.selectedClientePoliza.poliza.nombre}`
@@ -265,6 +272,8 @@ export class AddCitasMedicasComponent implements OnInit {
 
   openNew() {
     this.citaMedica = {};
+    this.centroMedico = null;
+
     this.submitted = false;
     this.citaMedicaDialog = true;
   }
@@ -287,8 +296,19 @@ export class AddCitasMedicasComponent implements OnInit {
       return
     }
 
+    if (!this.medicoCentroMedicoAseguradora?.id){
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error!',
+        detail: 'Médico es requerido',
+        life: 3000,
+      });
+      return
+    }
+
     this.loading = true; // Mostrar spinner
     const formData = new FormData();
+    this.citaMedica.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora.id
     this.citaMedica.clientePolizaId = this.selectedClientePoliza.id
     this.citaMedica.nombreDocumento = this.nombreDocumento
     formData.append('citaMedica', new Blob([JSON.stringify(this.citaMedica)], { type: 'application/json' }));
@@ -371,5 +391,28 @@ export class AddCitasMedicasComponent implements OnInit {
     }
   }
 
+  async filterCentrosMedicos(event) {
+    const responseCliente = await this.centrosMedicosService.obtenerCentrosMedicos(
+      0,
+      10,
+      event.query
+    )
+
+    this.filteredCentrosMedicos = responseCliente.data;
   }
+
+  async filterMedicoCentroMedicoAseguradora(event) {
+    const responseMedicoCentroMedicoAseguradora = await this.medicoCentroMedicoAseguradoraService.obtenerMedicoCentroMedicoAseguradorasByAseguradoraAndCentroMedico(
+      this.selectedClientePoliza.poliza.aseguradora.id,
+      this.centroMedico.id,
+      0,
+      10,
+      event.query
+    )
+
+    this.filteredMedicoCentroMedicoAseguradoras = responseMedicoCentroMedicoAseguradora.data;
+  }
+
+
+}
 

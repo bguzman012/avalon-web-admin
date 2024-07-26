@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import {MedicosComponent} from "./medicos/medicos.component";
+import {
+  MedCentrosMedicosAseguradorasComponent
+} from "./med-centros-medicos-aseguradoras/med-centros-medicos-aseguradoras.component";
 
 const routes: Routes = [
   {
@@ -16,21 +19,21 @@ const routes: Routes = [
         },
         component: MedicosComponent,
        },
-      // {
-      //   path: 'beneficios',
-      //   data: {
-      //     breadcrumb: 'Beneficios'
-      //   },
-      //   children: [
-      //     {
-      //       path: '',
-      //       data: {
-      //         breadcrumb: null
-      //       },
-      //       component: BeneficiosComponent,
-      //     },
-      //   ]
-      // },
+      {
+        path: 'centros-medicos-aseguradoras',
+        data: {
+          breadcrumb: 'Centros Médicos'
+        },
+        children: [
+          {
+            path: '',
+            data: {
+              breadcrumb: null
+            },
+            component: MedCentrosMedicosAseguradorasComponent,
+          },
+        ]
+      },
       // {
       //   path: 'clientes',
       //   data: {
@@ -42,7 +45,7 @@ const routes: Routes = [
       //       data: {
       //         breadcrumb: null
       //       },
-      //       component: ClientesMembresiasComponent,
+      //       component: MedCentrosMedicosAseguradorasComponent,
       //     },
       //   ]
       // }

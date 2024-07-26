@@ -40,11 +40,15 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import {PaginatorModule} from "primeng/paginator";
 import {MedicosComponent} from "./medicos/medicos.component";
+import {
+  MedCentrosMedicosAseguradorasComponent
+} from "./med-centros-medicos-aseguradoras/med-centros-medicos-aseguradoras.component";
 
 
 @NgModule({
   declarations: [
-    MedicosComponent
+    MedicosComponent,
+    MedCentrosMedicosAseguradorasComponent
   ],
     imports: [
         CommonModule,

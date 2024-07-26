@@ -47,6 +47,40 @@
         <input type="text" pInputText id="razon" [(ngModel)]="citaMedica.razon" [readonly]="readOnlyForm" required autofocus />
         <small class="p-invalid" *ngIf="submitted && !citaMedica.razon">Razón es requerida.</small>
       </div>
+      <div class="p-field" *ngIf="selectedClientePoliza?.id">
+        <label for="aseguradora">Aseguradora</label>
+        <input type="text" pInputText id="aseguradora" [(ngModel)]="selectedClientePoliza.poliza.aseguradora.nombre" readonly />
+      </div>
+      <div class="p-field">
+        <label for="centroMedicoId">Centro Médico</label>
+        <p-autoComplete
+          dropdown = "true"
+          [(ngModel)]="centroMedico"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredCentrosMedicos"
+          (completeMethod)="filterCentrosMedicos($event)"
+          field="nombre"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required>
+        </p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !centroMedico">Centro médico es requerido.</small>
+      </div>
+      <div class="p-field">
+        <label for="medicoId">Médico</label>
+        <p-autoComplete
+          dropdown = "true"
+          [(ngModel)]="medicoCentroMedicoAseguradora"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredMedicoCentroMedicoAseguradoras"
+          (completeMethod)="filterMedicoCentroMedicoAseguradora($event)"
+          field="medico.nombreCompleto"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required>
+        </p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !centroMedico">Centro médico es requerido.</small>
+      </div>
 
       <div class="p-field">
         <label for="estado">Estado</label>
