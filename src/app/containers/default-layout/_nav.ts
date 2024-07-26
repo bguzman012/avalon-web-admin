@@ -65,6 +65,11 @@ export const navItemsAdmin: INavData[] = [
     iconComponent: {}
 
   }, {
+    name: 'Métodos de Pago',
+    url: '/metodos-pago',
+    iconComponent: {}
+
+  }, {
     name: 'Notificaciones',
     url: '/notificaciones',
     iconComponent: {}

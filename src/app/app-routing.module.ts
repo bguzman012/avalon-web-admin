@@ -88,6 +88,11 @@ const routes: Routes = [
         loadChildren: () =>
           import('./views/arbol-preguntas/arbol-preguntas.module').then((m) => m.PreguntasModule)
       },
+      {
+        path: 'metodos-pago',
+        loadChildren: () =>
+          import('./views/metodos-pago/metodos-pago.module').then((m) => m.MetodosPagoModule)
+      },
       // {
       //   path: 'aseguradoras',
       //   loadChildren: () =>

@@ -5,49 +5,49 @@ import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class PreguntasService {
+export class MetodosPagoService {
 
-  private apiUrl = `${environment.api_base}:8087`;
+  private apiUrl = `${environment.api_base}:8086`;
 
   constructor(private http: HttpClient) {}
 
-  async obtenerPreguntas(): Promise<any[]> {
+  async obtenerMetodosPago(): Promise<any[]> {
     try {
-      const preguntas = await this.http.get<any[]>(`${this.apiUrl}/preguntas`).toPromise();
-      console.log('Resultado de preguntas:', preguntas);
-      return preguntas;
+      const metodosPago = await this.http.get<any[]>(`${this.apiUrl}/metodosPago`).toPromise();
+      console.log('Resultado de metodos Pago:', metodosPago);
+      return metodosPago;
     } catch (error) {
       console.error('Error en la solicitud:', error);
       throw error;
     }
   }
 
-  async guardarPregunta(preguntaData: any): Promise<any> {
+  async guardarMetodoPago(metodoPagoData: any): Promise<any> {
     try {
-      const response = await this.http.post<any>(`${this.apiUrl}/preguntas`, preguntaData).toPromise();
+      const response = await this.http.post<any>(`${this.apiUrl}/metodosPago`, metodoPagoData).toPromise();
       return response;
     } catch (error) {
-      console.error('Error al guardar pregunta:', error);
+      console.error('Error al guardar metodoPago:', error);
       throw error;
     }
   }
 
-  async actualizarPregunta(preguntaId: number, preguntaData: any): Promise<any> {
+  async actualizarMetodoPago(metodoPagoId: number, metodoPagoData: any): Promise<any> {
     try {
-      const response = await this.http.put<any>(`${this.apiUrl}/preguntas/${preguntaId}`, preguntaData).toPromise();
+      const response = await this.http.put<any>(`${this.apiUrl}/metodosPago/${metodoPagoId}`, metodoPagoData).toPromise();
       return response;
     } catch (error) {
-      console.error('Error al actualizar pregunta:', error);
+      console.error('Error al actualizar metodoPago:', error);
       throw error;
     }
   }
 
-  async eliminarPregunta(preguntaId: number): Promise<any> {
+  async eliminarMetodoPago(metodoPagoId: number): Promise<any> {
     try {
-      const response = await this.http.delete<any>(`${this.apiUrl}/preguntas/${preguntaId}`).toPromise();
+      const response = await this.http.delete<any>(`${this.apiUrl}/metodosPago/${metodoPagoId}`).toPromise();
       return response;
     } catch (error) {
-      console.error('Error al eliminar pregunta:', error);
+      console.error('Error al eliminar metodoPago:', error);
       throw error;
     }
   }
