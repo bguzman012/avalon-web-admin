@@ -24,7 +24,7 @@ const routes: Routes = [
 // const routes: Routes = [
 //   {
 //     path: '#',
-//     component: CentrosMedicosComponent,
+//     component: MetodosPagoComponent,
 //     data: {
 //       title: 'Aseguradoras',
 //       breadcrumb: 'Aseguradoras'
