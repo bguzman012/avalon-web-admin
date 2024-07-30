@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import { AuthService } from 'src/app/services/auth-service';
 import {MetodosPagoService} from "../../../services/metodos-pago-service";
 
@@ -34,7 +34,8 @@ export class MetodosPagoComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private metodosPagoService: MetodosPagoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private confirmationService: ConfirmationService
   ) {}
 
   async ngOnInit() {
@@ -69,22 +70,22 @@ export class MetodosPagoComponent implements OnInit {
   }
 
   async deleteMetodoPago(metodoPago: any) {
-    // this.confirmationService.confirm({
-    //   message: 'Estás seguro de eliminar la metodoPago ' + metodoPago.contenido + '?',
-    //   header: 'Confirmar',
-    //   icon: 'pi pi-exclamation-triangle',
-    //   accept: async () => {
-    //     await this.metodosPagoService.eliminarMetodoPago(metodoPago.id);
-    //     this.refrescarListado();
-    //
-    //     this.messageService.add({
-    //       severity: 'success',
-    //       summary: 'Enhorabuena!',
-    //       detail: 'Registro eliminado exitosamente',
-    //       life: 3000,
-    //     });
-    //   },
-    // });
+    this.confirmationService.confirm({
+      message: 'Estás seguro de eliminar el método de pago ' + metodoPago.nombre + '?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: async () => {
+        await this.metodosPagoService.eliminarMetodoPago(metodoPago.id);
+        this.refrescarListado();
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Enhorabuena!',
+          detail: 'Registro eliminado exitosamente',
+          life: 3000,
+        });
+      },
+    });
   }
 
   hideDialog() {
