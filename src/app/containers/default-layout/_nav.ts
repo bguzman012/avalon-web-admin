@@ -74,6 +74,11 @@ export const navItemsAdmin: INavData[] = [
     url: '/notificaciones',
     iconComponent: {}
 
+  }, {
+    name: 'Actividad',
+    url: '/audits',
+    iconComponent: {}
+
   }
 ];
 

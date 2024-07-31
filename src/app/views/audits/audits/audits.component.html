@@ -1,0 +1,137 @@
+<p-toast></p-toast>
+
+<div class="card">
+
+    <p-table
+        #dt
+        [value]="audits"
+        [(selection)]="selectedAudits"
+        [rowHover]="true"
+        dataKey="id"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+        [showCurrentPageReport]="true"
+        (onSort)="onSort($event)"
+        [customSort]="true"
+    >
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h5 class="p-m-0">Historial de Actividad</h5>
+
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+
+                </th>
+                <th pSortableColumn="entityId">
+                    <div>
+                        ID Registro
+                        <p-sortIcon field="entityId"></p-sortIcon>
+                        <span class="p-input-icon-left" style="display: block; margin-top: 4px;">
+                      <i class="pi pi-search"></i>
+                      <input
+                              pInputText
+                              type="text"
+                              (input)="filterGlobal($event, 'entityId')"
+                              (click)="$event.stopPropagation()"
+                              style="width: 80%;"
+                      />
+                    </span>
+                    </div>
+                </th>
+                <th pSortableColumn="entityName">
+                    <div>
+                        Entidad
+                        <p-sortIcon field="entityName"></p-sortIcon>
+                        <span class="p-input-icon-left" style="display: block; margin-top: 4px;">
+                      <i class="pi pi-search"></i>
+                      <input
+                              pInputText
+                              type="text"
+                              (input)="filterGlobal($event, 'entityName')"
+                              (click)="$event.stopPropagation()"
+                              style="width: 80%;"
+                      />
+                    </span>
+                    </div>
+                </th>
+                <th pSortableColumn="createdDate">
+                    <div>
+                        Fecha
+                        <p-sortIcon field="createdDate"></p-sortIcon>
+                        <span class="p-input-icon-left" style="display: block; margin-top: 4px;">
+                      <i class="pi pi-search"></i>
+                      <input
+                              pInputText
+                              type="text"
+                              (input)="filterGlobal($event, 'createdDate')"
+                              (click)="$event.stopPropagation()"
+                              style="width: 80%;"
+                      />
+                    </span>
+                    </div>
+                </th>
+                <th pSortableColumn="createdBy">
+                    <div>
+                        Usuario
+                        <p-sortIcon field="createdBy"></p-sortIcon>
+                        <span class="p-input-icon-left" style="display: block; margin-top: 4px;">
+          <i class="pi pi-search"></i>
+          <input
+                  pInputText
+                  type="text"
+                  (input)="filterGlobal($event, 'createdBy')"
+                  (click)="$event.stopPropagation()"
+                  style="width: 80%;"
+          />
+        </span>
+                    </div>
+                </th>
+                <th pSortableColumn="operation">
+                    <div>
+                        Operación
+                        <p-sortIcon field="operation"></p-sortIcon>
+                        <span class="p-input-icon-left" style="display: block; margin-top: 4px;">
+          <i class="pi pi-search"></i>
+          <input
+                  pInputText
+                  type="text"
+                  (input)="filterGlobal($event, 'operation')"
+                  (click)="$event.stopPropagation()"
+                  style="width: 80%;"
+          />
+        </span>
+                    </div>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-audit>
+            <tr>
+                <td>
+                </td>
+                <td>{{ audit.entityId }}</td>
+                <td>{{ audit.entityName }}</td>
+                <td>{{ formatDate(audit.createdDate) }}</td>
+                <td>{{ audit.createdBy }}</td>
+                <td>{{ audit.operation }}</td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="summary">
+            <p-blockUI [blocked]="loading">
+                <div class="p-field" *ngIf="loading">
+                    <p-progressSpinner></p-progressSpinner>
+                </div>
+            </p-blockUI>
+            <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first"
+                         (onPageChange)="onPageChange($event)"></p-paginator>
+            <div class="p-d-flex p-ai-center p-jc-between">
+                En total existen {{ totalRecords ? totalRecords : 0 }} registros.
+            </div>
+        </ng-template>
+
+    </p-table>
+</div>
+
+<!--<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>-->

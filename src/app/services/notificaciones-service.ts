@@ -14,7 +14,7 @@ export class NotificacionesService {
   async obtenerNotificaciones(): Promise<any[]> {
     try {
       const notificaciones = await this.http.get<any[]>(`${this.apiUrl}/notificaciones`).toPromise();
-      console.log('Resultado de notificaciones:', notificaciones);
+      console.log('Resultado de audits:', notificaciones);
       return notificaciones;
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -25,7 +25,7 @@ export class NotificacionesService {
   async obtenerTiposNotificacion(): Promise<any[]> {
     try {
       const tiposNotificaciones = await this.http.get<any[]>(`${this.apiUrl}/tiposNotificacion`).toPromise();
-      console.log('Resultado de tipos notificaciones:', tiposNotificaciones);
+      console.log('Resultado de tipos audits:', tiposNotificaciones);
       return tiposNotificaciones;
     } catch (error) {
       console.error('Error en la solicitud:', error);

@@ -1,4 +1,4 @@
-// src/app/components/notificaciones/notificaciones.component.ts
+// src/app/components/audits/audits.component.ts
 import { Component, OnInit } from '@angular/core';
 import { NotificacionesService } from '../../../services/notificaciones-service';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -6,7 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { AuthService } from 'src/app/services/auth-service';
 
 @Component({
-  selector: 'app-notificaciones',
+  selector: 'app-audits',
   templateUrl: './notificaciones.component.html',
   styleUrls: ['./notificaciones.component.scss'],
 })

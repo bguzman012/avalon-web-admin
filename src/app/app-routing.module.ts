@@ -66,9 +66,9 @@ const routes: Routes = [
           import('./views/medicos/medicos.module').then((m) => m.MedicosModule)
       },
       {
-        path: 'centros-medicos',
+        path: 'audits',
         loadChildren: () =>
-          import('./views/centros-medicos/centro-medicos.module').then((m) => m.CentroMedicosModule)
+          import('./views/audits/audits.module').then((m) => m.AuditsModule)
       },
       {
         path: 'reclamaciones',

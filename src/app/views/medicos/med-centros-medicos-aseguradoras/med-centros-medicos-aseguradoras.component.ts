@@ -9,7 +9,7 @@ import {MedicoService} from "../../../services/medicos-service";
 import {CentrosMedicosService} from "../../../services/centros-medicos-service";
 
 @Component({
-  selector: 'med-centros-medicos-aseguradoras',
+  selector: 'med-audits-aseguradoras',
   templateUrl: './med-centros-medicos-aseguradoras.component.html',
   styles: [
     `
