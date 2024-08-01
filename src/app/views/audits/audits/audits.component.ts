@@ -37,10 +37,14 @@ export class AuditsComponent implements OnInit {
   totalRecords: number = 0;
 
   busqueda: string = '';
+  tituloVerMas: string = 'Contenido completo'
   sortField
   sortOrder
 
-  activarCreate = false
+  entityAudit: any;
+  entityAuditDialog: boolean;
+  moreDialogVisible: boolean = false; // Visibilidad del diálogo "Ver más"
+  moreDialogContent: string = '';
 
   constructor(
     private auditsService: AuditsService,
@@ -101,5 +105,22 @@ export class AuditsComponent implements OnInit {
     this.audits = response.data;
     this.totalRecords = response.totalRecords;
   }
+
+  viewAuditEntity(entityAudit: any) {
+    this.entityAudit = { ...entityAudit };
+    this.entityAudit.createdDate = this.formatDate(this.entityAudit.createdDate)
+    this.entityAuditDialog = true;
+  }
+
+  hideDialog() {
+    this.entityAuditDialog = false;
+  }
+
+  showMore(content: string, tituloVerMas: string): void {
+    this.moreDialogContent = content;
+    this.tituloVerMas = tituloVerMas
+    this.moreDialogVisible = true;
+  }
+
 
 }

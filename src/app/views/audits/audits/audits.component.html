@@ -104,6 +104,7 @@
         </span>
                     </div>
                 </th>
+                <th></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-audit>
@@ -115,6 +116,15 @@
                 <td>{{ formatDate(audit.createdDate) }}</td>
                 <td>{{ audit.createdBy }}</td>
                 <td>{{ audit.operation }}</td>
+                <td>
+                    <button
+                            pButton
+                            pRipple
+                            icon="pi pi-eye"
+                            class="p-button-rounded p-button-p-button-success medium-button"
+                            (click)="viewAuditEntity(audit); $event.stopPropagation()"
+                    ></button>
+                </td>
             </tr>
         </ng-template>
 
@@ -134,4 +144,111 @@
     </p-table>
 </div>
 
-<!--<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>-->
+<p-dialog
+        [(visible)]="entityAuditDialog"
+        [style]="{ width: '500px' }"
+        header="Detalle Historial de Actividad"
+        [modal]="true"
+        styleClass="p-fluid"
+>
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="registryId">ID Registro</label>
+            <input
+                    type="text"
+                    pInputText
+                    id="registryId"
+                    [(ngModel)]="entityAudit.entityId"
+                    readonly
+                    autofocus
+            />
+        </div>
+        <div class="p-field">
+            <label for="entityName">Entidad</label>
+            <input
+                    type="text"
+                    pInputText
+                    id="entityName"
+                    [(ngModel)]="entityAudit.entityName"
+                    readonly
+                    autofocus
+            />
+        </div>
+        <div class="p-field">
+            <label for="createdDate">Fecha</label>
+            <input
+                    type="text"
+                    pInputText
+                    id="createdDate"
+                    [(ngModel)]="entityAudit.createdDate"
+                    readonly
+            />
+        </div>
+
+        <div class="p-field">
+            <label for="usuario">Usuario</label>
+            <input
+                    type="text"
+                    pInputText
+                    id="usuario"
+                    [(ngModel)]="entityAudit.createdBy"
+                    readonly
+                    autofocus
+            />
+        </div>
+
+        <div class="p-field">
+            <label for="operation">Operación</label>
+            <input
+                    type="text"
+                    pInputText
+                    id="operation"
+                    [(ngModel)]="entityAudit.operation"
+                    readonly
+                    autofocus
+            />
+        </div>
+        <div class="p-field">
+            <label for="newValue">Valor Actual</label>
+            <textarea pInputTextarea id="newValue" readonly [(ngModel)]="entityAudit.newValue"></textarea>
+            <a href="javascript:void(0)" (click)="showMore(entityAudit.newValue, 'Valor Actual')" class="ver-mas-link">Ver más</a>
+        </div>
+
+        <div class="p-field">
+            <label for="oldValue">Valor Anterior</label>
+            <textarea pInputTextarea id="oldValue" readonly [(ngModel)]="entityAudit.oldValue"></textarea>
+            <a href="javascript:void(0)" (click)="showMore(entityAudit.oldValue, 'Valor Anterior')" class="ver-mas-link">Ver más</a>
+        </div>
+
+        <p-blockUI [blocked]="loading">
+            <div class="p-field" *ngIf="loading">
+                <p-progressSpinner></p-progressSpinner>
+            </div>
+        </p-blockUI>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button
+                pButton
+                pRipple
+                label="Cerrar"
+                icon="pi pi-times"
+                class="p-button-text"
+                (click)="hideDialog()"
+        ></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="moreDialogVisible" [style]="{ width: '980px' }" header="{{tituloVerMas}}" [modal]="true">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <textarea pInputTextarea rows="20" cols="100" readonly [(ngModel)]="moreDialogContent"></textarea>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton label="Cerrar" icon="pi pi-times" (click)="moreDialogVisible = false"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+
