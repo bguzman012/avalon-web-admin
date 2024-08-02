@@ -1,19 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { UsuariosService } from '../../../services/usuarios-service';
-import { environment } from '../../../../environments/environment';
-import { FilterService } from "primeng/api";
-import { AseguradorasService } from 'src/app/services/aseguradoras-service';
-import { PolizasService } from 'src/app/services/polizas-service';
-import { ComentariosCitasMedicasService } from 'src/app/services/comentarios-citas-medicas-service';
-import { CitasMedicasService } from 'src/app/services/citas-medicas-service';
-import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
-import { ImagenesService } from 'src/app/services/imagenes-service';
-import { ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { AuthService } from 'src/app/services/auth-service';
+import {Component, OnInit} from '@angular/core';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {UsuariosService} from '../../../services/usuarios-service';
+import {environment} from '../../../../environments/environment';
+import {FilterService} from "primeng/api";
+import {AseguradorasService} from 'src/app/services/aseguradoras-service';
+import {PolizasService} from 'src/app/services/polizas-service';
+import {ComentariosCitasMedicasService} from 'src/app/services/comentarios-citas-medicas-service';
+import {CitasMedicasService} from 'src/app/services/citas-medicas-service';
+import {ClientePolizaService} from 'src/app/services/polizas-cliente-service';
+import {ImagenesService} from 'src/app/services/imagenes-service';
+import {ActivatedRoute} from '@angular/router';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {AuthService} from 'src/app/services/auth-service';
 import {CentrosMedicosService} from "../../../services/centros-medicos-service";
 import {MedicoCentroMedicoAseguradorasService} from "../../../services/med-centros-medicos-aseguradoras-service";
+import {RequisitoAdicional} from "../../../enums/requisito-adicional";
 
 @Component({
   selector: 'add-emergencias',
@@ -46,6 +47,7 @@ export class AddCitasMedicasComponent implements OnInit {
   clienteId: number;
   citaMedicaId: number;
   displayDialog: boolean = false;
+  imagenCambiadaEdit: boolean = false;
   editImage = false
   readOnlyForm = false
 
@@ -61,6 +63,25 @@ export class AddCitasMedicasComponent implements OnInit {
   medicoCentroMedicoAseguradora: any;
   centroMedico: any;
 
+  requisitosAdicionales: { [key in RequisitoAdicional]: boolean } = {
+    [RequisitoAdicional.VIAJES]: false,
+    [RequisitoAdicional.HOSPEDAJE]: false,
+    [RequisitoAdicional.SER_TRANSPORTE]: false,
+    [RequisitoAdicional.AMB_TERRESTRE]: false,
+    [RequisitoAdicional.AMB_AEREA]: false,
+    [RequisitoAdicional.SILLA_RUEDAS]: false,
+    [RequisitoAdicional.RECETA_MEDICA]: false
+  };
+
+  RequisitoAdicionalMapping = {
+    "VIAJES": "VIAJES",
+    "HOSPEDAJE": "HOSPEDAJE",
+    "SER. TRANSPORTE": "SER_TRANSPORTE",
+    "AMB. TERRESTRE": "AMB_TERRESTRE",
+    "AMB. AEREA": "AMB_AEREA",
+    "SILLA RUEDAS": "SILLA_RUEDAS",
+    "RECETA MEDICA": "RECETA_MEDICA"
+  };
 
   codigoDocumento: string = 'Nueva Cita Médica'
 
@@ -75,7 +96,8 @@ export class AddCitasMedicasComponent implements OnInit {
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
     private authService: AuthService
-  ) { }
+  ) {
+  }
 
   async ngOnInit() {
     this.loading = true;
@@ -88,6 +110,9 @@ export class AddCitasMedicasComponent implements OnInit {
 
       this.citaMedicaId = +(await this.getRouteParams('citaMedicaId'));
       this.citaMedica = citaMedica
+
+      this.initializeRequisitosAdicionales(this.citaMedica.requisitosAdicionales);
+      this.citaMedica.fechaTentativa = new Date(this.citaMedica.fechaTentativa + 'T23:59:00Z');
 
       this.codigoDocumento = "# " + this.citaMedica.codigo
       this.selectedCliente = this.citaMedica.clientePoliza.cliente
@@ -107,7 +132,7 @@ export class AddCitasMedicasComponent implements OnInit {
       this.medicoCentroMedicoAseguradora = this.citaMedica.medicoCentroMedicoAseguradora
       this.centroMedico = this.citaMedica.medicoCentroMedicoAseguradora.centroMedico
 
-      if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName){
+      if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName) {
         this.selectedClientePoliza.displayName = `${this.selectedClientePoliza.codigo}-${this.selectedClientePoliza.poliza.nombre}`
       }
 
@@ -115,16 +140,16 @@ export class AddCitasMedicasComponent implements OnInit {
       this.comentarios = await this.comentariosCitasMedicasService.getComentariosByCitaMedica(this.citaMedicaId);
       this.loading = false;
 
-      if (citaMedica.imagenId){
+      if (citaMedica.imagenId) {
         let foto = await this.imagenService.getImagen(citaMedica.imagenId);
-        this.imagen =  foto.documento
+        this.imagen = foto.documento
         this.nombreDocumento = foto.nombreDocumento
       }
       // this.citaMedica.fotoReclamo = citaMedicaFoto.fotoReclamo
 
       if (this.imagen) {
         this.imagePreview = this.imagen;
-      }else{
+      } else {
         this.nombreDocumento = undefined
       }
 
@@ -145,6 +170,13 @@ export class AddCitasMedicasComponent implements OnInit {
     this.loading = false;
   }
 
+  initializeRequisitosAdicionales(requisitos: { [key: string]: boolean }): void {
+    for (const key of Object.keys(this.requisitosAdicionales)) {
+      const backendKey = this.RequisitoAdicionalMapping[key as RequisitoAdicional];
+      this.requisitosAdicionales[key as RequisitoAdicional] = requisitos[backendKey] || false;
+    }
+  }
+
   async addComentario() {
     this.loading = true
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
@@ -159,10 +191,14 @@ export class AddCitasMedicasComponent implements OnInit {
       await this.comentariosCitasMedicasService.createComentario(comentario);
       this.nuevoComentario = '';
       await this.loadComentarios();
-      this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Comentario añadido con éxito' });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Comentario añadido',
+        detail: 'Comentario añadido con éxito'
+      });
       this.loading = false
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
       this.loading = false
     }
   }
@@ -185,10 +221,14 @@ export class AddCitasMedicasComponent implements OnInit {
       await this.comentariosCitasMedicasService.createComentario(comentario);
       this.nuevoComentario = '';
       await this.loadComentarios();
-      this.messageService.add({ severity: 'success', summary: 'Comentario añadido', detail: 'Cita médica cerrada con éxito' });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Comentario añadido',
+        detail: 'Cita médica cerrada con éxito'
+      });
       this.loading = false
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
       this.loading = false
     }
   }
@@ -197,9 +237,13 @@ export class AddCitasMedicasComponent implements OnInit {
     try {
       await this.comentariosCitasMedicasService.deleteComentario(comentarioId);
       await this.loadComentarios();
-      this.messageService.add({ severity: 'success', summary: 'Comentario eliminado', detail: 'Comentario eliminado con éxito' });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Comentario eliminado',
+        detail: 'Comentario eliminado con éxito'
+      });
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar el comentario' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar el comentario'});
     }
   }
 
@@ -218,13 +262,14 @@ export class AddCitasMedicasComponent implements OnInit {
     const file = event.files[0];
     this.imagen = file;
     this.nombreDocumento = this.imagen.name
-    console.log('Nombre del archivo:', file.name);
 
     const reader = new FileReader();
     reader.onload = (e: any) => {
       this.imagePreview = e.target.result;
     };
     reader.readAsDataURL(file);
+
+    this.imagenCambiadaEdit = true
   }
 
   clearImageSelection(fileUploadRef) {
@@ -286,7 +331,7 @@ export class AddCitasMedicasComponent implements OnInit {
   async saveCitaMedica() {
     this.submitted = true;
 
-    if (!this.imagen){
+    if (!this.imagen) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error!',
@@ -296,7 +341,7 @@ export class AddCitasMedicasComponent implements OnInit {
       return
     }
 
-    if (!this.medicoCentroMedicoAseguradora?.id){
+    if (!this.medicoCentroMedicoAseguradora?.id) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error!',
@@ -311,8 +356,17 @@ export class AddCitasMedicasComponent implements OnInit {
     this.citaMedica.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora.id
     this.citaMedica.clientePolizaId = this.selectedClientePoliza.id
     this.citaMedica.nombreDocumento = this.nombreDocumento
-    formData.append('citaMedica', new Blob([JSON.stringify(this.citaMedica)], { type: 'application/json' }));
-    if (this.imagen) {
+    const requisitosAdicionalesBackend = {};
+
+    for (const [key, value] of Object.entries(this.requisitosAdicionales)) {
+      requisitosAdicionalesBackend[this.RequisitoAdicionalMapping[key]] = value;
+    }
+
+    this.citaMedica.requisitosAdicionales = requisitosAdicionalesBackend
+
+    formData.append('citaMedica', new Blob([JSON.stringify(this.citaMedica)], {type: 'application/json'}));
+
+    if (this.imagen && this.imagenCambiadaEdit) {
       formData.append('fotoCitaMedica', this.imagen);
     }
 
@@ -320,20 +374,21 @@ export class AddCitasMedicasComponent implements OnInit {
       if (this.citaMedica.id) {
         await this.citasMedicasService.actualizarCitaMedica(this.citaMedica.id, formData);
       } else {
+
         let citaSaved = await this.citasMedicasService.guardarCitaMedica(formData);
         this.codigoDocumento = "# " + citaSaved.codigo
       }
 
       this.loading = false;
-      this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
+      this.messageService.add({severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito'});
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar la cita médica' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al guardar la cita médica'});
     } finally {
       this.loading = false; // Ocultar spinner
     }
   }
 
-  async filterClientes(event){
+  async filterClientes(event) {
     let query = event.query;
 
     const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
@@ -363,7 +418,6 @@ export class AddCitasMedicasComponent implements OnInit {
         ...obj,
         displayName: `${obj.codigo}-${obj.poliza.nombre}`
       }));
-      console.log(clientePolizas)
 
       this.filteredPolizas = clientePolizas;
     }
@@ -378,16 +432,7 @@ export class AddCitasMedicasComponent implements OnInit {
         10,
         esEdicion ? this.selectedClientePoliza.codigo : "");
 
-      let clientePolizas = responseClientePoliza.data
-      if (clientePolizas) {
-        clientePolizas = clientePolizas.map(obj => ({
-          ...obj,
-          displayName: `${obj.codigo}-${obj.poliza.nombre}`
-        }));
-        console.log(clientePolizas)
-
-        this.clientePolizas = clientePolizas;
-      }
+      this.clientePolizas = responseClientePoliza.data
     }
   }
 

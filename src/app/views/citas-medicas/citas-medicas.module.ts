@@ -1,6 +1,6 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {
   ButtonGroupModule,
@@ -13,7 +13,7 @@ import {
 } from '@coreui/angular';
 
 
-import { CitasMedicasRoutingModule } from './citas-medicas-routing.module';
+import {CitasMedicasRoutingModule} from './citas-medicas-routing.module';
 
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
@@ -26,23 +26,25 @@ import {ButtonModule} from 'primeng/button';
 import {DropdownModule} from 'primeng/dropdown';
 import {ProgressBarModule} from 'primeng/progressbar';
 import {InputTextModule} from 'primeng/inputtext';
+import {CheckboxModule} from "primeng/checkbox";
 import {FileUploadModule} from 'primeng/fileupload';
 import {ToolbarModule} from 'primeng/toolbar';
 import {RatingModule} from 'primeng/rating';
 import {RadioButtonModule} from 'primeng/radiobutton';
 import {InputNumberModule} from 'primeng/inputnumber';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import { BlockUIModule } from 'primeng/blockui';
-import { MessageService } from 'primeng/api';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import {ConfirmationService} from 'primeng/api';
+import {BlockUIModule} from 'primeng/blockui';
+import {MessageService} from 'primeng/api';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {InputTextareaModule} from 'primeng/inputtextarea';
 // import { MembresiasComponent } from './membresias/membresias.component';
-import { AutoCompleteModule } from 'primeng/autocomplete';
+import {AutoCompleteModule} from 'primeng/autocomplete';
 import {PanelModule} from 'primeng/panel';
-import { CitasMedicasComponent } from './citas-medicas/citas-medicas.component';
-import { AddCitasMedicasComponent } from './add-citas-medicas/add-citas-medicas.component';
+import {CitasMedicasComponent} from './citas-medicas/citas-medicas.component';
+import {AddCitasMedicasComponent} from './add-citas-medicas/add-citas-medicas.component';
 import {PaginatorModule} from "primeng/paginator";
+
 // import { MedCentrosMedicosAseguradorasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
@@ -51,48 +53,48 @@ import {PaginatorModule} from "primeng/paginator";
     CitasMedicasComponent,
     AddCitasMedicasComponent
   ],
-    imports: [
-        CommonModule,
-        CitasMedicasRoutingModule,
-        CardModule,
-        FormModule,
-        GridModule,
-        FormsModule,
-        PanelModule,
-        ReactiveFormsModule,
-        FormModule,
-        ButtonGroupModule,
-        DropdownModule,
-        AlertModule,
-        TableModule,
-        SharedModule,
-        ListGroupModule,
-        AutoCompleteModule,
+  imports: [
+    CommonModule,
+    CitasMedicasRoutingModule,
+    CardModule,
+    FormModule,
+    GridModule,
+    FormsModule,
+    PanelModule,
+    ReactiveFormsModule,
+    FormModule,
+    ButtonGroupModule,
+    DropdownModule,
+    AlertModule,
+    TableModule,
+    SharedModule,
+    ListGroupModule,
+    AutoCompleteModule,
+    CheckboxModule,
 
-
-        TableModule,
-        CalendarModule,
-        SliderModule,
-        DialogModule,
-        BlockUIModule,
-        ProgressSpinnerModule,
-        MultiSelectModule,
-        ContextMenuModule,
-        DropdownModule,
-        ButtonModule,
-        ToastModule,
-        InputTextModule,
-        ProgressBarModule,
-        FileUploadModule,
-        ToolbarModule,
-        RatingModule,
-        FormsModule,
-        RadioButtonModule,
-        InputNumberModule,
-        ConfirmDialogModule,
-        InputTextareaModule,
-        PaginatorModule,
-    ]
+    TableModule,
+    CalendarModule,
+    SliderModule,
+    DialogModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    MultiSelectModule,
+    ContextMenuModule,
+    DropdownModule,
+    ButtonModule,
+    ToastModule,
+    InputTextModule,
+    ProgressBarModule,
+    FileUploadModule,
+    ToolbarModule,
+    RatingModule,
+    FormsModule,
+    RadioButtonModule,
+    InputNumberModule,
+    ConfirmDialogModule,
+    InputTextareaModule,
+    PaginatorModule,
+  ]
 })
 export class CitasMedicasModule {
 }

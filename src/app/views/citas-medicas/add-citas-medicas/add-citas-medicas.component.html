@@ -43,16 +43,21 @@
   <div class="card">
     <p-panel styleClass="p-fluid" header="Detalles de Cita Médica">
       <div class="p-field">
-        <label for="razon">Razón  (*)</label>
-        <input type="text" pInputText id="razon" [(ngModel)]="citaMedica.razon" [readonly]="readOnlyForm" required autofocus />
-        <small class="p-invalid" *ngIf="submitted && !citaMedica.razon">Razón es requerida.</small>
+        <label for="fechaTentativa">Fecha Tentativa *</label>
+        <p-calendar [(ngModel)]="citaMedica.fechaTentativa" dateFormat="dd/mm/yy" [showIcon]="true" required></p-calendar>
+        <small class="p-invalid" *ngIf="submitted && !citaMedica.fechaTentativa">Fecha tentativa es requerida.</small>
+      </div>
+      <div class="p-field">
+        <label for="ciudadPreferencia">Ciudad de  preferencias</label>
+        <input type="text" pInputText id="ciudadPreferencia" [(ngModel)]="citaMedica.ciudadPreferencia" [readonly]="readOnlyForm" required autofocus />
       </div>
       <div class="p-field" *ngIf="selectedClientePoliza?.id">
         <label for="aseguradora">Aseguradora</label>
         <input type="text" pInputText id="aseguradora" [(ngModel)]="selectedClientePoliza.poliza.aseguradora.nombre" readonly />
       </div>
+
       <div class="p-field">
-        <label for="centroMedicoId">Centro Médico</label>
+        <label for="centroMedicoId">Hospital</label>
         <p-autoComplete
           dropdown = "true"
           [(ngModel)]="centroMedico"
@@ -64,10 +69,10 @@
           [appendTo]="'body'"
           required>
         </p-autoComplete>
-        <small class="p-invalid" *ngIf="submitted && !centroMedico">Centro médico es requerido.</small>
+        <small class="p-invalid" *ngIf="submitted && !centroMedico">Hospital es requerido.</small>
       </div>
       <div class="p-field">
-        <label for="medicoId">Médico</label>
+        <label for="medicoId">Dr. Preferencia</label>
         <p-autoComplete
           dropdown = "true"
           [(ngModel)]="medicoCentroMedicoAseguradora"
@@ -79,13 +84,37 @@
           [appendTo]="'body'"
           required>
         </p-autoComplete>
-        <small class="p-invalid" *ngIf="submitted && !centroMedico">Centro médico es requerido.</small>
+        <small class="p-invalid" *ngIf="submitted && !medicoCentroMedicoAseguradora">Dr. Preferencia es requerido.</small>
       </div>
 
       <div class="p-field">
-        <label for="estado">Estado</label>
-        <input type="text" pInputText id="estado" readonly [(ngModel)]="citaMedica.estado" />
+        <label for="padecimiento">Padecimiento  *</label>
+        <textarea pInputTextarea id="padecimiento" [(ngModel)]="citaMedica.padecimiento" required></textarea>
       </div>
+
+      <div class="p-field">
+        <label for="informacionAdicional">Información Adicional  *</label>
+        <textarea pInputTextarea id="informacionAdicional" [(ngModel)]="citaMedica.informacionAdicional" required></textarea>
+      </div>
+
+      <div class="p-field">
+        <label for="requisitosAdicionales">Requisitos Adicionales</label>
+        <div *ngFor="let requisito of requisitosAdicionales | keyvalue">
+          <p-checkbox
+            [(ngModel)]="requisitosAdicionales[requisito.key]"
+            binary="true"
+            name="requisitosAdicionales"
+            [label]="requisito.key"
+          ></p-checkbox>
+        </div>
+      </div>
+
+      <div class="p-field">
+        <label for="otrosRequisitos">Otros Requisitos</label>
+        <textarea pInputTextarea id="otrosRequisitos" [(ngModel)]="citaMedica.otrosRequisitos" required></textarea>
+      </div>
+
+
       <div class="p-field">
         <label for="fotoCitaMedica">Foto Cita Médica (*)</label>
         <div class="upload-container">
@@ -100,6 +129,11 @@
           alt="Vista Previa" class="image-preview" (click)="showDialogImage()"    loading="lazy" />
 
         <br />
+      </div>
+
+      <div class="p-field">
+        <label for="estado">Estado</label>
+        <input type="text" pInputText id="estado" readonly [(ngModel)]="citaMedica.estado" />
       </div>
 
       <div class="custom-button-container">
