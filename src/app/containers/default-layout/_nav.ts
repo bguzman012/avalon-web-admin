@@ -83,15 +83,9 @@ export const navItemsAdmin: INavData[] = [
 ];
 
 export const navItems: INavData[] = [
-
-  {
-    name: 'Usuarios',
-    url: '/usuarios',
-    iconComponent: {}
-  },
-  {
-    name: 'Aseguradoras',
-    url: '/aseguradoras',
+ {
+    name: 'Clientes',
+    url: '/clientes',
     iconComponent: {}
 
   }
