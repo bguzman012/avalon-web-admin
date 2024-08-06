@@ -43,10 +43,158 @@
 
   <div class="card">
     <p-panel styleClass="p-fluid" header="Detalles de Emergencia">
+      <div class="p-field" *ngIf="selectedClientePoliza?.id">
+        <label for="aseguradora">Aseguradora</label>
+        <input type="text" pInputText id="aseguradora" [(ngModel)]="selectedClientePoliza.poliza.aseguradora.nombre" readonly />
+      </div>
+
       <div class="p-field">
-        <label for="razon">Razón  (*)</label>
-        <input type="text" pInputText id="razon" [(ngModel)]="emergencia.razon" [readonly]="readOnlyForm" required autofocus />
-        <small class="p-invalid" *ngIf="submitted && !emergencia.razon">Razón es requerida.</small>
+        <label for="centroMedicoId">Hospital *</label>
+        <p-autoComplete
+          dropdown = "true"
+          [(ngModel)]="centroMedico"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredCentrosMedicos"
+          (completeMethod)="filterCentrosMedicos($event)"
+          field="nombre"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required>
+        </p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !centroMedico">Hospital es requerido.</small>
+      </div>
+
+      <p-divider align="left" type="dashed">
+        <b>Dirección</b>
+      </p-divider>
+
+      <div class="p-field">
+        <label for="direccionUno">Dirección</label>
+        <input
+          type="text"
+          pInputText
+          id="direccionUno"
+          [(ngModel)]="direccion.direccionUno"
+          required
+          autofocus
+        />
+        <small class="p-invalid" *ngIf="submitted && !direccion.direccionUno"
+        >Dirección uno es required.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="direccionDos">Dirección (2)</label>
+        <input
+          type="text"
+          pInputText
+          id="direccionDos"
+          [(ngModel)]="direccion.direccionDos"
+          required
+          autofocus
+        />
+        <small class="p-invalid" *ngIf="submitted && !direccion.direccionDos"
+        >Dirección dos es required.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="paisesId">País</label>
+        <p-autoComplete
+          [(ngModel)]="pais"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredPaises"
+          (completeMethod)="filterPaises($event)"
+          dropdown="true"
+          field="nombre"
+          (ngModelChange)="loadEstados()"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required
+        ></p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !pais"
+        >País es requerido.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="asesoresId">Estado</label>
+        <p-autoComplete
+          [(ngModel)]="estado"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredEstados"
+          (completeMethod)="filterEstados($event)"
+          [readonly]="!pais"
+          dropdown="true"
+          field="nombre"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required
+        ></p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !estado">
+          Estado es requerido.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="ciudad">Ciudad</label>
+        <input
+          type="text"
+          pInputText
+          id="ciudad"
+          [(ngModel)]="direccion.ciudad"
+          required
+          autofocus
+        />
+        <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
+        >Ciudad es required.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="codigoPostal">Código Postal</label>
+        <input
+          type="text"
+          pInputText
+          id="codigoPostal"
+          [(ngModel)]="direccion.codigoPostal"
+          required
+          autofocus
+        />
+        <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
+        >Código Postal es required.</small
+        >
+      </div>
+
+      <p-divider type="dashed">
+      </p-divider>
+
+      <div class="p-field">
+        <label for="diagnostico">Diagnóstico</label>
+        <textarea pInputTextarea id="diagnostico" [(ngModel)]="emergencia.diagnostico"></textarea>
+      </div>
+
+      <div class="p-field">
+        <label for="sintomas">Sintomas *</label>
+        <textarea pInputTextarea id="sintomas" [(ngModel)]="emergencia.sintomas" required></textarea>
+        <small class="p-invalid" *ngIf="submitted && !emergencia.sintomas"
+        >Sintomas es required.</small>
+      </div>
+
+      <div class="p-field">
+        <label for="medicoId">Dr. *</label>
+        <p-autoComplete
+          dropdown = "true"
+          [(ngModel)]="medicoCentroMedicoAseguradora"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredMedicoCentroMedicoAseguradoras"
+          (completeMethod)="filterMedicoCentroMedicoAseguradora($event)"
+          field="medico.nombreCompleto"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required>
+        </p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !medicoCentroMedicoAseguradora">Dr. Preferencia es requerido.</small>
       </div>
 
       <div class="p-field">

@@ -42,6 +42,7 @@ import {PanelModule} from 'primeng/panel';
 import { EmergenciasComponent } from './emergencias/emergencias.component';
 import { AddEmergenciasComponent } from './add-emergencias/add-emergencias.component';
 import {PaginatorModule} from "primeng/paginator";
+import {DividerModule} from "primeng/divider";
 
 
 @NgModule({
@@ -66,7 +67,7 @@ import {PaginatorModule} from "primeng/paginator";
         SharedModule,
         ListGroupModule,
         AutoCompleteModule,
-
+      DividerModule,
 
         TableModule,
         CalendarModule,

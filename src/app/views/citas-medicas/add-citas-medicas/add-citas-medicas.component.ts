@@ -458,6 +458,5 @@ export class AddCitasMedicasComponent implements OnInit {
     this.filteredMedicoCentroMedicoAseguradoras = responseMedicoCentroMedicoAseguradora.data;
   }
 
-
 }
 
