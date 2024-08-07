@@ -133,10 +133,6 @@ export class AddEmergenciasComponent implements OnInit {
       this.medicoCentroMedicoAseguradora = this.emergencia.medicoCentroMedicoAseguradora
       this.centroMedico = this.emergencia.medicoCentroMedicoAseguradora.centroMedico
 
-      if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName) {
-        this.selectedClientePoliza.displayName = `${this.selectedClientePoliza.codigo}-${this.selectedClientePoliza.poliza.nombre}`
-      }
-
       await this.loadPolizas(true);
       this.comentarios = await this.comentariosEmergenciasService.getComentariosByEmergencia(this.emergenciaId);
       this.loading = false;

@@ -114,10 +114,6 @@ export class AddReclamacionesComponent implements OnInit {
       this.medicoCentroMedicoAseguradora = this.reclamacion.medicoCentroMedicoAseguradora
       this.centroMedico = this.reclamacion.medicoCentroMedicoAseguradora.centroMedico
 
-      if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName){
-        this.selectedClientePoliza.displayName = `${this.selectedClientePoliza.codigo}-${this.selectedClientePoliza.poliza.nombre}`
-      }
-
       await this.loadPolizas(true);
       this.comentarios = await this.comentariosService.getComentariosByReclamacion(this.reclamacionId);
       this.loading = false;

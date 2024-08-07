@@ -129,10 +129,6 @@ export class AddCitasMedicasComponent implements OnInit {
       this.medicoCentroMedicoAseguradora = this.citaMedica.medicoCentroMedicoAseguradora
       this.centroMedico = this.citaMedica.medicoCentroMedicoAseguradora.centroMedico
 
-      if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName) {
-        this.selectedClientePoliza.displayName = `${this.selectedClientePoliza.codigo}-${this.selectedClientePoliza.poliza.nombre}`
-      }
-
       await this.loadPolizas(true);
       this.comentarios = await this.comentariosCitasMedicasService.getComentariosByCitaMedica(this.citaMedicaId);
       this.loading = false;
