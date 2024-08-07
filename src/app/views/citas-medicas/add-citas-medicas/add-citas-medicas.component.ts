@@ -23,8 +23,6 @@ import {RequisitoAdicional} from "../../../enums/requisito-adicional";
 })
 export class AddCitasMedicasComponent implements OnInit {
   citaMedicaDialog: boolean;
-  citasMedicas: any[];
-  selectedCitasMedicas: any[];
   submitted: boolean;
   citaMedica: any;
   loading: boolean = false;
@@ -34,7 +32,6 @@ export class AddCitasMedicasComponent implements OnInit {
   clientePolizas: any[]; // Lista de polizas para el autocompletado
 
   selectedCliente: any; // Cliente seleccionado en el filtro
-  selectedAseguradora: any; // Aseguradora seleccionada en el filtro
   selectedClientePoliza: any; // Poliza seleccionada en el filtro
 
   filteredClientes: any[]; // Clientes filtrados para el autocompletado
@@ -412,16 +409,7 @@ export class AddCitasMedicasComponent implements OnInit {
       10,
       query);
 
-    let clientePolizas = responseClientePoliza.data
-    if (clientePolizas) {
-      clientePolizas = clientePolizas.map(obj => ({
-        ...obj,
-        displayName: `${obj.codigo}-${obj.poliza.nombre}`
-      }));
-
-      this.filteredPolizas = clientePolizas;
-    }
-
+    this.filteredPolizas = responseClientePoliza.data
   }
 
   async loadPolizas(esEdicion: boolean | null = false) {

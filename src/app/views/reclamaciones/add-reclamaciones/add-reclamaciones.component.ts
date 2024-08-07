@@ -12,6 +12,9 @@ import {ImagenesService} from 'src/app/services/imagenes-service';
 import {ActivatedRoute} from '@angular/router';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {AuthService} from 'src/app/services/auth-service';
+import {CentrosMedicosService} from "../../../services/centros-medicos-service";
+import {MedicoCentroMedicoAseguradorasService} from "../../../services/med-centros-medicos-aseguradoras-service";
+import {TipoAdm} from "../../../enums/tipo-adm";
 
 @Component({
   selector: 'add-reclamaciones',
@@ -21,7 +24,6 @@ import {AuthService} from 'src/app/services/auth-service';
 export class AddReclamacionesComponent implements OnInit {
   reclamacionDialog: boolean;
   reclamaciones: any[];
-  selectedReclamaciones: any[];
   submitted: boolean;
   reclamacion: any;
   loading: boolean = false;
@@ -31,7 +33,6 @@ export class AddReclamacionesComponent implements OnInit {
   clientePolizas: any[]; // Lista de polizas para el autocompletado
 
   selectedCliente: any; // Cliente seleccionado en el filtro
-  selectedAseguradora: any; // Aseguradora seleccionada en el filtro
   selectedClientePoliza: any; // Poliza seleccionada en el filtro
 
   filteredClientes: any[]; // Clientes filtrados para el autocompletado
@@ -54,20 +55,28 @@ export class AddReclamacionesComponent implements OnInit {
   nombreDocumento
   codigoDocumento: string = 'Nuevo Reclamo'
 
+  filteredCentrosMedicos
+  filteredMedicoCentroMedicoAseguradoras
+
+  medicoCentroMedicoAseguradora: any;
+  centroMedico: any;
+
+  tipoAdmOptions: { label: string, value: string }[];
+  selectedTipoAdm: TipoAdm;
+  imagenCambiadaEdit: boolean = false;
+
+
   constructor(
     private messageService: MessageService,
     private reclamacionesService: ReclamacionesService,
-    private aseguradorasService: AseguradorasService,
     private usuariosService: UsuariosService,
     private comentariosService: ComentariosService,
-    private confirmationService: ConfirmationService,
     private imagenService: ImagenesService,
-    private polizasService: PolizasService,
+    private centrosMedicosService: CentrosMedicosService,
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
     private authService: AuthService,
-    private filterService: FilterService,
-    private sanitizer: DomSanitizer
+    private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService
   ) {
   }
 
@@ -76,13 +85,15 @@ export class AddReclamacionesComponent implements OnInit {
     this.loading = true;
     this.openNew();
     await this.prepareData();
-    console.log(this.reclamacion)
 
     if (await this.getRouteParams('reclamacionId')) {
       this.nombreDocumento = 'Cargando ...'
       const reclamacion = JSON.parse(localStorage.getItem('reclamacion'));
       this.reclamacionId = +(await this.getRouteParams('reclamacionId'));
       this.reclamacion = reclamacion
+
+      this.reclamacion.fechaServicio = new Date(this.reclamacion.fechaServicio + 'T23:59:00Z');
+      this.selectedTipoAdm = this.reclamacion.tipoAdm
 
       this.codigoDocumento = "# " + this.reclamacion.codigo
       this.selectedCliente = this.reclamacion.clientePoliza.cliente
@@ -99,6 +110,9 @@ export class AddReclamacionesComponent implements OnInit {
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
       this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.reclamacion.clientePoliza
+
+      this.medicoCentroMedicoAseguradora = this.reclamacion.medicoCentroMedicoAseguradora
+      this.centroMedico = this.reclamacion.medicoCentroMedicoAseguradora.centroMedico
 
       if (this.selectedClientePoliza && !this.selectedClientePoliza.displayName){
         this.selectedClientePoliza.displayName = `${this.selectedClientePoliza.codigo}-${this.selectedClientePoliza.poliza.nombre}`
@@ -138,6 +152,16 @@ export class AddReclamacionesComponent implements OnInit {
     this.loading = false;
   }
 
+  async filterCentrosMedicos(event) {
+    const responseCliente = await this.centrosMedicosService.obtenerCentrosMedicos(
+      0,
+      10,
+      event.query
+    )
+
+    this.filteredCentrosMedicos = responseCliente.data;
+  }
+
   async addComentario() {
     this.loading = true
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
@@ -162,6 +186,18 @@ export class AddReclamacionesComponent implements OnInit {
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
       this.loading = false
     }
+  }
+
+  async filterMedicoCentroMedicoAseguradora(event) {
+    const responseMedicoCentroMedicoAseguradora = await this.medicoCentroMedicoAseguradoraService.obtenerMedicoCentroMedicoAseguradorasByAseguradoraAndCentroMedico(
+      this.selectedClientePoliza.poliza.aseguradora.id,
+      this.centroMedico.id,
+      0,
+      10,
+      event.query
+    )
+
+    this.filteredMedicoCentroMedicoAseguradoras = responseMedicoCentroMedicoAseguradora.data;
   }
 
   async cerrarReclamo() {
@@ -230,6 +266,8 @@ export class AddReclamacionesComponent implements OnInit {
       this.imagePreview = e.target.result;
     };
     reader.readAsDataURL(file);
+
+    this.imagenCambiadaEdit = true
   }
 
   clearImageSelection(fileUploadRef) {
@@ -267,6 +305,11 @@ export class AddReclamacionesComponent implements OnInit {
     );
 
     this.clientes = responseCliente.data
+
+    this.tipoAdmOptions = Object.keys(TipoAdm).map(key => {
+      return { label: key, value: TipoAdm[key] };
+    });
+
   }
 
   private getRouteParams(param: string): Promise<string> {
@@ -277,6 +320,8 @@ export class AddReclamacionesComponent implements OnInit {
 
   openNew() {
     this.reclamacion = {};
+    this.centroMedico = null;
+
     this.submitted = false;
     this.reclamacionDialog = true;
   }
@@ -299,12 +344,26 @@ export class AddReclamacionesComponent implements OnInit {
       return
     }
 
+    if (!this.selectedTipoAdm) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error!',
+        detail: 'Tipo adm. es requerido',
+        life: 3000,
+      });
+      return
+    }
+
     this.loading = true; // Mostrar spinner
     const formData = new FormData();
     this.reclamacion.clientePolizaId = this.selectedClientePoliza.id
+    this.reclamacion.tipoAdm = this.selectedTipoAdm
+    this.reclamacion.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora.id
     this.reclamacion.nombreDocumento = this.nombreDocumento
+
     formData.append('reclamacion', new Blob([JSON.stringify(this.reclamacion)], {type: 'application/json'}));
-    if (this.imagen) {
+
+    if (this.imagen && this.imagenCambiadaEdit) {
       formData.append('fotoReclamo', this.imagen);
     }
 
@@ -350,17 +409,7 @@ export class AddReclamacionesComponent implements OnInit {
       10,
       query);
 
-    let clientePolizas = responseClientePoliza.data
-    if (clientePolizas) {
-      clientePolizas = clientePolizas.map(obj => ({
-        ...obj,
-        displayName: `${obj.codigo}-${obj.poliza.nombre}`
-      }));
-      console.log(clientePolizas)
-
-      this.filteredPolizas = clientePolizas;
-    }
-
+    this.filteredPolizas = responseClientePoliza.data
   }
 
   async loadPolizas(esEdicion: boolean | null = false) {
@@ -371,16 +420,7 @@ export class AddReclamacionesComponent implements OnInit {
         10,
         esEdicion ? this.selectedClientePoliza.codigo : "");
 
-      let clientePolizas = responseClientePoliza.data
-      if (clientePolizas) {
-        clientePolizas = clientePolizas.map(obj => ({
-          ...obj,
-          displayName: `${obj.codigo}-${obj.poliza.nombre}`
-        }));
-        console.log(clientePolizas)
-
-        this.clientePolizas = clientePolizas;
-      }
+      this.clientePolizas = responseClientePoliza.data
     }
   }
 

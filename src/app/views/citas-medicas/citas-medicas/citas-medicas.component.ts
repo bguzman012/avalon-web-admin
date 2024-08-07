@@ -183,16 +183,7 @@ export class CitasMedicasComponent implements OnInit {
       10,
       query);
 
-    let clientePolizas = responseClientePoliza.data
-    if (clientePolizas) {
-      clientePolizas = clientePolizas.map(obj => ({
-        ...obj,
-        displayName: `${obj.codigo}-${obj.poliza.nombre}`
-      }));
-      console.log(clientePolizas)
-
-      this.filteredPolizas = clientePolizas;
-    }
+    this.filteredPolizas = responseClientePoliza.data;
 
   }
 

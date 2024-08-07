@@ -183,16 +183,8 @@ export class ReclamacionesComponent implements OnInit {
       10,
       query);
 
-    let clientePolizas = responseClientePoliza.data
-    if (clientePolizas) {
-      clientePolizas = clientePolizas.map(obj => ({
-        ...obj,
-        displayName: `${obj.codigo}-${obj.poliza.nombre}`
-      }));
-      console.log(clientePolizas)
+      this.filteredPolizas = responseClientePoliza.data;
 
-      this.filteredPolizas = clientePolizas;
-    }
 
   }
 
@@ -224,17 +216,7 @@ export class ReclamacionesComponent implements OnInit {
         10,
         "");
 
-      let clientePolizas = responseClientePoliza.data
-      if (clientePolizas) {
-        clientePolizas = clientePolizas.map(obj => ({
-          ...obj,
-          displayName: `${obj.codigo}-${obj.poliza.nombre}`
-        }));
-        console.log(clientePolizas)
-
-        this.clientePolizas = clientePolizas;
-      }
-      console.log(this.clientePolizas, " CLIPIIE")
+      this.clientePolizas = responseClientePoliza.data;
     }
   }
 

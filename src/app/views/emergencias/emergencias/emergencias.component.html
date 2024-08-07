@@ -67,9 +67,6 @@
         <th pSortableColumn="codigo">Código
           <p-sortIcon field="codigo"></p-sortIcon>
         </th>
-        <th pSortableColumn="razon">Razón
-          <p-sortIcon field="razon"></p-sortIcon>
-        </th>
         <th pSortableColumn="estado">Estado
           <p-sortIcon field="estado"></p-sortIcon>
         </th>
@@ -82,7 +79,6 @@
           <p-tableCheckbox [value]="emergencia"></p-tableCheckbox>
         </td>
         <td>{{ emergencia.codigo }}</td>
-        <td>{{ emergencia.razon }}</td>
         <td>{{ emergencia.estado }}</td>
         <td>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 medium-button"
