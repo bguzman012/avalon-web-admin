@@ -114,6 +114,8 @@ export class ClientesComponent implements OnInit {
     this.usuario = {};
     this.direccion = {};
     this.submitted = false;
+    this.usuario.fechaNacimiento = new Date();
+
     this.prepareData();
     this.usuarioDialog = true;
   }
@@ -138,6 +140,10 @@ export class ClientesComponent implements OnInit {
   async editUsuario(usuario: any) {
     this.usuario = { ...usuario };
     this.usuario.rolId = this.usuario.rol.id;
+
+
+    this.usuario.fechaNacimiento = this.usuario?.fechaNacimiento ? new Date(this.usuario.fechaNacimiento + 'T23:59:00Z') : new Date();
+
     this.prepareData();
     if (this.usuario.direccion) {
       this.direccion = this.usuario.direccion;

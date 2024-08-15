@@ -116,7 +116,7 @@
           ></button>
         </td>
       </tr>
-      
+
     </ng-template>
     <ng-template pTemplate="summary">
       <p-blockUI [blocked]="loading">
@@ -143,7 +143,7 @@
                     <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombre uno is required.</small>
                 </div>
             </div>
-            
+
             <div class="p-col-12 p-md-6">
                 <div class="p-field">
                     <label for="nombres">Nombre Dos</label>
@@ -166,13 +166,20 @@
                     <input type="text" pInputText id="apellidosDos" [(ngModel)]="usuario.apellidosDos" required autofocus />
                     <small class="p-invalid" *ngIf="submitted && !usuario.apellidosDos">Apellido dos is required.</small>
                 </div>
-            </div>            
+            </div>
         </div>
 
     <div class="p-field">
       <label class="p-mb-3">Correo Electrónico</label>
       <input type="text" pInputText [(ngModel)]="usuario.correoElectronico" />
     </div>
+
+      <div class="p-field">
+        <label for="fechaNacimiento">Fecha de Inicio</label>
+        <p-calendar [(ngModel)]="usuario.fechaNacimiento" dateFormat="dd/mm/yy"
+                    [showIcon]="true"></p-calendar>
+        <small class="p-invalid" *ngIf="submitted && !usuario.fechaNacimiento">Fecha de nacimiento es requerido.</small>
+      </div>
 
     <div class="p-field">
       <label class="p-mb-3">Número Teléfono</label>
