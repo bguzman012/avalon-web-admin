@@ -20,7 +20,7 @@ const routes: Routes = [
         component: MedicosComponent,
        },
       {
-        path: 'audits-aseguradoras',
+        path: 'centros-medicos-aseguradoras',
         data: {
           breadcrumb: 'Centros Médicos'
         },

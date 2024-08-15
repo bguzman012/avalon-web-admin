@@ -18,9 +18,9 @@ export class CasosService {
       page: number,
       size: number,
       busqueda: string,
+      clientePolizaId: string | null = "",
       sortField: string | null = 'createdDate',
       sortOrder: number | null = -1,
-      clientePolizaId: string | null = "",
     ): Promise<any> {
       try {
         const order = sortOrder === 1 ? 'asc' : 'desc';

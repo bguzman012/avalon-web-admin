@@ -114,6 +114,7 @@ export class CasosComponent implements OnInit {
       });
     } else {
       localStorage.removeItem("clientePoliza");
+      localStorage.removeItem("caso");
       this.router.navigate(['casos/detalle-caso']);
     }
   }

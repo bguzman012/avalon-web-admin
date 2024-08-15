@@ -359,7 +359,7 @@ export class AddEmergenciasComponent implements OnInit {
       return
     }
 
-    if (!this.medicoCentroMedicoAseguradora?.id) {
+    if (!this.medicoCentroMedicoAseguradora) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error!',
