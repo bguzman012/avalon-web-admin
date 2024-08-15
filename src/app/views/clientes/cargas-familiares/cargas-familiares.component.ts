@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ConfirmationService, MessageService, SortEvent} from 'primeng/api';
-import { CargaFamiliarService } from '../../../services/cargas-familiares-service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
+import {CargaFamiliarService} from '../../../services/cargas-familiares-service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ClientePolizaService} from 'src/app/services/polizas-cliente-service';
 import {PaisesService} from "../../../services/paises-service";
 import {EstadosService} from "../../../services/estados-service";
 import {UsuariosService} from "../../../services/usuarios-service";
@@ -12,12 +12,12 @@ import {environment} from "../../../../environments/environment";
   selector: 'cargas-familiares',
   templateUrl: './cargas-familiares.component.html',
   styles: [`
-  :host ::ng-deep .p-dialog .product-image {
+    :host ::ng-deep .p-dialog .product-image {
       width: 150px;
       margin: 0 auto 2rem auto;
       display: block;
-  }
-`],
+    }
+  `],
   styleUrls: ['./cargas-familiares.component.scss'],
 })
 export class CargasFamiliaresComponent implements OnInit {
@@ -67,7 +67,8 @@ export class CargasFamiliaresComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private usuariosService: UsuariosService
-  ) { }
+  ) {
+  }
 
   async ngOnInit() {
 
@@ -76,8 +77,6 @@ export class CargasFamiliaresComponent implements OnInit {
     if (!this.clientePolizaId) this.clientePolizaId = localStorage.getItem('clientePolizaId');
 
     this.clientePoliza = JSON.parse(localStorage.getItem('clientePoliza'));
-
-    console.log(this.clientePoliza)
 
     await this.refrescarListado();
   }
@@ -146,6 +145,7 @@ export class CargasFamiliaresComponent implements OnInit {
 
   openNew() {
     this.cargaFamiliar = {};
+    this.selectedCliente = null
     this.direccion = {};
 
     this.cargaFamiliar.fechaNacimiento = new Date();
@@ -169,7 +169,11 @@ export class CargasFamiliaresComponent implements OnInit {
 
 
   async editCargaFamiliar(cargaFamiliar: any) {
-    this.cargaFamiliar = { ...cargaFamiliar };
+    this.cargaFamiliar = {...cargaFamiliar};
+    this.selectedCliente = this.cargaFamiliar.cliente
+    this.parentesco = this.cargaFamiliar.parentesco
+    this.numeroCertificado = this.cargaFamiliar.numeroCertificado
+
     this.cargaFamiliarDialog = true;
   }
 
@@ -202,30 +206,35 @@ export class CargasFamiliaresComponent implements OnInit {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
     try {
-      if (!this.selectedCliente) {
-        this.cargaFamiliar.rolId = this.ROL_CLIENTE_ID
-        this.direccion.paisId = this.pais.id;
-        this.direccion.estadoId = this.estado.id;
-        this.cargaFamiliar.direccion = this.direccion;
-        this.cargaFamiliar.estado = 'P';
-        this.cargaFamiliar.contrasenia = environment.pass_default;
-      }else{
-        this.cargaFamiliar.clienteId = this.selectedCliente.id
-      }
+
       this.cargaFamiliar.parentesco = this.parentesco
       this.cargaFamiliar.numeroCertificado = this.numeroCertificado
-      this.cargaFamiliar.clientePolizaTitularId = this.clientePolizaId;
 
       if (this.cargaFamiliar.id) {
+        if (!this.selectedCliente?.id)
+          this.cargaFamiliar.clienteId = this.selectedCliente.id
+
         await this.cargasFamiliaresService.updateCargaFamiliar(this.cargaFamiliar.id, this.cargaFamiliar);
       } else {
+        if (!this.selectedCliente?.id) {
+          this.direccion.paisId = this.pais.id;
+          this.direccion.estadoId = this.estado.id;
+          this.cargaFamiliar.direccion = this.direccion;
+        } else
+          this.cargaFamiliar.clienteId = this.selectedCliente.id
+
+        this.cargaFamiliar.rolId = this.ROL_CLIENTE_ID
+        this.cargaFamiliar.estado = 'P';
+        this.cargaFamiliar.contrasenia = environment.pass_default;
+        this.cargaFamiliar.clientePolizaTitularId = this.clientePolizaId;
+
         await this.cargasFamiliaresService.createCargaFamiliar(this.cargaFamiliar);
       }
       this.first = 0
       await this.refrescarListado();
       this.cargaFamiliarDialog = false;
       this.cargaFamiliar = {};
-      this.messageService.add({ severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito' });
+      this.messageService.add({severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito'});
     } finally {
       this.loading = false; // Ocultar spinner
     }
