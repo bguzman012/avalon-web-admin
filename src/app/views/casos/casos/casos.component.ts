@@ -199,9 +199,9 @@ export class CasosComponent implements OnInit {
       this.first / this.pageSize,
       this.pageSize,
       this.busqueda,
+      this.selectedClientePoliza?.id ? this.selectedClientePoliza?.id : "",
       this.sortField,
       this.sortOrder,
-      this.selectedClientePoliza?.id ? this.selectedClientePoliza?.id : ""
     );
 
     this.casos = response.data;

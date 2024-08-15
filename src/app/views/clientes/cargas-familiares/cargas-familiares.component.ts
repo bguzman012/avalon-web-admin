@@ -6,6 +6,7 @@ import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
 import {PaisesService} from "../../../services/paises-service";
 import {EstadosService} from "../../../services/estados-service";
 import {UsuariosService} from "../../../services/usuarios-service";
+import {environment} from "../../../../environments/environment";
 
 @Component({
   selector: 'cargas-familiares',
@@ -42,6 +43,9 @@ export class CargasFamiliaresComponent implements OnInit {
   loading: boolean = false;
   clientePolizaId;
   clientePoliza
+
+  numeroCertificado
+  parentesco
 
   first: number = 0;
   pageSize: number = 10;
@@ -198,7 +202,19 @@ export class CargasFamiliaresComponent implements OnInit {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
     try {
-      this.cargaFamiliar.clientePolizaId = this.clientePolizaId;
+      if (!this.selectedCliente) {
+        this.cargaFamiliar.rolId = this.ROL_CLIENTE_ID
+        this.direccion.paisId = this.pais.id;
+        this.direccion.estadoId = this.estado.id;
+        this.cargaFamiliar.direccion = this.direccion;
+        this.cargaFamiliar.estado = 'P';
+        this.cargaFamiliar.contrasenia = environment.pass_default;
+      }else{
+        this.cargaFamiliar.clienteId = this.selectedCliente.id
+      }
+      this.cargaFamiliar.parentesco = this.parentesco
+      this.cargaFamiliar.numeroCertificado = this.numeroCertificado
+      this.cargaFamiliar.clientePolizaTitularId = this.clientePolizaId;
 
       if (this.cargaFamiliar.id) {
         await this.cargasFamiliaresService.updateCargaFamiliar(this.cargaFamiliar.id, this.cargaFamiliar);

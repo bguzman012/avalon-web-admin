@@ -36,18 +36,18 @@
         <th style="width: 3rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
-        <th pSortableColumn="nombres">Nombres
-          <p-sortIcon field="nombres"></p-sortIcon>
+        <th pSortableColumn="cliente">Nombres
+          <p-sortIcon field="cliente"></p-sortIcon>
         </th>
-        <th pSortableColumn="apellidos">Apellidos
-          <p-sortIcon field="apellidos"></p-sortIcon>
+        <th pSortableColumn="cliente">Apellidos
+          <p-sortIcon field="cliente"></p-sortIcon>
         </th>
-        <th pSortableColumn="correoElectronico">Correo Electrónico
+        <th pSortableColumn="cliente">Correo Electrónico
           <p-sortIcon
-            field="correoElectronico"></p-sortIcon>
+            field="cliente"></p-sortIcon>
         </th>
-        <th pSortableColumn="numeroTelefono">Número Teléfono
-          <p-sortIcon field="numeroTelefono"></p-sortIcon>
+        <th pSortableColumn="cliente">
+          Nombre Usuario <p-sortIcon field="cliente"></p-sortIcon>
         </th>
         <th pSortableColumn="parentesco">Parentesco
           <p-sortIcon field="parentesco"></p-sortIcon>
@@ -60,10 +60,10 @@
         <td>
           <p-tableCheckbox [value]="cargaFamiliar"></p-tableCheckbox>
         </td>
-        <td>{{ cargaFamiliar.nombres }} {{ cargaFamiliar.nombresDos }}</td>
-        <td>{{ cargaFamiliar.apellidos }} {{ cargaFamiliar.apellidosDos }}</td>
-        <td>{{ cargaFamiliar.correoElectronico }}</td>
-        <td>{{ cargaFamiliar.numeroTelefono }}</td>
+        <td>{{ cargaFamiliar.cliente.nombres }} {{ cargaFamiliar.cliente.nombresDos }}</td>
+        <td>{{ cargaFamiliar.cliente.apellidos }} {{ cargaFamiliar.cliente.apellidosDos }}</td>
+        <td>{{ cargaFamiliar.cliente.correoElectronico }}</td>
+        <td>{{ cargaFamiliar.cliente.nombreUsuario }}</td>
         <td>{{ cargaFamiliar.parentesco }}</td>
         <td style="text-align: right;">
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
@@ -350,7 +350,22 @@
 
       </p-accordionTab>
         <p-accordionTab header="Datos Cliente Poliza" [selected]="true">
-
+          <div class="p-grid p-fluid">
+            <div class="p-col-12 p-md-6">
+              <div class="p-field">
+                <label for="numeroCertificado">Número Certificado</label>
+                <input type="text" pInputText id="numeroCertificado" [(ngModel)]="numeroCertificado" required autofocus/>
+                <small class="p-invalid" *ngIf="submitted && !numeroCertificado">Número certificado is required.</small>
+              </div>
+            </div>
+            <div class="p-col-12 p-md-6">
+              <div class="p-field">
+                <label for="parentesco">Parentesco</label>
+                <input type="text" pInputText id="parentesco" [(ngModel)]="parentesco" required autofocus/>
+                <small class="p-invalid" *ngIf="submitted && !parentesco">Parentesco is required.</small>
+              </div>
+            </div>
+          </div>
         </p-accordionTab>
 
     </p-accordion>
