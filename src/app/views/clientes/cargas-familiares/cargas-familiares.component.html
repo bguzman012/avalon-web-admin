@@ -79,76 +79,286 @@
           <p-progressSpinner></p-progressSpinner>
         </div>
       </p-blockUI>
-      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first"
+                   (onPageChange)="onPageChange($event)"></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{totalRecords ? totalRecords : 0 }} registros.
+        En total existen {{ totalRecords ? totalRecords : 0 }} registros.
       </div>
     </ng-template>
   </p-table>
 </div>
 
-<p-dialog [(visible)]="cargaFamiliarDialog" [style]="{width: '600px'}" header="Detalle de Carga Familiar" [modal]="true"
+<!--<p-dialog [(visible)]="cargaFamiliarDialog" [style]="{width: '600px'}" header="Detalle de Carga Familiar" [modal]="true"-->
+<!--          styleClass="p-fluid">-->
+<!--  <ng-template pTemplate="content">-->
+
+<!--    <div class="p-grid p-fluid">-->
+<!--      <div class="p-col-12 p-md-6">-->
+<!--        <div class="p-field">-->
+<!--          <label for="nombres">Nombre Uno</label>-->
+<!--          <input type="text" pInputText id="nombres" [(ngModel)]="cargaFamiliar.nombres" required autofocus/>-->
+<!--          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombres">Nombre uno is required.</small>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div class="p-col-12 p-md-6">-->
+<!--        <div class="p-field">-->
+<!--          <label for="nombres">Nombre Dos</label>-->
+<!--          <input type="text" pInputText id="nombresDos" [(ngModel)]="cargaFamiliar.nombresDos" required autofocus/>-->
+<!--          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombresDos">Nombre dos is required.</small>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="p-grid p-fluid">-->
+<!--      <div class="p-col-12 p-md-6">-->
+<!--        <div class="p-field">-->
+<!--          <label for="apellidos">Apellido Uno</label>-->
+<!--          <input type="text" pInputText id="apellidos" [(ngModel)]="cargaFamiliar.apellidos" required autofocus/>-->
+<!--          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidos">Apellido uno is required.</small>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <div class="p-col-12 p-md-6">-->
+<!--        <div class="p-field">-->
+<!--          <label for="apellidosDos">Apellido Dos</label>-->
+<!--          <input type="text" pInputText id="apellidosDos" [(ngModel)]="cargaFamiliar.apellidosDos" required autofocus/>-->
+<!--          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidosDos">Apellido dos is required.</small>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+<!--    <div class="p-field">-->
+<!--      <label class="p-mb-3">Correo Electrónico</label>-->
+<!--      <input type="text" pInputText [(ngModel)]="cargaFamiliar.correoElectronico" required/>-->
+<!--      <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.correoElectronico">Correo Electrónico es-->
+<!--        requerido.</small>-->
+<!--    </div>-->
+<!--    <div class="p-field">-->
+<!--      <label class="p-mb-3">Número Teléfono</label>-->
+<!--      <input type="text" pInputText [(ngModel)]="cargaFamiliar.numeroTelefono" required/>-->
+<!--      <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.numeroTelefono">Número Teléfono es-->
+<!--        requerido.</small>-->
+<!--    </div>-->
+<!--    <div class="p-field">-->
+<!--      <label class="p-mb-3">Parentesco</label>-->
+<!--      <input type="text" pInputText [(ngModel)]="cargaFamiliar.parentesco" required/>-->
+<!--      <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.parentesco">Parentesco es requerido.</small>-->
+<!--    </div>-->
+
+<!--    <p-blockUI [blocked]="loading">-->
+<!--      <div class="p-field" *ngIf="loading">-->
+<!--        <p-progressSpinner></p-progressSpinner>-->
+<!--      </div>-->
+<!--    </p-blockUI>-->
+
+<!--  </ng-template>-->
+
+<!--  <ng-template pTemplate="footer">-->
+<!--    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"-->
+<!--            (click)="hideDialog()"></button>-->
+<!--    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"-->
+<!--            (click)="saveCargaFamiliar()"></button>-->
+<!--  </ng-template>-->
+<!--</p-dialog>-->
+
+<p-dialog [(visible)]="cargaFamiliarDialog" [style]="{width: '900px'}" header="Detalle de Carga Familiar" [modal]="true"
           styleClass="p-fluid">
   <ng-template pTemplate="content">
+    <p-accordion>
+      <p-accordionTab header="Datos Cliente" [selected]="true">
+    <p-divider align="left">
+      <b>Seleccionar un cliente</b>
 
-    <div class="p-grid p-fluid">
-      <div class="p-col-12 p-md-6">
-        <div class="p-field">
-          <label for="nombres">Nombre Uno</label>
-          <input type="text" pInputText id="nombres" [(ngModel)]="cargaFamiliar.nombres" required autofocus/>
-          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombres">Nombre uno is required.</small>
-        </div>
-      </div>
-
-      <div class="p-col-12 p-md-6">
-        <div class="p-field">
-          <label for="nombres">Nombre Dos</label>
-          <input type="text" pInputText id="nombresDos" [(ngModel)]="cargaFamiliar.nombresDos" required autofocus/>
-          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombresDos">Nombre dos is required.</small>
-        </div>
-      </div>
-    </div>
-    <div class="p-grid p-fluid">
-      <div class="p-col-12 p-md-6">
-        <div class="p-field">
-          <label for="apellidos">Apellido Uno</label>
-          <input type="text" pInputText id="apellidos" [(ngModel)]="cargaFamiliar.apellidos" required autofocus/>
-          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidos">Apellido uno is required.</small>
-        </div>
-      </div>
-      <div class="p-col-12 p-md-6">
-        <div class="p-field">
-          <label for="apellidosDos">Apellido Dos</label>
-          <input type="text" pInputText id="apellidosDos" [(ngModel)]="cargaFamiliar.apellidosDos" required autofocus/>
-          <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidosDos">Apellido dos is required.</small>
+    </p-divider>
+    <div>
+      <div class="p-grid p-fluid">
+        <div class="p-col-12 p-md-6">
+        <p-autoComplete
+          [(ngModel)]="selectedCliente"
+          [suggestions]="filteredClientes"
+          (completeMethod)="filterClientes($event)"
+          field="nombreUsuario"
+          [dropdown]="true"
+          [appendTo]="'body'"
+          placeholder="Filtrar por Cliente">
+        </p-autoComplete>
         </div>
       </div>
     </div>
+    <p-divider align="center"  *ngIf="!selectedCliente">
+      <b> Si no existe </b>
+    </p-divider>
+    <p-divider align="left" *ngIf="!selectedCliente">
+      <b>Crear cliente</b>
+    </p-divider>
+    <div *ngIf="!selectedCliente">
+      <div class="p-grid p-fluid">
+        <div class="p-col-12 p-md-6">
+          <div class="p-field">
+            <label for="nombres">Nombre Uno</label>
+            <input type="text" pInputText id="nombres" [(ngModel)]="cargaFamiliar.nombres" required autofocus/>
+            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombres">Nombre uno is required.</small>
+          </div>
+        </div>
 
-    <div class="p-field">
-      <label class="p-mb-3">Correo Electrónico</label>
-      <input type="text" pInputText [(ngModel)]="cargaFamiliar.correoElectronico" required/>
-      <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.correoElectronico">Correo Electrónico es
-        requerido.</small>
-    </div>
-    <div class="p-field">
-      <label class="p-mb-3">Número Teléfono</label>
-      <input type="text" pInputText [(ngModel)]="cargaFamiliar.numeroTelefono" required/>
-      <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.numeroTelefono">Número Teléfono es
-        requerido.</small>
-    </div>
-    <div class="p-field">
-      <label class="p-mb-3">Parentesco</label>
-      <input type="text" pInputText [(ngModel)]="cargaFamiliar.parentesco" required/>
-      <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.parentesco">Parentesco es requerido.</small>
+        <div class="p-col-12 p-md-6">
+          <div class="p-field">
+            <label for="nombres">Nombre Dos</label>
+            <input type="text" pInputText id="nombresDos" [(ngModel)]="cargaFamiliar.nombresDos" required autofocus/>
+            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombresDos">Nombre dos is required.</small>
+          </div>
+        </div>
+      </div>
+      <div class="p-grid p-fluid">
+        <div class="p-col-12 p-md-6">
+          <div class="p-field">
+            <label for="apellidos">Apellido Uno</label>
+            <input type="text" pInputText id="apellidos" [(ngModel)]="cargaFamiliar.apellidos" required autofocus/>
+            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidos">Apellido uno is required.</small>
+          </div>
+        </div>
+        <div class="p-col-12 p-md-6">
+          <div class="p-field">
+            <label for="apellidosDos">Apellido Dos</label>
+            <input type="text" pInputText id="apellidosDos" [(ngModel)]="cargaFamiliar.apellidosDos" required
+                   autofocus/>
+            <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidosDos">Apellido dos is required.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-field">
+        <label class="p-mb-3">Correo Electrónico</label>
+        <input type="text" pInputText [(ngModel)]="cargaFamiliar.correoElectronico"/>
+      </div>
+
+      <div class="p-field">
+        <label for="fechaNacimiento">Fecha de Inicio</label>
+        <p-calendar [(ngModel)]="cargaFamiliar.fechaNacimiento" dateFormat="dd/mm/yy"
+                    [showIcon]="true"></p-calendar>
+        <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.fechaNacimiento">Fecha de nacimiento es
+          requerido.</small>
+      </div>
+
+      <div class="p-field">
+        <label class="p-mb-3">Número Teléfono</label>
+        <input type="text" pInputText [(ngModel)]="cargaFamiliar.numeroTelefono"/>
+      </div>
+
+      <div class="p-field">
+        <label class="p-mb-3">Nombre Usuario</label>
+        <input type="text" pInputText [(ngModel)]="cargaFamiliar.nombreUsuario"/>
+      </div>
+
+      <div class="p-field">
+        <label for="direccionUno">Dirección</label>
+        <input
+          type="text"
+          pInputText
+          id="direccionUno"
+          [(ngModel)]="direccion.direccionUno"
+          required
+          autofocus
+        />
+        <small class="p-invalid" *ngIf="submitted && !direccion.direccionUno"
+        >Dirección uno es required.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="direccionDos">Dirección (2)</label>
+        <input
+          type="text"
+          pInputText
+          id="direccionDos"
+          [(ngModel)]="direccion.direccionDos"
+          required
+          autofocus
+        />
+        <small class="p-invalid" *ngIf="submitted && !direccion.direccionDos"
+        >Dirección dos es required.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="paisesId">País</label>
+        <p-autoComplete
+          [(ngModel)]="pais"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredPaises"
+          (completeMethod)="filterPaises($event)"
+          dropdown="true"
+          field="nombre"
+          (ngModelChange)="loadEstados()"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required
+        ></p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !pais"
+        >País es requerido.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="asesoresId">Estado</label>
+        <p-autoComplete
+          [(ngModel)]="estado"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredEstados"
+          (completeMethod)="filterEstados($event)"
+          [readonly]="!pais"
+          dropdown="true"
+          field="nombre"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required
+        ></p-autoComplete>
+        <small class="p-invalid" *ngIf="submitted && !estado">
+          Estado es requerido.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="ciudad">Ciudad</label>
+        <input
+          type="text"
+          pInputText
+          id="ciudad"
+          [(ngModel)]="direccion.ciudad"
+          required
+          autofocus
+        />
+        <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
+        >Ciudad es required.</small
+        >
+      </div>
+
+      <div class="p-field">
+        <label for="codigoPostal">Código Postal</label>
+        <input
+          type="text"
+          pInputText
+          id="codigoPostal"
+          [(ngModel)]="direccion.codigoPostal"
+          required
+          autofocus
+        />
+        <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
+        >Código Postal es required.</small
+        >
+      </div>
     </div>
 
+      </p-accordionTab>
+        <p-accordionTab header="Datos Cliente Poliza" [selected]="true">
+
+        </p-accordionTab>
+
+    </p-accordion>
     <p-blockUI [blocked]="loading">
       <div class="p-field" *ngIf="loading">
         <p-progressSpinner></p-progressSpinner>
       </div>
     </p-blockUI>
-
   </ng-template>
 
   <ng-template pTemplate="footer">

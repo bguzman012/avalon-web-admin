@@ -3,6 +3,9 @@ import {ConfirmationService, MessageService, SortEvent} from 'primeng/api';
 import { CargaFamiliarService } from '../../../services/cargas-familiares-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
+import {PaisesService} from "../../../services/paises-service";
+import {EstadosService} from "../../../services/estados-service";
+import {UsuariosService} from "../../../services/usuarios-service";
 
 @Component({
   selector: 'cargas-familiares',
@@ -22,6 +25,20 @@ export class CargasFamiliaresComponent implements OnInit {
   selectedCargasFamiliares: any[];
   submitted: boolean;
   cargaFamiliar: any;
+  selectedCliente: any; // Cliente seleccionado en el filtro
+
+  direccion: any;
+
+  paises: any[];
+  estados: any[];
+
+  pais: any;
+  estado: any;
+
+  filteredPaises: any[];
+  filteredEstados: any[];
+  filteredClientes: any[]; // Clientes filtrados para el autocompletado
+
   loading: boolean = false;
   clientePolizaId;
   clientePoliza
@@ -33,14 +50,19 @@ export class CargasFamiliaresComponent implements OnInit {
   busqueda: string = '';
   sortField
   sortOrder
+  ROL_CLIENTE_ID = 3;
+  ESTADO_ACTIVO = 'A';
 
   constructor(
     private messageService: MessageService,
     private cargasFamiliaresService: CargaFamiliarService,
     private confirmationService: ConfirmationService,
     private clientePolizaService: ClientePolizaService,
+    private paisesService: PaisesService,
+    private estadosService: EstadosService,
     private route: ActivatedRoute,
     private router: Router,
+    private usuariosService: UsuariosService
   ) { }
 
   async ngOnInit() {
@@ -70,6 +92,44 @@ export class CargasFamiliaresComponent implements OnInit {
 
   }
 
+  async filterClientes(event) {
+    let query = event.query;
+
+    const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      query
+    );
+
+    this.filteredClientes = responseCliente.data
+    this.filteredClientes = this.filteredClientes.filter(cliente => cliente.id != this.clientePoliza.cliente.id)
+  }
+
+
+  filterPaises(event): void {
+    let query = event.query;
+    this.filteredPaises = this.paises.filter(
+      (pais) => pais.nombre.toLowerCase().indexOf(query.toLowerCase()) === 0
+    );
+  }
+
+  filterEstados(event): void {
+    let query = event.query;
+    this.filteredEstados = this.estados.filter(
+      (obj) => obj.nombre.toLowerCase().indexOf(query.toLowerCase()) === 0
+    );
+  }
+
+  async loadEstados() {
+    if (this.pais.id)
+      this.estados = await this.estadosService.obtenerEstadosByPais(
+        this.pais.id
+      );
+  }
+
+
   async onSort(event: SortEvent) {
     if (event.field !== this.sortField || event.order !== this.sortOrder) {
       this.loading = true
@@ -82,8 +142,17 @@ export class CargasFamiliaresComponent implements OnInit {
 
   openNew() {
     this.cargaFamiliar = {};
+    this.direccion = {};
+
+    this.cargaFamiliar.fechaNacimiento = new Date();
+
     this.submitted = false;
+    this.prepareData()
     this.cargaFamiliarDialog = true;
+  }
+
+  async prepareData() {
+    this.paises = await this.paisesService.obtenerPaises();
   }
 
   async onPageChange(event) {

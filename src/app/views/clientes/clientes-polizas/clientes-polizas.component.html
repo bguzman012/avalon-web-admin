@@ -39,6 +39,10 @@
           Código
           <p-sortIcon field="codigo"></p-sortIcon>
         </th>
+        <th pSortableColumn="numeroCertificado">
+          Num. Cert.
+          <p-sortIcon field="numeroCertificado"></p-sortIcon>
+        </th>
         <th pSortableColumn="poliza">
           Poliza
           <p-sortIcon field="poliza"></p-sortIcon>
@@ -68,6 +72,7 @@
           <p-tableCheckbox [value]="clientePoliza"></p-tableCheckbox>
         </td>
         <td>{{ clientePoliza.codigo }}</td>
+        <td>{{ clientePoliza.numeroCertificado }}</td>
         <td>{{ clientePoliza.poliza.nombre }}</td>
         <td>{{ clientePoliza.asesor.nombreUsuario }}</td>
         <td>{{ clientePoliza.agente.nombreUsuario }}</td>
@@ -106,6 +111,14 @@
 <p-dialog [(visible)]="polizaDialog" [style]="{ width: '500px' }" header="{{codigoDocumento}}" [modal]="true"
           styleClass="p-fluid">
   <ng-template pTemplate="content">
+
+    <div class="p-field">
+      <label class="p-mb-3">Número Certificado</label>
+      <input type="text" pInputText [(ngModel)]="polizaCliente.numeroCertificado" required/>
+      <small class="p-invalid" *ngIf="submitted && !polizaCliente.numeroCertificado"
+      >Número de certificado es requerido.</small>
+    </div>
+
     <div class="p-field">
       <label for="asesoresId">Aseguradora</label>
       <p-autoComplete

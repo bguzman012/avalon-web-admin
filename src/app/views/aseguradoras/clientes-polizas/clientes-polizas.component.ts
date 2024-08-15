@@ -60,6 +60,8 @@ export class ClientesPolizasComponent implements OnInit {
   busqueda: string = '';
   sortField
   sortOrder
+  ROL_ADMINISTRADOR_ID = 1
+
 
   constructor(
     private messageService: MessageService,

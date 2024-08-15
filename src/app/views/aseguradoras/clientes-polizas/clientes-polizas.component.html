@@ -34,19 +34,23 @@
         <th style="width: 3rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
-        <th pSortableColumn="id">
+        <th pSortableColumn="codigo">
           Código
-          <p-sortIcon field="id"></p-sortIcon>
+          <p-sortIcon field="codigo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="numeroCertificado">
+          Num. Cert.
+          <p-sortIcon field="numeroCertificado"></p-sortIcon>
         </th>
         <th pSortableColumn="cliente">
           Cliente
           <p-sortIcon field="cliente"></p-sortIcon>
         </th>
-        <th pSortableColumn="asesor">
+        <th pSortableColumn="asesor" *ngIf="user?.rol.id == ROL_ADMINISTRADOR_ID">
           Asesor
           <p-sortIcon field="asesor"></p-sortIcon>
         </th>
-        <th pSortableColumn="agente">
+        <th pSortableColumn="agente" *ngIf="user?.rol.id == ROL_ADMINISTRADOR_ID">
           Agente
           <p-sortIcon field="agente"></p-sortIcon>
         </th>
@@ -66,10 +70,11 @@
         <td>
           <p-tableCheckbox [value]="clientePoliza"></p-tableCheckbox>
         </td>
-        <td>{{ clientePoliza.id }}</td>
+        <td>{{ clientePoliza.codigo }}</td>
+        <td>{{ clientePoliza.numeroCertificado }}</td>
         <td>{{ clientePoliza.cliente.nombreUsuario }}</td>
-        <td>{{ clientePoliza.asesor.nombreUsuario }}</td>
-        <td>{{ clientePoliza.agente.nombreUsuario }}</td>
+        <td *ngIf="user?.rol.id == ROL_ADMINISTRADOR_ID">{{ clientePoliza.asesor.nombreUsuario }}</td>
+        <td *ngIf="user?.rol.id == ROL_ADMINISTRADOR_ID">{{ clientePoliza.agente.nombreUsuario }}</td>
         <td>{{ clientePoliza.fechaInicio }}</td>
         <td>{{ clientePoliza.fechaFin }}</td>
 
@@ -99,6 +104,12 @@
 <p-dialog [(visible)]="polizaDialog" [style]="{ width: '500px' }" header="Detalle de Póliza" [modal]="true"
           styleClass="p-fluid">
   <ng-template pTemplate="content">
+    <div class="p-field">
+      <label class="p-mb-3">Número Certificado</label>
+      <input type="text" pInputText [(ngModel)]="polizaCliente.numeroCertificado" required/>
+      <small class="p-invalid" *ngIf="submitted && !polizaCliente.numeroCertificado"
+      >Número de certificado es requerido.</small>
+    </div>
     <div class="p-field">
       <label for="asesoresId">Poliza</label>
       <p-autoComplete

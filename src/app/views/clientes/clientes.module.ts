@@ -1,6 +1,6 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {
   ButtonGroupModule,
@@ -13,7 +13,7 @@ import {
 } from '@coreui/angular';
 
 
-import { ClientesRoutingModule } from './clientes-routing.module';
+import {ClientesRoutingModule} from './clientes-routing.module';
 
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
@@ -29,21 +29,24 @@ import {InputTextModule} from 'primeng/inputtext';
 import {FileUploadModule} from 'primeng/fileupload';
 import {ToolbarModule} from 'primeng/toolbar';
 import {RatingModule} from 'primeng/rating';
+import {AccordionModule} from 'primeng/accordion';
 import {RadioButtonModule} from 'primeng/radiobutton';
 import {InputNumberModule} from 'primeng/inputnumber';
 import {PaginatorModule} from 'primeng/paginator';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import { BlockUIModule } from 'primeng/blockui';
-import { MessageService } from 'primeng/api';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import {ConfirmationService} from 'primeng/api';
+import {BlockUIModule} from 'primeng/blockui';
+import {MessageService} from 'primeng/api';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {InputTextareaModule} from 'primeng/inputtextarea';
 // import { MembresiasComponent } from './membresias/membresias.component';
-import { AutoCompleteModule } from 'primeng/autocomplete';
-import { ClientesComponent } from './clientes/clientes.component';
-import { ClientesMembresiasComponent } from './clientes-membresias/clientes-membresias.component';
-import { ClientesPolizasComponent } from './clientes-polizas/clientes-polizas.component';
-import { CargasFamiliaresComponent } from './cargas-familiares/cargas-familiares.component';
+import {AutoCompleteModule} from 'primeng/autocomplete';
+import {ClientesComponent} from './clientes/clientes.component';
+import {ClientesMembresiasComponent} from './clientes-membresias/clientes-membresias.component';
+import {ClientesPolizasComponent} from './clientes-polizas/clientes-polizas.component';
+import {CargasFamiliaresComponent} from './cargas-familiares/cargas-familiares.component';
+import {DividerModule} from "primeng/divider";
+
 // import { MedCentrosMedicosAseguradorasComponent } from './clientes-membresias/clientes-membresias.component';
 
 
@@ -73,15 +76,16 @@ import { CargasFamiliaresComponent } from './cargas-familiares/cargas-familiares
     PaginatorModule,
     TableModule,
     CalendarModule,
-		SliderModule,
-		DialogModule,
+    SliderModule,
+    DialogModule,
     BlockUIModule,
     ProgressSpinnerModule,
-		MultiSelectModule,
-		ContextMenuModule,
-		DropdownModule,
-		ButtonModule,
-		ToastModule,
+    MultiSelectModule,
+    ContextMenuModule,
+    DropdownModule,
+    ButtonModule,
+    AccordionModule,
+    ToastModule,
     InputTextModule,
     ProgressBarModule,
     FileUploadModule,
@@ -92,6 +96,7 @@ import { CargasFamiliaresComponent } from './cargas-familiares/cargas-familiares
     InputNumberModule,
     ConfirmDialogModule,
     InputTextareaModule,
+    DividerModule,
   ]
 })
 export class ClientesModule {
