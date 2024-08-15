@@ -13,7 +13,7 @@ import {
 } from '@coreui/angular';
 
 
-import { EmergenciasRoutingModule } from './emergencias-routing.module';
+import { CasosRoutingModule } from './casos-routing.module';
 
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
@@ -38,63 +38,64 @@ import { MessageService } from 'primeng/api';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { AutoCompleteModule } from 'primeng/autocomplete';
-import {PanelModule} from 'primeng/panel';
-import { EmergenciasComponent } from './emergencias/emergencias.component';
-import { AddEmergenciasComponent } from './add-emergencias/add-emergencias.component';
 import {PaginatorModule} from "primeng/paginator";
-import {DividerModule} from "primeng/divider";
+import {CasosComponent} from "./casos/casos.component";
+import {PanelModule} from "primeng/panel";
+import {AddCasosComponent} from "./add-casos/add-casos.component";
+import {CitasMedicasModule} from "../citas-medicas/citas-medicas.module";
+import {EmergenciasModule} from "../emergencias/emergencias.module";
+import {ReclamacionesModule} from "../reclamaciones/reclamaciones.module";
 
 
 @NgModule({
-    declarations: [
-        EmergenciasComponent,
-        AddEmergenciasComponent
-    ],
-    exports: [
-        EmergenciasComponent
-    ],
-    imports: [
-        CommonModule,
-        EmergenciasRoutingModule,
-        CardModule,
-        FormModule,
-        GridModule,
-        FormsModule,
-        PanelModule,
-        ReactiveFormsModule,
-        FormModule,
-        ButtonGroupModule,
-        DropdownModule,
-        AlertModule,
-        TableModule,
-        SharedModule,
-        ListGroupModule,
-        AutoCompleteModule,
-        DividerModule,
+  declarations: [
+    CasosComponent,
+    AddCasosComponent
+  ],
+  imports: [
+    CommonModule,
+    CasosRoutingModule,
+    CardModule,
+    FormModule,
+    GridModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FormModule,
+    ButtonGroupModule,
+    DropdownModule,
+    AlertModule,
+    TableModule,
+    SharedModule,
+    ListGroupModule,
+    AutoCompleteModule,
 
-        TableModule,
-        CalendarModule,
-        SliderModule,
-        DialogModule,
-        BlockUIModule,
-        ProgressSpinnerModule,
-        MultiSelectModule,
-        ContextMenuModule,
-        DropdownModule,
-        ButtonModule,
-        ToastModule,
-        InputTextModule,
-        ProgressBarModule,
-        FileUploadModule,
-        ToolbarModule,
-        RatingModule,
-        FormsModule,
-        RadioButtonModule,
-        InputNumberModule,
-        ConfirmDialogModule,
-        InputTextareaModule,
-        PaginatorModule,
-    ]
+    TableModule,
+    CalendarModule,
+    SliderModule,
+    DialogModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    MultiSelectModule,
+    ContextMenuModule,
+    DropdownModule,
+    ButtonModule,
+    ToastModule,
+    InputTextModule,
+    ProgressBarModule,
+    FileUploadModule,
+    ToolbarModule,
+    RatingModule,
+    FormsModule,
+    RadioButtonModule,
+    InputNumberModule,
+    ConfirmDialogModule,
+    InputTextareaModule,
+    PaginatorModule,
+    PanelModule,
+    CitasMedicasModule,
+    EmergenciasModule,
+    ReclamacionesModule,
+  ]
 })
-export class EmergenciasModule {
+export class CasosModule {
 }

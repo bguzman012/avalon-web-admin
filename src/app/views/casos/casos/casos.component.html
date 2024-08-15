@@ -1,20 +1,26 @@
 <p-toast></p-toast>
+
 <div class="card">
+
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left">
-
-      <h5 class="p-m-0" *ngIf="!originCaso">Administrar Citas Médicas</h5>
-      <h6 class="p-m-0" *ngIf="originCaso">Citas Médicas</h6>
-
-
+      <h5 class="p-m-0">Administrar Casos</h5>
     </ng-template>
 
     <ng-template pTemplate="right">
-      <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2 medium-button"
-              (click)="redirectToDetailCitaMedicaPage()"></button>
+      <button
+        pButton
+        pRipple
+        label="Nueva"
+        icon="pi pi-plus"
+        [disabled]="!activarCreate"
+        class="p-button-success p-mr-2"
+        (click)="openNew()"
+      ></button>
     </ng-template>
   </p-toolbar>
-  <p-panel *ngIf="!originCaso">
+
+  <p-panel>
     <div class="filter-container">
       <!-- Filtro por Cliente -->
       <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
@@ -34,29 +40,26 @@
                       [maxlength]="50">
       </p-autoComplete>
 
-      <p-autoComplete
-        [(ngModel)]="selectedCaso"
-        [suggestions]="filteredCasos"
-        (completeMethod)="filterCasos($event)"
-        field="displayName"
-        [dropdown]="true"
-        placeholder="Filtrar por Caso"
-        [disabled]="!selectedClientePoliza?.id">
-      </p-autoComplete>
 
-      <button pButton pRipple class="p-button-primary p-mr-2" (click)="manageListado()">Buscar</button>
+
+      <button pButton pRipple class="p-button-primary p-mr-2" (click)="refrescarListado()">Buscar</button>
     </div>
   </p-panel>
 
-  <p-table #dt [value]="citasMedicas"
-           [(selection)]="selectedCitasMedicas" [rowHover]="true" dataKey="id"
-           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-           [showCurrentPageReport]="true"
-           (onSort)="onSort($event)"
-           [customSort]="true">
+  <p-table
+    #dt
+    [value]="casos"
+    [(selection)]="selectedCasos"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    [showCurrentPageReport]="true"
+    (onSort)="onSort($event)"
+    [customSort]="true"
+  >
     <ng-template pTemplate="caption">
       <div class="p-d-flex p-ai-center p-jc-between">
-        <h5 class="p-m-0"></h5>
+        <h5 class="p-m-0">Administrar Casos</h5>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
@@ -67,7 +70,6 @@
           />
         </span>
       </div>
-
     </ng-template>
 
     <ng-template pTemplate="header">
@@ -75,43 +77,59 @@
         <th style="width: 3rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
-        <th pSortableColumn="codigo">Código
-          <p-sortIcon field="codigo"></p-sortIcon>
+        <th pSortableColumn="codigo">
+          Código <p-sortIcon field="codigo"></p-sortIcon>
         </th>
-        <th pSortableColumn="estado">Estado
-          <p-sortIcon field="estado"></p-sortIcon>
+        <th pSortableColumn="clientePoliza.cliente">
+          Cliente <p-sortIcon field="clientePoliza.cliente"></p-sortIcon>
+        </th>
+        <th pSortableColumn="clientePoliza">
+          Poliza <p-sortIcon field="clientePoliza"></p-sortIcon>
         </th>
         <th></th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-citaMedica>
+    <ng-template pTemplate="body" let-caso>
       <tr>
         <td>
-          <p-tableCheckbox [value]="citaMedica"></p-tableCheckbox>
+          <p-tableCheckbox [value]="caso"></p-tableCheckbox>
         </td>
-        <td>{{ citaMedica.codigo }}</td>
-        <td>{{ citaMedica.estado }}</td>
+        <td>{{ caso.codigo }}</td>
+        <td>{{ caso.clienteDisplayName }}</td>
+        <td>{{ caso.clientePoliza.displayName }}</td>
         <td>
-          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 medium-button"
-                  (click)="editCitaMedica(citaMedica)"></button>
-          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning medium-button"
-                  (click)="deleteCitaMedica(citaMedica)"></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success p-mr-2 medium-button"
+            (click)="editCaso(caso); $event.stopPropagation()"
+          ></button>
+          <button
+            pButton
+            pRipple
+            [disabled]="!activarCreate"
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning medium-button"
+            (click)="deleteCaso(caso); $event.stopPropagation()"
+          ></button>
         </td>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="summary">
       <p-blockUI [blocked]="loading">
         <div class="p-field" *ngIf="loading">
           <p-progressSpinner></p-progressSpinner>
         </div>
       </p-blockUI>
-      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first"
-                   (onPageChange)="onPageChange($event)"></p-paginator>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen {{ totalRecords ? totalRecords : 0 }} registros.
+        En total existen {{totalRecords ? totalRecords : 0  }} registros.
       </div>
     </ng-template>
+
   </p-table>
 </div>
 
-<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

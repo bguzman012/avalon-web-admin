@@ -19,13 +19,13 @@ export class CitasMedicasService {
     size: number,
     busqueda: string,
     sortField: string | null = 'createdDate',
-    sortOrder: number | null = -1
+    sortOrder: number | null = -1,
+    casoId: string | null = ""
   ): Promise<any> {
     try {
       const order = sortOrder === 1 ? 'asc' : 'desc';
       const sort = `&sortField=${sortField}&sortOrder=${order}`;
-
-      const citasMedicas = await this.http.get<any[]>(`${this.apiUrl}/citasMedicas?estado=${estado}&clientePolizaId=${clientePolizaId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
+      const citasMedicas = await this.http.get<any[]>(`${this.apiUrl}/citasMedicas?estado=${estado}&clientePolizaId=${clientePolizaId}&casoId=${casoId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de citasMedicas:', citasMedicas);
       return citasMedicas;
     } catch (error) {

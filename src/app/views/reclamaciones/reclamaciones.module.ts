@@ -47,10 +47,13 @@ import {PaginatorModule} from "primeng/paginator";
 
 
 @NgModule({
-  declarations: [
-    ReclamacionesComponent,
-    AddReclamacionesComponent
-  ],
+    declarations: [
+        ReclamacionesComponent,
+        AddReclamacionesComponent
+    ],
+    exports: [
+        ReclamacionesComponent
+    ],
     imports: [
         CommonModule,
         ReclamacionesRoutingModule,

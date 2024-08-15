@@ -97,6 +97,11 @@ const routes: Routes = [
         loadChildren: () =>
           import('./views/metodos-pago/metodos-pago.module').then((m) => m.MetodosPagoModule)
       },
+      {
+        path: 'casos',
+        loadChildren: () =>
+          import('./views/casos/casos.module').then((m) => m.CasosModule)
+      },
       // {
       //   path: 'aseguradoras',
       //   loadChildren: () =>

@@ -20,13 +20,14 @@ export class EmergenciasService {
     size: number,
     busqueda: string,
     sortField: string | null = 'createdDate',
-    sortOrder: number | null = -1
+    sortOrder: number | null = -1,
+    casoId: string | null = ""
   ): Promise<any> {
     try {
       const order = sortOrder === 1 ? 'asc' : 'desc';
       const sort = `&sortField=${sortField}&sortOrder=${order}`;
 
-      const emergencias = await this.http.get<any[]>(`${this.apiUrl}/emergencias?estado=${estado}&clientePolizaId=${clientePolizaId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
+      const emergencias = await this.http.get<any[]>(`${this.apiUrl}/emergencias?estado=${estado}&clientePolizaId=${clientePolizaId}&casoId=${casoId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de emergencias:', emergencias);
       return emergencias;
     } catch (error) {

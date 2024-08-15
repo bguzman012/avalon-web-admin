@@ -1,20 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, MessageService, SortEvent } from 'primeng/api';
-import { EmergenciasService } from '../../../services/emergencias-service';
-import { UsuariosService } from '../../../services/usuarios-service';
-import { environment } from '../../../../environments/environment';
-import { FilterService } from "primeng/api";
-import { AseguradorasService } from 'src/app/services/aseguradoras-service';
-import { PolizasService } from 'src/app/services/polizas-service';
-import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
-import { Router } from '@angular/router';
+import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
+import {ConfirmationService, MessageService, SortEvent} from 'primeng/api';
+import {EmergenciasService} from '../../../services/emergencias-service';
+import {UsuariosService} from '../../../services/usuarios-service';
+import {environment} from '../../../../environments/environment';
+import {FilterService} from "primeng/api";
+import {AseguradorasService} from 'src/app/services/aseguradoras-service';
+import {PolizasService} from 'src/app/services/polizas-service';
+import {ClientePolizaService} from 'src/app/services/polizas-cliente-service';
+import {Router} from '@angular/router';
+import {CasosService} from "../../../services/casos-service";
 
 @Component({
-  selector: 'emergencias',
+  selector: 'app-emergencias',
   templateUrl: './emergencias.component.html',
   styleUrls: ['./emergencias.component.scss'],
 })
 export class EmergenciasComponent implements OnInit {
+  @Input() originCaso: boolean = false;
+  @Input() caso: any;
+
   emergenciaDialog: boolean;
   emergencias: any[];
   selectedEmergencias: any[];
@@ -29,10 +33,12 @@ export class EmergenciasComponent implements OnInit {
   selectedCliente: any; // Cliente seleccionado en el filtro
   selectedAseguradora: any; // Aseguradora seleccionada en el filtro
   selectedClientePoliza: any; // Poliza seleccionada en el filtro
+  selectedCaso: any; // Poliza seleccionada en el filtro
 
   filteredClientes: any[]; // Clientes filtrados para el autocompletado
   filteredAseguradoras: any[]; // Aseguradoras filtradas para el autocompletado
   filteredPolizas: any[]; // Pólizas filtradas para el autocompletado
+  filteredCasos: any[]; // Pólizas filtradas para el autocompletado
 
   ROL_CLIENTE_ID = 3;
   ESTADO_ACTIVO = 'A';
@@ -51,27 +57,73 @@ export class EmergenciasComponent implements OnInit {
     private usuariosService: UsuariosService,
     private confirmationService: ConfirmationService,
     private router: Router,
-    private clientesPolizasService: ClientePolizaService
-  ) { }
+    private clientesPolizasService: ClientePolizaService,
+    private casosService: CasosService
+
+  ) {
+  }
+
+  async ngOnChanges(changes: SimpleChanges) {
+    if (changes['caso']) {
+      await this.onChangeCaso()
+    }
+  }
 
   async ngOnInit() {
 
     this.loading = true
-    this.prepareData();
-    const response = await this.emergenciasService.obtenerEmergencias(
-      "",
-      "",
-      0,
-      10,
-      "",
-      this.sortField,
-      this.sortOrder);
+    if (!this.originCaso) {
+      this.prepareData();
+      const response = await this.emergenciasService.obtenerEmergencias(
+        "",
+        "",
+        0,
+        10,
+        "",
+        this.sortField,
+        this.sortOrder);
 
-    this.emergencias = response.data;
-    this.totalRecords = response.totalRecords;
+      this.emergencias = response.data;
+      this.totalRecords = response.totalRecords;
+    } else
+      this.pageSize = 5
 
     this.loading = false
   }
+
+  async filterCasos(event) {
+    let query = event.query;
+
+    const filteredCasos = await this.casosService.obtenerCasos(
+      0,
+      10,
+      query,
+      this.selectedClientePoliza?.id ? this.selectedClientePoliza?.id : "");
+
+    this.filteredCasos = filteredCasos.data
+  }
+
+  async onChangeCaso() {
+    console.log("CAMBIOS EMERGENCIAS")
+    if (this.caso?.id) {
+      const response = await this.emergenciasService.obtenerEmergencias(
+        "",
+        this.caso.clientePoliza.id,
+        0,
+        this.pageSize,
+        "",
+        this.sortField,
+        this.sortOrder,
+        this.caso.id);
+
+      this.emergencias = response.data;
+      this.totalRecords = response.totalRecords;
+      this.selectedClientePoliza = this.caso.clientePoliza
+      this.selectedCliente = this.caso.clientePoliza.cliente
+      this.selectedCaso = this.caso
+    }
+  }
+
 
   async prepareData() {
     const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
@@ -94,19 +146,23 @@ export class EmergenciasComponent implements OnInit {
   }
 
   async editEmergencia(emergencia: any) {
-    this.emergencia = { ...emergencia };
+    this.emergencia = {...emergencia};
+    let redirect = !this.originCaso ? 'emergencias/detalle-emergencia' : 'casos/detalle-caso/detalle-emergencia';
+
     let queryParamsClientePoliza = {}
-    if (this.selectedClientePoliza && this.selectedClientePoliza.id) {
+    if (this.selectedCaso?.id) {
       queryParamsClientePoliza = {
         clientePolizaId: this.selectedClientePoliza.id,
-        clienteId: this.selectedCliente.id
+        clienteId: this.selectedCliente.id,
+        casoId: this.selectedCaso.id,
+        originCaso: this.originCaso
       };
     }
 
     if (this.emergencia && this.emergencia.id) {
       localStorage.setItem('emergencia', JSON.stringify(this.emergencia));
-      queryParamsClientePoliza['emergenciaId']= this.emergencia.id
-      this.router.navigate(['emergencias/detalle-emergencia'], {
+      queryParamsClientePoliza['emergenciaId'] = this.emergencia.id
+      this.router.navigate([redirect], {
         queryParams: queryParamsClientePoliza,
       });
     }
@@ -142,7 +198,7 @@ export class EmergenciasComponent implements OnInit {
         "",
         "",
         this.first / this.pageSize,
-        10,
+        this.pageSize,
         this.busqueda,
         this.sortField,
         this.sortOrder);
@@ -151,15 +207,16 @@ export class EmergenciasComponent implements OnInit {
         "",
         this.selectedClientePoliza.id,
         this.first / this.pageSize,
-        10,
+        this.pageSize,
         this.busqueda,
         this.sortField,
-        this.sortOrder);
+        this.sortOrder,
+        this.selectedCaso.id);
 
     this.emergencias = response.data
   }
 
-  async filterClientes(event){
+  async filterClientes(event) {
     let query = event.query;
 
     const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
@@ -225,19 +282,28 @@ export class EmergenciasComponent implements OnInit {
   }
 
   redirectToDetailEmergenciaPage() {
-    if (this.selectedClientePoliza && this.selectedClientePoliza.id) {
+    let redirect = !this.originCaso ? 'emergencias/detalle-emergencia' : 'casos/detalle-caso/detalle-emergencia';
+
+    if (this.selectedCaso?.id) {
       localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
+      localStorage.setItem("caso", JSON.stringify(this.caso));
+
       const queryParamsClientePoliza = {
         clientePolizaId: this.selectedClientePoliza.id,
-        clienteId: this.selectedCliente.id
+        clienteId: this.selectedCliente.id,
+        casoId: this.selectedCaso.id,
+        originCaso: this.originCaso
       };
-      this.router.navigate(['emergencias/detalle-emergencia'], {
+      this.router.navigate([redirect], {
         queryParams: queryParamsClientePoliza,
       });
-    } else {
-      localStorage.removeItem("clientePoliza");
-      this.router.navigate(['emergencias/detalle-emergencia']);
+      return
     }
+
+    localStorage.removeItem("clientePoliza");
+    localStorage.removeItem("caso");
+    this.router.navigate([redirect]);
+
   }
 
 }

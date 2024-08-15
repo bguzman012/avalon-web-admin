@@ -16,9 +16,11 @@ import {MedicoCentroMedicoAseguradorasService} from "../../../services/med-centr
 import {CentrosMedicosService} from "../../../services/centros-medicos-service";
 import {PaisesService} from "../../../services/paises-service";
 import {EstadosService} from "../../../services/estados-service";
+import {CasosService} from "../../../services/casos-service";
+
 
 @Component({
-  selector: 'add-emergencias',
+  selector: 'app-add-emergencias',
   templateUrl: './add-emergencias.component.html',
   styleUrls: ['./add-emergencias.component.scss'],
 })
@@ -35,10 +37,14 @@ export class AddEmergenciasComponent implements OnInit {
 
   selectedCliente: any; // Cliente seleccionado en el filtro
   selectedClientePoliza: any; // Poliza seleccionada en el filtro
+  selectedCaso: any; // Poliza seleccionada en el filtro
 
   filteredClientes: any[]; // Clientes filtrados para el autocompletado
   filteredAseguradoras: any[]; // Aseguradoras filtradas para el autocompletado
   filteredPolizas: any[]; // Pólizas filtradas para el autocompletado
+  filteredCasos: any[]; // Pólizas filtradas para el autocompletado
+
+  casoId: number;
 
   ROL_CLIENTE_ID = 3;
   ESTADO_ACTIVO = 'A';
@@ -75,6 +81,7 @@ export class AddEmergenciasComponent implements OnInit {
   filteredPaises: any[];
   filteredEstados: any[];
 
+  originCaso: boolean = false
 
   constructor(
     private messageService: MessageService,
@@ -89,6 +96,8 @@ export class AddEmergenciasComponent implements OnInit {
     private authService: AuthService,
     private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService,
     private centrosMedicosService: CentrosMedicosService,
+    private casosService: CasosService,
+
   ) {
   }
 
@@ -107,6 +116,8 @@ export class AddEmergenciasComponent implements OnInit {
 
       this.codigoDocumento = "# " + this.emergencia.codigo
       this.selectedCliente = this.emergencia.clientePoliza.cliente
+
+      console.log(this.emergencia, "  EMERGENCIAS")
 
       if (this.emergencia.direccion) {
         this.direccion = this.emergencia.direccion;
@@ -128,12 +139,14 @@ export class AddEmergenciasComponent implements OnInit {
       this.clientes = responseCliente.data
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
+      const casoParam = JSON.parse(localStorage.getItem("caso"))
+
       this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.emergencia.clientePoliza
+      this.selectedCaso = casoParam ? casoParam : this.emergencia.caso
 
       this.medicoCentroMedicoAseguradora = this.emergencia.medicoCentroMedicoAseguradora
       this.centroMedico = this.emergencia.medicoCentroMedicoAseguradora.centroMedico
 
-      await this.loadPolizas(true);
       this.comentarios = await this.comentariosEmergenciasService.getComentariosByEmergencia(this.emergenciaId);
       this.loading = false;
 
@@ -156,12 +169,25 @@ export class AddEmergenciasComponent implements OnInit {
       return
     }
 
+    if (await this.getRouteParamsBoolean('originCaso'))
+      this.originCaso = await this.getRouteParamsBoolean('originCaso');
+
     if (await this.getRouteParams('clientePolizaId'))
       this.clientePolizaId = +(await this.getRouteParams('clientePolizaId'));
 
-    if (this.clientePolizaId) {
-      this.clienteId = +(await this.getRouteParams('clienteId'));
-      await this.prepareClientePolizaData();
+    if (await this.getRouteParams('casoId'))
+      this.casoId = +(await this.getRouteParams('casoId'));
+
+    const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
+    const casoParam = JSON.parse(localStorage.getItem("caso"))
+
+    if (clientePolizaParm) {
+      this.selectedClientePoliza = clientePolizaParm
+      this.selectedCliente = clientePolizaParm.cliente
+    }
+
+    if (casoParam){
+      this.selectedCaso = casoParam
     }
 
     this.loading = false;
@@ -304,14 +330,24 @@ export class AddEmergenciasComponent implements OnInit {
       );
   }
 
-
-  hideDialog() {
-    this.emergenciaDialog = false;
-    this.submitted = false;
+  private getRouteParamsBoolean(param: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.route.queryParams.subscribe((params) => resolve(params[param]));
+    });
   }
 
   async saveEmergencia() {
     this.submitted = true;
+
+    if (!this.selectedCaso?.id) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error!',
+        detail: 'Caso es requerido',
+        life: 3000,
+      });
+      return
+    }
 
     if (!this.imagen) {
       this.messageService.add({
@@ -338,6 +374,7 @@ export class AddEmergenciasComponent implements OnInit {
     this.emergencia.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora.id
     this.emergencia.clientePolizaId = this.selectedClientePoliza.id
     this.emergencia.nombreDocumento = this.nombreDocumento
+    this.emergencia.casoId = this.selectedCaso.id
 
     this.direccion.paisId = this.pais.id;
     this.direccion.estadoId = this.estado.id;
@@ -365,6 +402,11 @@ export class AddEmergenciasComponent implements OnInit {
     }
   }
 
+  hideDialog() {
+    this.submitted = false;
+  }
+
+
   async filterClientes(event) {
     let query = event.query;
 
@@ -377,6 +419,18 @@ export class AddEmergenciasComponent implements OnInit {
     );
 
     this.filteredClientes = responseCliente.data
+  }
+
+  async filterCasos(event) {
+    let query = event.query;
+
+    const filteredCasos = await this.casosService.obtenerCasos(
+      0,
+      10,
+      query,
+      this.selectedClientePoliza?.id ? this.selectedClientePoliza?.id : "");
+
+    this.filteredCasos = filteredCasos.data
   }
 
   filterPaises(event): void {

@@ -15,6 +15,7 @@ import {AuthService} from 'src/app/services/auth-service';
 import {CentrosMedicosService} from "../../../services/centros-medicos-service";
 import {MedicoCentroMedicoAseguradorasService} from "../../../services/med-centros-medicos-aseguradoras-service";
 import {RequisitoAdicional} from "../../../enums/requisito-adicional";
+import {CasosService} from "../../../services/casos-service";
 
 @Component({
   selector: 'add-emergencias',
@@ -33,14 +34,18 @@ export class AddCitasMedicasComponent implements OnInit {
 
   selectedCliente: any; // Cliente seleccionado en el filtro
   selectedClientePoliza: any; // Poliza seleccionada en el filtro
+  selectedCaso: any; // Poliza seleccionada en el filtro
 
   filteredClientes: any[]; // Clientes filtrados para el autocompletado
   filteredAseguradoras: any[]; // Aseguradoras filtradas para el autocompletado
   filteredPolizas: any[]; // Pólizas filtradas para el autocompletado
+  filteredCasos: any[]; // Pólizas filtradas para el autocompletado
 
   ROL_CLIENTE_ID = 3;
   ESTADO_ACTIVO = 'A';
   clientePolizaId: number;
+  casoId: number;
+
   clienteId: number;
   citaMedicaId: number;
   displayDialog: boolean = false;
@@ -59,6 +64,7 @@ export class AddCitasMedicasComponent implements OnInit {
 
   medicoCentroMedicoAseguradora: any;
   centroMedico: any;
+  originCaso: boolean = false
 
   requisitosAdicionales: { [key in RequisitoAdicional]: boolean } = {
     [RequisitoAdicional.VIAJES]: false,
@@ -92,7 +98,8 @@ export class AddCitasMedicasComponent implements OnInit {
     private centrosMedicosService: CentrosMedicosService,
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private casosService: CasosService,
   ) {
   }
 
@@ -125,11 +132,16 @@ export class AddCitasMedicasComponent implements OnInit {
       this.clientes = responseCliente.data
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
+      const casoParam = JSON.parse(localStorage.getItem("caso"))
+
       this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.citaMedica.clientePoliza
+      this.selectedCaso = casoParam ? casoParam : this.citaMedica.caso
+
       this.medicoCentroMedicoAseguradora = this.citaMedica.medicoCentroMedicoAseguradora
       this.centroMedico = this.citaMedica.medicoCentroMedicoAseguradora.centroMedico
 
-      await this.loadPolizas(true);
+      // await this.loadPolizas(true);
+
       this.comentarios = await this.comentariosCitasMedicasService.getComentariosByCitaMedica(this.citaMedicaId);
       this.loading = false;
 
@@ -152,12 +164,25 @@ export class AddCitasMedicasComponent implements OnInit {
       return
     }
 
+    if (await this.getRouteParamsBoolean('originCaso'))
+      this.originCaso = await this.getRouteParamsBoolean('originCaso');
+
     if (await this.getRouteParams('clientePolizaId'))
       this.clientePolizaId = +(await this.getRouteParams('clientePolizaId'));
 
-    if (this.clientePolizaId) {
-      this.clienteId = +(await this.getRouteParams('clienteId'));
-      await this.prepareClientePolizaData();
+    if (await this.getRouteParams('casoId'))
+      this.casoId = +(await this.getRouteParams('casoId'));
+
+    const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
+    const casoParam = JSON.parse(localStorage.getItem("caso"))
+
+    if (clientePolizaParm) {
+      this.selectedClientePoliza = clientePolizaParm
+      this.selectedCliente = clientePolizaParm.cliente
+    }
+
+    if (casoParam){
+      this.selectedCaso = casoParam
     }
 
     this.loading = false;
@@ -279,16 +304,6 @@ export class AddCitasMedicasComponent implements OnInit {
     this.displayDialog = true;
   }
 
-  hideDialogImage() {
-    this.displayDialog = false;
-  }
-
-  async prepareClientePolizaData() {
-    this.selectedCliente = this.clientes.find(x => x.id === this.clienteId);
-    await this.loadPolizas();
-    this.selectedClientePoliza = this.clientePolizas.find(x => x.id === this.clientePolizaId);
-  }
-
 
   async prepareData() {
     const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
@@ -303,6 +318,12 @@ export class AddCitasMedicasComponent implements OnInit {
   }
 
   private getRouteParams(param: string): Promise<string> {
+    return new Promise((resolve) => {
+      this.route.queryParams.subscribe((params) => resolve(params[param]));
+    });
+  }
+
+  private getRouteParamsBoolean(param: string): Promise<boolean> {
     return new Promise((resolve) => {
       this.route.queryParams.subscribe((params) => resolve(params[param]));
     });
@@ -323,6 +344,16 @@ export class AddCitasMedicasComponent implements OnInit {
 
   async saveCitaMedica() {
     this.submitted = true;
+
+    if (!this.selectedCaso?.id) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error!',
+        detail: 'Caso es requerido',
+        life: 3000,
+      });
+      return
+    }
 
     if (!this.imagen) {
       this.messageService.add({
@@ -349,6 +380,7 @@ export class AddCitasMedicasComponent implements OnInit {
     this.citaMedica.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora.id
     this.citaMedica.clientePolizaId = this.selectedClientePoliza.id
     this.citaMedica.nombreDocumento = this.nombreDocumento
+    this.citaMedica.casoId = this.selectedCaso.id
     const requisitosAdicionalesBackend = {};
 
     for (const [key, value] of Object.entries(this.requisitosAdicionales)) {
@@ -406,6 +438,18 @@ export class AddCitasMedicasComponent implements OnInit {
       query);
 
     this.filteredPolizas = responseClientePoliza.data
+  }
+
+  async filterCasos(event) {
+    let query = event.query;
+
+    const filteredCasos = await this.casosService.obtenerCasos(
+      0,
+      10,
+      query,
+      this.selectedClientePoliza?.id ? this.selectedClientePoliza?.id : "");
+
+    this.filteredCasos = filteredCasos.data
   }
 
   async loadPolizas(esEdicion: boolean | null = false) {

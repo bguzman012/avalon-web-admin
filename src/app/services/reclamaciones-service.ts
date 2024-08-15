@@ -19,13 +19,14 @@ export class ReclamacionesService {
     size: number,
     busqueda: string,
     sortField: string | null = 'createdDate',
-    sortOrder: number | null = -1
+    sortOrder: number | null = -1,
+    casoId: string | null = ""
   ): Promise<any> {
     try {
       const order = sortOrder === 1 ? 'asc' : 'desc';
       const sort = `&sortField=${sortField}&sortOrder=${order}`;
 
-      const reclamaciones = await this.http.get<any[]>(`${this.apiUrl}/reclamaciones?estado=${estado}&clientePolizaId=${clientePolizaId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
+      const reclamaciones = await this.http.get<any[]>(`${this.apiUrl}/reclamaciones?estado=${estado}&clientePolizaId=${clientePolizaId}&casoId=${casoId}&page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
       console.log('Resultado de reclamaciones:', reclamaciones);
       return reclamaciones;
     } catch (error) {

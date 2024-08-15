@@ -15,6 +15,7 @@ import {AuthService} from 'src/app/services/auth-service';
 import {CentrosMedicosService} from "../../../services/centros-medicos-service";
 import {MedicoCentroMedicoAseguradorasService} from "../../../services/med-centros-medicos-aseguradoras-service";
 import {TipoAdm} from "../../../enums/tipo-adm";
+import {CasosService} from "../../../services/casos-service";
 
 @Component({
   selector: 'add-reclamaciones',
@@ -34,10 +35,14 @@ export class AddReclamacionesComponent implements OnInit {
 
   selectedCliente: any; // Cliente seleccionado en el filtro
   selectedClientePoliza: any; // Poliza seleccionada en el filtro
+  selectedCaso: any; // Poliza seleccionada en el filtro
 
   filteredClientes: any[]; // Clientes filtrados para el autocompletado
   filteredAseguradoras: any[]; // Aseguradoras filtradas para el autocompletado
   filteredPolizas: any[]; // Pólizas filtradas para el autocompletado
+  filteredCasos: any[]; // Pólizas filtradas para el autocompletado
+
+  casoId: number;
 
   ROL_CLIENTE_ID = 3;
   ESTADO_ACTIVO = 'A';
@@ -65,6 +70,7 @@ export class AddReclamacionesComponent implements OnInit {
   selectedTipoAdm: TipoAdm;
   imagenCambiadaEdit: boolean = false;
 
+  originCaso: boolean = false
 
   constructor(
     private messageService: MessageService,
@@ -76,7 +82,8 @@ export class AddReclamacionesComponent implements OnInit {
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
     private authService: AuthService,
-    private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService
+    private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService,
+    private casosService: CasosService
   ) {
   }
 
@@ -109,12 +116,15 @@ export class AddReclamacionesComponent implements OnInit {
       this.clientes = responseCliente.data
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
+      const casoParam = JSON.parse(localStorage.getItem("caso"))
+
       this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.reclamacion.clientePoliza
+      this.selectedCaso = casoParam ? casoParam : this.reclamacion.caso
+
 
       this.medicoCentroMedicoAseguradora = this.reclamacion.medicoCentroMedicoAseguradora
       this.centroMedico = this.reclamacion.medicoCentroMedicoAseguradora.centroMedico
 
-      await this.loadPolizas(true);
       this.comentarios = await this.comentariosService.getComentariosByReclamacion(this.reclamacionId);
       this.loading = false;
 
@@ -137,12 +147,22 @@ export class AddReclamacionesComponent implements OnInit {
       return
     }
 
+    if (await this.getRouteParamsBoolean('originCaso'))
+      this.originCaso = await this.getRouteParamsBoolean('originCaso');
+
     if (await this.getRouteParams('clientePolizaId'))
       this.clientePolizaId = +(await this.getRouteParams('clientePolizaId'));
 
-    if (this.clientePolizaId) {
-      this.clienteId = +(await this.getRouteParams('clienteId'));
-      await this.prepareClientePolizaData();
+    const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
+    const casoParam = JSON.parse(localStorage.getItem("caso"))
+
+    if (clientePolizaParm) {
+      this.selectedClientePoliza = clientePolizaParm
+      this.selectedCliente = clientePolizaParm.cliente
+    }
+
+    if (casoParam){
+      this.selectedCaso = casoParam
     }
 
     this.loading = false;
@@ -182,6 +202,12 @@ export class AddReclamacionesComponent implements OnInit {
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
       this.loading = false
     }
+  }
+
+  private getRouteParamsBoolean(param: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.route.queryParams.subscribe((params) => resolve(params[param]));
+    });
   }
 
   async filterMedicoCentroMedicoAseguradora(event) {
@@ -280,17 +306,6 @@ export class AddReclamacionesComponent implements OnInit {
     this.displayDialog = true;
   }
 
-  hideDialogImage() {
-    this.displayDialog = false;
-  }
-
-  async prepareClientePolizaData() {
-    this.selectedCliente = this.clientes.find(x => x.id === this.clienteId);
-    await this.loadPolizas();
-    this.selectedClientePoliza = this.clientePolizas.find(x => x.id === this.clientePolizaId);
-  }
-
-
   async prepareData() {
     const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
@@ -330,6 +345,16 @@ export class AddReclamacionesComponent implements OnInit {
   async saveReclamacion() {
     this.submitted = true;
 
+    if (!this.selectedCaso?.id) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error!',
+        detail: 'Caso es requerido',
+        life: 3000,
+      });
+      return
+    }
+
     if (!this.imagen) {
       this.messageService.add({
         severity: 'error',
@@ -356,6 +381,7 @@ export class AddReclamacionesComponent implements OnInit {
     this.reclamacion.tipoAdm = this.selectedTipoAdm
     this.reclamacion.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora.id
     this.reclamacion.nombreDocumento = this.nombreDocumento
+    this.reclamacion.casoId = this.selectedCaso.id
 
     formData.append('reclamacion', new Blob([JSON.stringify(this.reclamacion)], {type: 'application/json'}));
 
@@ -380,6 +406,17 @@ export class AddReclamacionesComponent implements OnInit {
     }
   }
 
+  async filterCasos(event) {
+    let query = event.query;
+
+    const filteredCasos = await this.casosService.obtenerCasos(
+      0,
+      10,
+      query,
+      this.selectedClientePoliza?.id ? this.selectedClientePoliza?.id : "");
+
+    this.filteredCasos = filteredCasos.data
+  }
 
   async filterClientes(event) {
     let query = event.query;

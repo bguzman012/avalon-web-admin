@@ -20,9 +20,9 @@
           [suggestions]="filteredClientes"
           (completeMethod)="filterClientes($event)"
           field="nombreUsuario"
-          [dropdown]="!citaMedica?.id"
+          [dropdown]="!citaMedica?.id && !originCaso"
           (ngModelChange)="loadPolizas()"
-          [readonly]="citaMedica?.id" placeholder="Filtrar por Cliente">
+          [readonly]="citaMedica?.id && originCaso" placeholder="Filtrar por Cliente">
         </p-autoComplete>
 
         <!-- Filtro por Póliza -->
@@ -31,10 +31,21 @@
           [suggestions]="filteredPolizas"
           (completeMethod)="filterPolizas($event)"
           field="displayName"
-          [dropdown]="!citaMedica?.id"
+          [dropdown]="!citaMedica?.id && !originCaso"
           placeholder="Filtrar por Póliza"
           [disabled]="!selectedCliente?.id"
-          [readonly]="citaMedica?.id">
+          [readonly]="citaMedica?.id && originCaso">
+        </p-autoComplete>
+
+        <p-autoComplete
+          [(ngModel)]="selectedCaso"
+          [suggestions]="filteredCasos"
+          (completeMethod)="filterCasos($event)"
+          field="displayName"
+          [dropdown]="!citaMedica?.id && !originCaso"
+          placeholder="Filtrar por Caso"
+          [disabled]="!selectedClientePoliza?.id"
+          [readonly]="citaMedica?.id && originCaso">
         </p-autoComplete>
       </div>
     </p-panel>

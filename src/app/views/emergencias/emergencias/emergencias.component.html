@@ -3,17 +3,18 @@
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left">
 
-      <h5 class="p-m-0">Administrar Emergencias</h5>
+      <h5 class="p-m-0" *ngIf="!originCaso">Administrar Emergencias</h5>
+      <h6 class="p-m-0" *ngIf="originCaso">Emergencias</h6>
 
 
     </ng-template>
 
     <ng-template pTemplate="right">
-      <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
+      <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2 medium-button"
               (click)="redirectToDetailEmergenciaPage()"></button>
     </ng-template>
   </p-toolbar>
-  <p-panel>
+  <p-panel *ngIf="!originCaso">
     <div class="filter-container">
       <!-- Filtro por Cliente -->
       <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
@@ -31,6 +32,16 @@
                       placeholder="Filtrar por Póliza"
                       [size]="30" [minLength]="1" [disabled]="!selectedCliente" [forceSelection]="true"
                       [maxlength]="50">
+      </p-autoComplete>
+
+      <p-autoComplete
+        [(ngModel)]="selectedCaso"
+        [suggestions]="filteredCasos"
+        (completeMethod)="filterCasos($event)"
+        field="displayName"
+        [dropdown]="true"
+        placeholder="Filtrar por Caso"
+        [disabled]="!selectedClientePoliza?.id">
       </p-autoComplete>
 
       <button pButton pRipple class="p-button-primary p-mr-2" (click)="manageListado()">Buscar</button>

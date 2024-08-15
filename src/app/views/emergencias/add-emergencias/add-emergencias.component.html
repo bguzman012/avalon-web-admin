@@ -21,9 +21,9 @@
           [suggestions]="filteredClientes"
           (completeMethod)="filterClientes($event)"
           field="nombreUsuario"
-          [dropdown]="!emergencia?.id"
+          [dropdown]="!emergencia?.id  && !originCaso"
           (ngModelChange)="loadPolizas()"
-          [readonly]="emergencia?.id" placeholder="Filtrar por Cliente">
+          [readonly]="emergencia?.id  && originCaso" placeholder="Filtrar por Cliente">
         </p-autoComplete>
 
         <!-- Filtro por Póliza -->
@@ -32,10 +32,21 @@
           [suggestions]="filteredPolizas"
           (completeMethod)="filterPolizas($event)"
           field="displayName"
-          [dropdown]="!emergencia?.id"
+          [dropdown]="!emergencia?.id && !originCaso"
           placeholder="Filtrar por Póliza"
-          [disabled]="!selectedCliente?.id"
+          [disabled]="!selectedCliente?.id && originCaso"
           [readonly]="emergencia?.id">
+        </p-autoComplete>
+
+        <p-autoComplete
+          [(ngModel)]="selectedCaso"
+          [suggestions]="filteredCasos"
+          (completeMethod)="filterCasos($event)"
+          field="displayName"
+          [dropdown]="!emergencia?.id && !originCaso"
+          placeholder="Filtrar por Caso"
+          [disabled]="!selectedClientePoliza?.id"
+          [readonly]="emergencia?.id && originCaso">
         </p-autoComplete>
       </div>
     </p-panel>
@@ -116,7 +127,6 @@
         >País es requerido.</small
         >
       </div>
-
       <div class="p-field">
         <label for="asesoresId">Estado</label>
         <p-autoComplete

@@ -15,7 +15,7 @@ const routes: Routes = [
           breadcrumb: null
         },
         component: CentrosMedicosComponent,
-       },
+       }
       // {
       //   path: 'beneficios',
       //   data: {

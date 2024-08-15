@@ -20,23 +20,32 @@
           [suggestions]="filteredClientes"
           (completeMethod)="filterClientes
           ($event)" field="nombreUsuario"
-          [dropdown]="!reclamacion?.id"
+          [dropdown]="!reclamacion?.id  && !originCaso"
           (ngModelChange)="loadPolizas()"
-          [readonly]="reclamacion?.id"
+          [readonly]="reclamacion?.id  && originCaso"
           placeholder="Filtrar por Cliente"
           [forceSelection]="true" [maxlength]="50">
         </p-autoComplete>
-
         <!-- Filtro por Póliza -->
         <p-autoComplete
           [(ngModel)]="selectedClientePoliza"
           [suggestions]="filteredPolizas"
           (completeMethod)="filterPolizas($event)"
           field="displayName"
-          [dropdown]="!reclamacion?.id"
+          [dropdown]="!reclamacion?.id && !originCaso"
           placeholder="Filtrar por Póliza"
-          [disabled]="!selectedCliente?.id"
+          [disabled]="!selectedCliente?.id  && originCaso"
           [readonly]="reclamacion?.id" [forceSelection]="true" [maxlength]="50">
+        </p-autoComplete>
+        <p-autoComplete
+          [(ngModel)]="selectedCaso"
+          [suggestions]="filteredCasos"
+          (completeMethod)="filterCasos($event)"
+          field="displayName"
+          [dropdown]="!reclamacion?.id && !originCaso"
+          placeholder="Filtrar por Caso"
+          [disabled]="!selectedClientePoliza?.id"
+          [readonly]="reclamacion?.id && originCaso">
         </p-autoComplete>
       </div>
     </p-panel>
