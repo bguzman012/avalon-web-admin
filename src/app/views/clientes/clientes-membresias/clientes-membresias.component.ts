@@ -238,7 +238,8 @@ export class ClientesMembresiasComponent implements OnInit {
           clienteId: this.cliente.id,
           asesorId: this.asesor.id,
           fechaInicio: this.clienteMembresia.fechaInicio,
-          fechaFin: this.clienteMembresia.fechaFin
+          fechaFin: this.clienteMembresia.fechaFin,
+          codigo: this.clienteMembresia.codigo
         }
 
         await this.clientesMembresiasService.actualizarClienteMembresia(

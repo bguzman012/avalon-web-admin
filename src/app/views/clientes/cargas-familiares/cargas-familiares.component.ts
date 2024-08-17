@@ -71,7 +71,7 @@ export class CargasFamiliaresComponent implements OnInit {
   }
 
   async ngOnInit() {
-
+    this.loading = true
     this.clientePolizaId = +(await this.getRouteParams('clienteId'));
 
     if (!this.clientePolizaId) this.clientePolizaId = localStorage.getItem('clientePolizaId');
@@ -79,6 +79,7 @@ export class CargasFamiliaresComponent implements OnInit {
     this.clientePoliza = JSON.parse(localStorage.getItem('clientePoliza'));
 
     await this.refrescarListado();
+    this.loading = false
   }
 
   private getRouteParams(param: string): Promise<string> {

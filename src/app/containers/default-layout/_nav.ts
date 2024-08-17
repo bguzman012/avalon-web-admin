@@ -90,6 +90,26 @@ export const navItems: INavData[] = [
     url: '/clientes',
     iconComponent: {}
 
+  }, {
+    name: 'Casos',
+    url: '/casos',
+    iconComponent: {}
+
+  }, {
+    name: 'Citas Médicas',
+    url: '/citas-medicas',
+    iconComponent: {}
+
+  }, {
+    name: 'Reclamos',
+    url: '/reclamaciones',
+    iconComponent: {}
+
+  }, {
+    name: 'Emergencias',
+    url: '/emergencias',
+    iconComponent: {}
+
   }
 ];
 

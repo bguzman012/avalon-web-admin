@@ -79,15 +79,14 @@ export class ClientesPolizasComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
-    this.user = await this.authService.obtenerUsuarioLoggeado();
 
     this.clienteId = +(await this.getRouteParams('clienteId'));
-
     if (!this.clienteId) this.clienteId = localStorage.getItem('clienteId');
-
     this.cliente = JSON.parse(localStorage.getItem('cliente'));
 
     await this.refrescarListado();
+
+    this.user = await this.authService.obtenerUsuarioLoggeado();
     this.loading = false;
   }
 
@@ -334,20 +333,16 @@ export class ClientesPolizasComponent implements OnInit {
     this.loading = true;
 
     try {
+      this.polizaCliente.clienteId = this.clienteId;
+      this.polizaCliente.asesorId = this.asesor.id;
+      this.polizaCliente.agenteId = this.broker.id;
+      this.polizaCliente.polizaId = this.poliza.id;
       if (this.polizaCliente.id) {
-        this.polizaCliente.clienteId = this.clienteId;
-        this.polizaCliente.asesorId = this.asesor.id;
-        this.polizaCliente.agenteId = this.broker.id;
-        this.polizaCliente.polizaId = this.poliza.id;
         await this.clientesPolizasService.actualizarClientePoliza(
           this.polizaCliente.id,
           this.polizaCliente
         );
       } else {
-        this.polizaCliente.clienteId = this.clienteId;
-        this.polizaCliente.asesorId = this.asesor.id;
-        this.polizaCliente.agenteId = this.broker.id;
-        this.polizaCliente.polizaId = this.poliza.id;
         await this.clientesPolizasService.crearClientePoliza(
           this.polizaCliente
         );

@@ -37,6 +37,10 @@
         <th style="width: 3rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
+        <th pSortableColumn="codigo">
+          Código
+          <p-sortIcon field="codigo"></p-sortIcon>
+        </th>
         <th pSortableColumn="membresia">
           Membresía
           <p-sortIcon field="membresia"></p-sortIcon>
@@ -61,6 +65,7 @@
         <td>
           <p-tableCheckbox [value]="clienteMembresias"></p-tableCheckbox>
         </td>
+        <td>{{ clienteMembresia.codigo }}</td>
         <td>{{ clienteMembresia.membresia.nombres }}</td>
         <td>{{ clienteMembresia.asesor.nombreUsuario }}</td>
         <td>{{ clienteMembresia.fechaInicio }}</td>
@@ -92,7 +97,20 @@
 <p-dialog [(visible)]="clienteMembresiaDialog" [style]="{ width: '500px' }" header="Detalle de Cliente Membresía"
           [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
-
+    <div class="p-field">
+      <label for="codigo">Código</label>
+      <input
+        type="text"
+        pInputText
+        id="codigo"
+        [(ngModel)]="clienteMembresia.codigo"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !clienteMembresia.codigo"
+      >Código es requerido.</small
+      >
+    </div>
     <div class="p-field">
       <label for="clienteId">Cliente</label>
       <p-autoComplete [(ngModel)]="cliente" [showEmptyMessage]="true" [suggestions]="filteredClientes"
@@ -161,11 +179,6 @@
       <small class="p-invalid" *ngIf="submitted && !asesor">Asesor es requerido.</small>
     </div>
 
-    <p-blockUI [blocked]="loading">
-      <div class="p-field" *ngIf="loading">
-        <p-progressSpinner></p-progressSpinner>
-      </div>
-    </p-blockUI>
   </ng-template>
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
