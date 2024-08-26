@@ -1,4 +1,4 @@
-<p-toast></p-toast>
+<p-toast *ngIf="!originCaso"></p-toast>
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left">
@@ -115,4 +115,4 @@
   </p-table>
 </div>
 
-<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+<p-confirmDialog *ngIf="!originCaso" [style]="{width: '450px'}"></p-confirmDialog>

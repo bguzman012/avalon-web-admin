@@ -82,6 +82,21 @@ export class CitasMedicasComponent implements OnInit {
     }
   }
 
+  getEstadoLabel(estado: string): string {
+    switch (estado) {
+      case 'C':
+        return 'CERRADO';
+      case 'N':
+        return 'POR GESTIONAR';
+      case 'G':
+        return 'GESTIONANDO';
+      case 'I':
+        return 'ELIMINADO';
+      default:
+        return 'DRAFT';
+    }
+  }
+
 
   constructor(
     private messageService: MessageService,
@@ -177,9 +192,19 @@ export class CitasMedicasComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
+        if (citaMedica.estado != "N")
+          return this.messageService.add({
+            severity: 'error',
+            summary: 'Error!',
+            detail: 'No es posible eliminar una cita médica en estado GESTIONANDO o CERRADO',
+            life: 3000,
+          });
+
+        this.loading = true
         await this.citasMedicasService.eliminarCitaMedica(citaMedica.id);
         this.first = 0
         await this.manageListado()
+        this.loading = false
 
         this.messageService.add({
           severity: 'success',
@@ -288,10 +313,10 @@ export class CitasMedicasComponent implements OnInit {
   redirectToDetailCitaMedicaPage() {
     let redirect = !this.originCaso ? 'citas-medicas/detalle-cita-medica' : 'casos/detalle-caso/detalle-cita-medica';
 
-    console.log(this.selectedCaso, " SELECTED CASO")
     if (this.selectedCaso?.id) {
       localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
       localStorage.setItem("caso", JSON.stringify(this.caso));
+      localStorage.removeItem('citaMedica')
       const queryParamsClientePoliza = {
         clientePolizaId: this.selectedClientePoliza.id,
         clienteId: this.selectedCliente.id,

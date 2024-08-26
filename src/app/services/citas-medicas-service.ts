@@ -1,7 +1,6 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, catchError, tap, throwError } from 'rxjs';
-import { environment } from '../../environments/environment'
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {environment} from '../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +9,8 @@ export class CitasMedicasService {
 
   private apiUrl = `${environment.api_base}:8086`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   async obtenerCitasMedicas(
     estado: string,
@@ -45,7 +45,7 @@ export class CitasMedicasService {
   }
 
 
-    async actualizarCitaMedica(citaMedicaId: number, citaMedicaData: FormData): Promise<any> {
+  async actualizarCitaMedica(citaMedicaId: number, citaMedicaData: FormData): Promise<any> {
     try {
       const response = await this.http.put<any>(`${this.apiUrl}/citasMedicas/${citaMedicaId}`, citaMedicaData).toPromise();
       return response;
@@ -67,7 +67,7 @@ export class CitasMedicasService {
 
   async eliminarCitaMedica(citaMedicaId: number): Promise<any> {
     try {
-      const response = await this.http.patch<any>(`${this.apiUrl}/citasMedicas/${citaMedicaId}`, { estado: 'I' }).toPromise();
+      const response = await this.http.patch<any>(`${this.apiUrl}/citasMedicas/${citaMedicaId}`, {estado: 'I'}).toPromise();
       return response;
     } catch (error) {
       console.error('Error al eliminar cita medica:', error);
@@ -75,9 +75,11 @@ export class CitasMedicasService {
     }
   }
 
-  async partiallyUpdateCitaMedica(citaMedicaId: number, estado: string): Promise<any> {
+  async partiallyUpdateCitaMedica(
+    citaMedicaId: number,
+    partiallyUpdateObject): Promise<any> {
     try {
-      const response = await this.http.patch<any>(`${this.apiUrl}/citasMedicas/${citaMedicaId}`, { estado: estado }).toPromise();
+      const response = await this.http.patch<any>(`${this.apiUrl}/citasMedicas/${citaMedicaId}`, partiallyUpdateObject).toPromise();
       return response;
     } catch (error) {
       console.error('Error al actualizar  part. cita medica:', error);

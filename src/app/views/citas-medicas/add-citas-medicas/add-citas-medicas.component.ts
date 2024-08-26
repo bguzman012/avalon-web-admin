@@ -49,22 +49,42 @@ export class AddCitasMedicasComponent implements OnInit {
   clienteId: number;
   citaMedicaId: number;
   displayDialog: boolean = false;
+
   imagenCambiadaEdit: boolean = false;
   editImage = false
+  editImageComment = false
+
   readOnlyForm = false
 
   imagePreview: SafeUrl | null = null; // Utilizamos SafeUrl para la URL segura de la imagen
+
+  imageComplete: SafeUrl | null = null; // Utilizamos SafeUrl para la URL segura de la imagen
 
   comentarios: any[] = [];
   nuevoComentario: string = '';
   imagen
   nombreDocumento
+  nombreDocumentoComplete
+  nombreDocumentoComment = "Seleccionar imagen"
+
   filteredCentrosMedicos
   filteredMedicoCentroMedicoAseguradoras
 
   medicoCentroMedicoAseguradora: any;
   centroMedico: any;
   originCaso: boolean = false
+  habilitarCierreTramite: boolean = false
+  habilitarEdicionComentario: boolean = false
+
+  rolesCierreTramite = ["ASR", "BRO"]
+  user
+
+  comentarioEdit
+  newCommentImage: File | null = null;
+  editCommentImage: File | null = null;
+  editingCommentImageComplete: boolean = false;
+
+  newCommentImagePreview: string | null = null;
 
   requisitosAdicionales: { [key in RequisitoAdicional]: boolean } = {
     [RequisitoAdicional.VIAJES]: false,
@@ -95,6 +115,7 @@ export class AddCitasMedicasComponent implements OnInit {
     private comentariosCitasMedicasService: ComentariosCitasMedicasService,
     private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService,
     private imagenService: ImagenesService,
+    private confirmationService: ConfirmationService,
     private centrosMedicosService: CentrosMedicosService,
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
@@ -105,31 +126,29 @@ export class AddCitasMedicasComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
+    this.user = await this.authService.obtenerUsuarioLoggeado()
+
+    this.habilitarCierreTramite = this.rolesCierreTramite.includes(this.user.rol.codigo)
+
     this.openNew();
     await this.prepareData();
 
-    if (await this.getRouteParams('citaMedicaId')) {
+    if (await this.getRouteParams('citaMedicaId') || localStorage.getItem('citaMedica')) {
       this.nombreDocumento = 'Cargando ...'
       const citaMedica = JSON.parse(localStorage.getItem('citaMedica'));
 
       this.citaMedicaId = +(await this.getRouteParams('citaMedicaId'));
-      this.citaMedica = citaMedica
+      if (!this.citaMedicaId)
+        this.citaMedicaId = citaMedica.id
+
+      this.citaMedica = await this.citasMedicasService.getCitaMedica(citaMedica.id)
+
+      this.citaMedica.fechaTentativa = new Date(this.citaMedica.fechaTentativa + 'T23:59:00Z');
 
       this.initializeRequisitosAdicionales(this.citaMedica.requisitosAdicionales);
-      this.citaMedica.fechaTentativa = new Date(this.citaMedica.fechaTentativa + 'T23:59:00Z');
 
       this.codigoDocumento = "# " + this.citaMedica.codigo
       this.selectedCliente = this.citaMedica.clientePoliza.cliente
-
-      const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-        this.ROL_CLIENTE_ID,
-        this.ESTADO_ACTIVO,
-        0,
-        10,
-        this.selectedCliente.nombreUsuario
-      );
-
-      this.clientes = responseCliente.data
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
       const casoParam = JSON.parse(localStorage.getItem("caso"))
@@ -141,16 +160,18 @@ export class AddCitasMedicasComponent implements OnInit {
       this.centroMedico = this.citaMedica.medicoCentroMedicoAseguradora.centroMedico
 
       // await this.loadPolizas(true);
+      if (this.citaMedica.estado == 'C')
+        this.readOnlyForm = true
+
+      this.loading = false;
 
       this.comentarios = await this.comentariosCitasMedicasService.getComentariosByCitaMedica(this.citaMedicaId);
-      this.loading = false;
 
       if (citaMedica.imagenId) {
         let foto = await this.imagenService.getImagen(citaMedica.imagenId);
         this.imagen = foto.documento
         this.nombreDocumento = foto.nombreDocumento
       }
-      // this.citaMedica.fotoReclamo = citaMedicaFoto.fotoReclamo
 
       if (this.imagen) {
         this.imagePreview = this.imagen;
@@ -158,9 +179,7 @@ export class AddCitasMedicasComponent implements OnInit {
         this.nombreDocumento = undefined
       }
 
-      if (citaMedica.estado == 'C')
-        this.readOnlyForm = true
-
+      this.cargarImagenesComentarios()
       return
     }
 
@@ -181,11 +200,34 @@ export class AddCitasMedicasComponent implements OnInit {
       this.selectedCliente = clientePolizaParm.cliente
     }
 
-    if (casoParam){
+    if (casoParam) {
       this.selectedCaso = casoParam
     }
 
+    this.citaMedica.fechaTentativa = new Date();
+
     this.loading = false;
+    this.citaMedicaDialog = true;
+
+  }
+
+  async cargarImagenesComentarios(){
+    console.log(this.comentarios, " THISSCOMETNS")
+    for (const comentario of this.comentarios) {
+      if (comentario.imagenId) {
+        let foto = await this.imagenService.getImagen(comentario.imagenId);
+        comentario.imagen = foto.documento
+        comentario.nombreDocumento = foto.nombreDocumento
+      }
+
+      if (comentario.imagen) {
+        comentario.imagePreview = comentario.imagen;
+      } else {
+        comentario.nombreDocumento = undefined
+      }
+    }
+
+    console.log(this.comentarios)
   }
 
   initializeRequisitosAdicionales(requisitos: { [key: string]: boolean }): void {
@@ -195,26 +237,122 @@ export class AddCitasMedicasComponent implements OnInit {
     }
   }
 
-  async addComentario() {
+  async iniciarEdicion(comentario: any) {
+    if (comentario.usuarioComenta.nombreUsuario === this.user.nombreUsuario && !this.readOnlyForm) {
+      comentario.enEdicion = true;
+      comentario.contenidoOriginal = comentario.contenido;
+      this.comentarioEdit = comentario
+      this.habilitarEdicionComentario = true
+      this.editImageComment = false
+    }
+  }
+
+  getEstadoLabel(estado: string): string {
+    switch (estado) {
+      case 'C':
+        return 'CERRADO';
+      case 'N':
+        return 'POR GESTIONAR';
+      case 'G':
+        return 'GESTIONANDO';
+      case 'I':
+        return 'ELIMINADO';
+      default:
+        return 'DRAFT';
+    }
+  }
+
+  async actualizarComentario() {
     this.loading = true
+    const comentarioToUpdate = {
+      citaMedicaId: this.citaMedicaId,
+      contenido: this.comentarioEdit.contenido,
+      usuarioComentaId: this.user.id,
+      estado: 'A', // Estado activo
+      nombreDocumento: this.comentarioEdit.nombreDocumento
+    };
+
+    const formData = new FormData();
+    formData.append('comentarioCitaMedica', new Blob([JSON.stringify(comentarioToUpdate)], {type: 'application/json'}));
+
+    if (this.editCommentImage) {
+      formData.append('fotoComentarioCitaMedica', this.editCommentImage);
+    }
+
+    try {
+      await this.comentariosCitasMedicasService.updateComentario(this.comentarioEdit.id, formData);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Comentario actualizado',
+        detail: 'Comentario actualizado con éxito'
+      });
+
+      this.habilitarEdicionComentario = false
+      await this.loadComentarios();
+      this.loading = false
+      await this.cargarImagenesComentarios();
+    } catch (error) {
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al actualizar el comentario'});
+      this.loading = false
+    }
+    this.loading = false
+  }
+
+  async cancelarEdicion() {
+    this.loading = true
+    await this.loadComentarios()
+    this.habilitarEdicionComentario = false
+    this.comentarioEdit = {}
+    this.loading = false
+    await this.cargarImagenesComentarios()
+  }
+
+  async addComentario(fileUploadRefNew) {
+    this.loading = true
+    if (this.nuevoComentario == "") {
+      this.loading = false
+      return this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al añadir el comentario, está vacío el texto'
+      });
+    }
+
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
     const comentario = {
       citaMedicaId: this.citaMedicaId,
       contenido: this.nuevoComentario,
       usuarioComentaId: currentUser.id,
-      estado: 'A' // Estado activo
+      estado: 'A', // Estado activo
+      nombreDocumento: this.nombreDocumentoComment
     };
 
+    const formData = new FormData();
+    formData.append('comentarioCitaMedica', new Blob([JSON.stringify(comentario)], {type: 'application/json'}));
+
+    if (this.newCommentImage) {
+      formData.append('fotoComentarioCitaMedica', this.newCommentImage);
+    }
+
     try {
-      await this.comentariosCitasMedicasService.createComentario(comentario);
+      let comentarioSaved = await this.comentariosCitasMedicasService.createComentario(formData);
+      this.citaMedica.estado = comentarioSaved.citaMedica.estado
       this.nuevoComentario = '';
+
+      this.newCommentImage = null;
+      this.newCommentImagePreview = null;
+      this.nombreDocumentoComment = null
+
+      fileUploadRefNew.clear()
       await this.loadComentarios();
+      this.loading = false
+      await this.cargarImagenesComentarios()
       this.messageService.add({
         severity: 'success',
         summary: 'Comentario añadido',
         detail: 'Comentario añadido con éxito'
       });
-      this.loading = false
+
     } catch (error) {
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
       this.loading = false
@@ -223,46 +361,56 @@ export class AddCitasMedicasComponent implements OnInit {
 
   async cerrarTramite() {
     this.loading = true
-    let currentUser = await this.authService.obtenerUsuarioLoggeado();
-    const comentario = {
-      citaMedicaId: this.citaMedicaId,
-      contenido: this.nuevoComentario,
-      usuarioComentaId: currentUser.id,
-      estado: 'C' // Estado activo
-    };
-
-    await this.citasMedicasService.partiallyUpdateCitaMedica(this.citaMedica.id, 'C')
-
-    this.readOnlyForm = true
-
     try {
-      await this.comentariosCitasMedicasService.createComentario(comentario);
-      this.nuevoComentario = '';
-      await this.loadComentarios();
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Comentario añadido',
-        detail: 'Cita médica cerrada con éxito'
-      });
+      let currentUser = await this.authService.obtenerUsuarioLoggeado();
+
+      const comentario = {
+        citaMedicaId: this.citaMedicaId,
+        contenido: this.nuevoComentario,
+        usuarioComentaId: currentUser.id,
+        estado: 'C' // Estado activo
+      };
+
+      const partiallyUpdateObject = {
+        estado: 'C',
+        comentarioCitaMedicaRequest: comentario
+      };
+
+      let citaUpdated = await this.citasMedicasService.partiallyUpdateCitaMedica(this.citaMedica.id, partiallyUpdateObject)
+
+      this.citaMedica.estado = citaUpdated.estado
+      this.readOnlyForm = true
       this.loading = false
+      await this.loadComentarios();
+      await this.cargarImagenesComentarios()
     } catch (error) {
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al cerrar la cita'});
       this.loading = false
     }
+
   }
 
-  async deleteComentario(comentarioId: number) {
-    try {
-      await this.comentariosCitasMedicasService.deleteComentario(comentarioId);
-      await this.loadComentarios();
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Comentario eliminado',
-        detail: 'Comentario eliminado con éxito'
-      });
-    } catch (error) {
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar el comentario'});
-    }
+  async deleteComentario(comentario: any) {
+    this.confirmationService.confirm({
+      message: 'Estás seguro de eliminar el comentario ' + comentario.contenido + '?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: async () => {
+        this.loading = true
+        await this.comentariosCitasMedicasService.deleteComentario(comentario.id);
+        await this.loadComentarios();
+        this.loading = false
+
+        await this.cargarImagenesComentarios()
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Enhorabuena!',
+          detail: 'Registro eliminado exitosamente',
+          life: 3000,
+        });
+      },
+    });
   }
 
   async loadComentarios() {
@@ -271,6 +419,31 @@ export class AddCitasMedicasComponent implements OnInit {
     } catch (error) {
       console.error('Error al cargar los comentarios', error);
     }
+  }
+
+
+  onNewCommentImageSelect(event: any): void {
+
+    this.newCommentImage = event.files[0];
+    this.nombreDocumentoComment = this.newCommentImage.name
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.newCommentImagePreview = e.target.result;
+    };
+    reader.readAsDataURL(this.newCommentImage);
+  }
+
+  onEditCommentImageSelect(event: any): void {
+    this.editImageComment = true
+    this.editCommentImage = event.files[0];
+    this.comentarioEdit.nombreDocumento = this.editCommentImage.name
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.comentarioEdit.imagePreview = e.target.result;
+    };
+    reader.readAsDataURL(this.editCommentImage);
   }
 
   onFileSelect(event) {
@@ -300,7 +473,57 @@ export class AddCitasMedicasComponent implements OnInit {
     fileUploadRef.clear(); // Limpiar la selección de archivo en el componente de carga
   }
 
+  onFileSelectCommentUpdate(event, comentario) {
+    if (comentario.citaMedica)
+      comentario.editImage = true;
+
+    const file = event.files[0];
+    comentario.imagen = file;
+    comentario.nombreDocumento = comentario.name
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      comentario.imagePreview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    comentario.imagenCambiadaEdit = true
+  }
+
+  removeNewCommentImage(fileUploadRef): void {
+    this.newCommentImage = null;
+    this.newCommentImagePreview = null;
+    this.nombreDocumentoComment = null
+    fileUploadRef.clear();
+  }
+
+  removeEditCommentImage(fileUploadRef): void {
+    this.editImageComment = true;
+    this.editCommentImage = null;
+
+    this.comentarioEdit.nombreDocumento  = null;
+    this.comentarioEdit.imagePreview  = null;
+    fileUploadRef.clear();
+  }
+
   showDialogImage() {
+    this.imageComplete = this.imagePreview
+    this.editingCommentImageComplete = this.editImage
+    this.nombreDocumentoComplete = this.nombreDocumento
+    this.displayDialog = true;
+  }
+
+  showDialogImageComments(comentario) {
+    this.imageComplete = comentario.imagePreview
+    this.editingCommentImageComplete = false
+    this.nombreDocumentoComplete = comentario.nombreDocumento
+    this.displayDialog = true;
+  }
+
+  showDialogNuevaImageComments() {
+    this.imageComplete = this.newCommentImagePreview
+    this.editingCommentImageComplete = true
+    this.nombreDocumentoComplete = this.nombreDocumentoComment
     this.displayDialog = true;
   }
 
@@ -334,7 +557,6 @@ export class AddCitasMedicasComponent implements OnInit {
     this.centroMedico = null;
 
     this.submitted = false;
-    this.citaMedicaDialog = true;
   }
 
   hideDialog() {
@@ -402,6 +624,12 @@ export class AddCitasMedicasComponent implements OnInit {
 
         let citaSaved = await this.citasMedicasService.guardarCitaMedica(formData);
         this.codigoDocumento = "# " + citaSaved.codigo
+
+        this.citaMedica.id = citaSaved.id
+        this.citaMedicaId = citaSaved.id
+        this.citaMedica.estado = citaSaved.estado
+        localStorage.setItem("citaMedicaId", citaSaved.id);
+        localStorage.setItem("citaMedica", JSON.stringify(citaSaved));
       }
 
       this.loading = false;

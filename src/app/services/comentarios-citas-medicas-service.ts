@@ -21,7 +21,7 @@ export class ComentariosCitasMedicasService {
     }
   }
 
-  async createComentario(comentarioData: any): Promise<any> {
+  async createComentario(comentarioData: FormData): Promise<any> {
     try {
       const response = await this.http.post<any>(`${this.apiUrl}/comentariosCitasMedicas`, comentarioData).toPromise();
       return response;
@@ -31,7 +31,7 @@ export class ComentariosCitasMedicasService {
     }
   }
 
-  async updateComentario(comentarioId: number, comentarioData: any): Promise<any> {
+  async updateComentario(comentarioId: number, comentarioData: FormData): Promise<any> {
     try {
       const response = await this.http.put<any>(`${this.apiUrl}/comentariosCitasMedicas/${comentarioId}`, comentarioData).toPromise();
       return response;

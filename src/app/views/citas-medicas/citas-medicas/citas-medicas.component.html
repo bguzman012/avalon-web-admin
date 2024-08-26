@@ -1,4 +1,4 @@
-<p-toast></p-toast>
+<p-toast *ngIf="!originCaso"></p-toast>
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left">
@@ -90,12 +90,17 @@
           <p-tableCheckbox [value]="citaMedica"></p-tableCheckbox>
         </td>
         <td>{{ citaMedica.codigo }}</td>
-        <td>{{ citaMedica.estado }}</td>
+        <td>
+          <div class="estado-flag-table" *ngIf="citaMedica?.estado"
+               [ngClass]="{'estado-verde': citaMedica?.estado === 'N', 'estado-rojo' : citaMedica?.estado === 'C',
+               'estado-azul' : citaMedica?.estado === 'G', 'estado-eliminado' : citaMedica?.estado === 'I'}">{{ getEstadoLabel(citaMedica?.estado) }}
+          </div>
+        </td>
         <td>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 medium-button"
                   (click)="editCitaMedica(citaMedica)"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning medium-button"
-                  (click)="deleteCitaMedica(citaMedica)"></button>
+                  (click)="deleteCitaMedica(citaMedica); $event.stopPropagation()"></button>
         </td>
       </tr>
     </ng-template>
@@ -114,4 +119,4 @@
   </p-table>
 </div>
 
-<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+<p-confirmDialog *ngIf="!originCaso" [style]="{width: '450px'}"></p-confirmDialog>

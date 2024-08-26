@@ -32,3 +32,48 @@
 .medium-button .pi {
     font-size: 0.95rem; /* Ajusta el tamaño del icono */
 }
+
+#main-card {
+  position: relative; /* Necesario para el posicionamiento absoluto del flag */
+}
+
+.estado-flag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: white; /* Color del texto */
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+.estado-flag-table {
+  top: 10px;
+  right: 10px;
+  color: white; /* Color del texto */
+  padding: 5px 10px;
+  border-radius: 5px;
+  width: 160px;
+  text-align: center;
+  //font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.estado-verde {
+  background-color: #28a745; /* Verde para estado 'N' */
+}
+
+.estado-rojo {
+  background-color: #dc3545; /* Rojo para estado 'C' */
+}
+
+.estado-azul {
+  background-color: #3B82F6; /* Rojo para estado 'C' */
+}
+
+.estado-eliminado {
+  background-color: #d3d3d3; /* Gris para estado "Draft" */
+  color: rgba(25, 25, 25, 0.82); /* Letras negras */
+}
