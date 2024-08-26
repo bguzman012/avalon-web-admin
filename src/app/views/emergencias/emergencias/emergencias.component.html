@@ -1,4 +1,4 @@
-<p-toast></p-toast>
+<p-toast *ngIf="!originCaso"></p-toast>
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left">
@@ -90,7 +90,12 @@
           <p-tableCheckbox [value]="emergencia"></p-tableCheckbox>
         </td>
         <td>{{ emergencia.codigo }}</td>
-        <td>{{ emergencia.estado }}</td>
+        <td>
+          <div class="estado-flag-table" *ngIf="emergencia?.estado"
+               [ngClass]="{'estado-verde': emergencia?.estado === 'N', 'estado-rojo' : emergencia?.estado === 'C',
+               'estado-azul' : emergencia?.estado === 'G', 'estado-eliminado' : emergencia?.estado === 'I'}">{{ getEstadoLabel(emergencia?.estado) }}
+          </div>
+        </td>
         <td>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 medium-button"
                   (click)="editEmergencia(emergencia)"></button>
@@ -114,4 +119,4 @@
   </p-table>
 </div>
 
-<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+<p-confirmDialog *ngIf="!originCaso" [style]="{width: '450px'}"></p-confirmDialog>

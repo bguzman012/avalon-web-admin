@@ -91,7 +91,12 @@
           <p-tableCheckbox [value]="reclamacion"></p-tableCheckbox>
         </td>
         <td>{{ reclamacion.codigo }}</td>
-        <td>{{ reclamacion.estado }}</td>
+        <td>
+          <div class="estado-flag-table" *ngIf="reclamacion?.estado"
+               [ngClass]="{'estado-verde': reclamacion?.estado === 'N', 'estado-rojo' : reclamacion?.estado === 'C',
+               'estado-azul' : reclamacion?.estado === 'G', 'estado-eliminado' : reclamacion?.estado === 'I'}">{{ getEstadoLabel(reclamacion?.estado) }}
+          </div>
+        </td>
         <td>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 medium-button"
                   (click)="editReclamacion(reclamacion)"></button>

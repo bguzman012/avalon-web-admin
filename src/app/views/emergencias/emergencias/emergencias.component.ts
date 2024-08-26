@@ -103,6 +103,21 @@ export class EmergenciasComponent implements OnInit {
     this.filteredCasos = filteredCasos.data
   }
 
+  getEstadoLabel(estado: string): string {
+    switch (estado) {
+      case 'C':
+        return 'CERRADO';
+      case 'N':
+        return 'POR GESTIONAR';
+      case 'G':
+        return 'GESTIONANDO';
+      case 'I':
+        return 'ELIMINADO';
+      default:
+        return 'DRAFT';
+    }
+  }
+
   async onChangeCaso() {
     console.log("CAMBIOS EMERGENCIAS")
     if (this.caso?.id) {
@@ -176,9 +191,20 @@ export class EmergenciasComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
+        if (emergencia.estado != "N")
+          return this.messageService.add({
+            severity: 'error',
+            summary: 'Error!',
+            detail: 'No es posible eliminar una emergencia en estado GESTIONANDO o CERRADO',
+            life: 3000,
+          });
+
+        this.loading = true
+
         await this.emergenciasService.eliminarEmergencia(emergencia.id);
         this.first = 0
         await this.manageListado()
+        this.loading = false
 
         this.messageService.add({
           severity: 'success',
@@ -287,6 +313,7 @@ export class EmergenciasComponent implements OnInit {
     if (this.selectedCaso?.id) {
       localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
       localStorage.setItem("caso", JSON.stringify(this.caso));
+      localStorage.removeItem('emergencia')
 
       const queryParamsClientePoliza = {
         clientePolizaId: this.selectedClientePoliza.id,

@@ -50,9 +50,15 @@ export class AddReclamacionesComponent implements OnInit {
   clienteId: number;
   reclamacionId: number;
   displayDialog: boolean = false;
+
+  editImageComment = false
   editImage = false
   readOnlyForm = false
   imagePreview: SafeUrl | null = null; // Utilizamos SafeUrl para la URL segura de la imagen
+  imageComplete: SafeUrl | null = null; // Utilizamos SafeUrl para la URL segura de la imagen
+
+  nombreDocumentoComplete
+  nombreDocumentoComment = "Seleccionar imagen"
 
   comentarios: any[] = [];
   nuevoComentario: string = '';
@@ -72,6 +78,19 @@ export class AddReclamacionesComponent implements OnInit {
 
   originCaso: boolean = false
 
+  habilitarCierreTramite: boolean = false
+  habilitarEdicionComentario: boolean = false
+
+  rolesCierreTramite = ["ASR", "BRO"]
+  user
+
+  comentarioEdit
+  newCommentImage: File | null = null;
+  editCommentImage: File | null = null;
+  editingCommentImageComplete: boolean = false;
+
+  newCommentImagePreview: string | null = null;
+
   constructor(
     private messageService: MessageService,
     private reclamacionesService: ReclamacionesService,
@@ -81,6 +100,7 @@ export class AddReclamacionesComponent implements OnInit {
     private centrosMedicosService: CentrosMedicosService,
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
+    private confirmationService: ConfirmationService,
     private authService: AuthService,
     private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService,
     private casosService: CasosService
@@ -90,30 +110,26 @@ export class AddReclamacionesComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
+    this.user = await this.authService.obtenerUsuarioLoggeado()
+
+    this.habilitarCierreTramite = this.rolesCierreTramite.includes(this.user.rol.codigo)
     this.openNew();
     await this.prepareData();
 
-    if (await this.getRouteParams('reclamacionId')) {
+    if (await this.getRouteParams('reclamacionId') || localStorage.getItem('reclamacion')) {
       this.nombreDocumento = 'Cargando ...'
       const reclamacion = JSON.parse(localStorage.getItem('reclamacion'));
       this.reclamacionId = +(await this.getRouteParams('reclamacionId'));
-      this.reclamacion = reclamacion
+      if (!this.reclamacionId)
+        this.reclamacionId = reclamacion.id
+
+      this.reclamacion = await this.reclamacionesService.getReclamacion(reclamacion.id)
 
       this.reclamacion.fechaServicio = new Date(this.reclamacion.fechaServicio + 'T23:59:00Z');
       this.selectedTipoAdm = this.reclamacion.tipoAdm
 
       this.codigoDocumento = "# " + this.reclamacion.codigo
       this.selectedCliente = this.reclamacion.clientePoliza.cliente
-
-      const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
-        this.ROL_CLIENTE_ID,
-        this.ESTADO_ACTIVO,
-        0,
-        10,
-        this.selectedCliente.nombreUsuario
-      );
-
-      this.clientes = responseCliente.data
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
       const casoParam = JSON.parse(localStorage.getItem("caso"))
@@ -125,8 +141,13 @@ export class AddReclamacionesComponent implements OnInit {
       this.medicoCentroMedicoAseguradora = this.reclamacion.medicoCentroMedicoAseguradora
       this.centroMedico = this.reclamacion.medicoCentroMedicoAseguradora.centroMedico
 
-      this.comentarios = await this.comentariosService.getComentariosByReclamacion(this.reclamacionId);
+      // await this.loadPolizas(true);
+      if (this.reclamacion.estado == 'C')
+        this.readOnlyForm = true
+
       this.loading = false;
+
+      this.comentarios = await this.comentariosService.getComentariosByReclamacion(this.reclamacionId);
 
       if (reclamacion.imagenId) {
         let foto = await this.imagenService.getImagen(reclamacion.imagenId);
@@ -141,9 +162,7 @@ export class AddReclamacionesComponent implements OnInit {
         this.nombreDocumento = undefined
       }
 
-      if (reclamacion.estado == 'C')
-        this.readOnlyForm = true
-
+      this.cargarImagenesComentarios()
       return
     }
 
@@ -165,7 +184,97 @@ export class AddReclamacionesComponent implements OnInit {
       this.selectedCaso = casoParam
     }
 
+    this.reclamacion.fechaServicio = new Date();
     this.loading = false;
+    this.reclamacionDialog = true;
+  }
+
+  async iniciarEdicion(comentario: any) {
+    if (comentario.usuarioComenta.nombreUsuario === this.user.nombreUsuario && !this.readOnlyForm) {
+      comentario.enEdicion = true;
+      comentario.contenidoOriginal = comentario.contenido;
+      this.comentarioEdit = comentario
+      this.habilitarEdicionComentario = true
+      this.editImageComment = false
+    }
+  }
+
+  getEstadoLabel(estado: string): string {
+    switch (estado) {
+      case 'C':
+        return 'CERRADO';
+      case 'N':
+        return 'POR GESTIONAR';
+      case 'G':
+        return 'GESTIONANDO';
+      case 'I':
+        return 'ELIMINADO';
+      default:
+        return 'DRAFT';
+    }
+  }
+
+  async actualizarComentario() {
+    this.loading = true
+    const comentarioToUpdate = {
+      reclamacionId: this.reclamacionId,
+      contenido: this.comentarioEdit.contenido,
+      usuarioComentaId: this.user.id,
+      estado: 'A', // Estado activo
+      nombreDocumento: this.comentarioEdit.nombreDocumento
+    };
+
+    const formData = new FormData();
+    formData.append('comentarioReclamacion', new Blob([JSON.stringify(comentarioToUpdate)], {type: 'application/json'}));
+
+    if (this.editCommentImage) {
+      formData.append('fotoComentarioReclamacion', this.editCommentImage);
+    }
+
+    try {
+      await this.comentariosService.updateComentario(this.comentarioEdit.id, formData);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Comentario actualizado',
+        detail: 'Comentario actualizado con éxito'
+      });
+
+      this.habilitarEdicionComentario = false
+      await this.loadComentarios();
+      this.loading = false
+      await this.cargarImagenesComentarios();
+    } catch (error) {
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al actualizar el comentario'});
+      this.loading = false
+    }
+    this.loading = false
+  }
+
+  async cancelarEdicion() {
+    this.loading = true
+    await this.loadComentarios()
+    this.habilitarEdicionComentario = false
+    this.comentarioEdit = {}
+    this.loading = false
+    await this.cargarImagenesComentarios()
+  }
+
+  async cargarImagenesComentarios(){
+    for (const comentario of this.comentarios) {
+      if (comentario.imagenId) {
+        let foto = await this.imagenService.getImagen(comentario.imagenId);
+        comentario.imagen = foto.documento
+        comentario.nombreDocumento = foto.nombreDocumento
+      }
+
+      if (comentario.imagen) {
+        comentario.imagePreview = comentario.imagen;
+      } else {
+        comentario.nombreDocumento = undefined
+      }
+    }
+
+    console.log(this.comentarios)
   }
 
   async filterCentrosMedicos(event) {
@@ -178,20 +287,45 @@ export class AddReclamacionesComponent implements OnInit {
     this.filteredCentrosMedicos = responseCliente.data;
   }
 
-  async addComentario() {
+  async addComentario(fileUploadRefNew) {
     this.loading = true
+    if (this.nuevoComentario == "") {
+      this.loading = false
+      return this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al añadir el comentario, está vacío el texto'
+      });
+    }
+
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
     const comentario = {
       reclamacionId: this.reclamacionId,
       contenido: this.nuevoComentario,
       usuarioComentaId: currentUser.id,
-      estado: 'A' // Estado activo
+      estado: 'A', // Estado activo
+      nombreDocumento: this.nombreDocumentoComment
     };
 
+    const formData = new FormData();
+    formData.append('comentarioReclamacion', new Blob([JSON.stringify(comentario)], {type: 'application/json'}));
+
+    if (this.newCommentImage) {
+      formData.append('fotoComentarioReclamacion', this.newCommentImage);
+    }
     try {
-      await this.comentariosService.createComentario(comentario);
+      let comentarioSaved = await this.comentariosService.createComentario(formData);
+      this.reclamacion.estado = comentarioSaved.reclamacion.estado
+
       this.nuevoComentario = '';
+      this.newCommentImage = null;
+      this.newCommentImagePreview = null;
+      this.nombreDocumentoComment = null
+
+      fileUploadRefNew.clear()
       await this.loadComentarios();
+      this.loading = false
+      await this.cargarImagenesComentarios()
       this.messageService.add({
         severity: 'success',
         summary: 'Comentario añadido',
@@ -224,45 +358,30 @@ export class AddReclamacionesComponent implements OnInit {
 
   async cerrarReclamo() {
     this.loading = true
-    let currentUser = await this.authService.obtenerUsuarioLoggeado();
-    const comentario = {
-      reclamacionId: this.reclamacionId,
-      contenido: this.nuevoComentario,
-      usuarioComentaId: currentUser.id,
-      estado: 'C' // Estado activo
-    };
-
-    await this.reclamacionesService.partiallyUpdateReclamacion(this.reclamacion.id, 'C')
-
-    this.readOnlyForm = true
-
     try {
-      await this.comentariosService.createComentario(comentario);
-      this.nuevoComentario = '';
-      await this.loadComentarios();
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Comentario añadido',
-        detail: 'Reclamo cerrado con éxito'
-      });
-      this.loading = false
-    } catch (error) {
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
-      this.loading = false
-    }
-  }
+      let currentUser = await this.authService.obtenerUsuarioLoggeado();
+      const comentario = {
+        reclamacionId: this.reclamacionId,
+        contenido: this.nuevoComentario,
+        usuarioComentaId: currentUser.id,
+        estado: 'C' // Estado activo
+      };
 
-  async deleteComentario(comentarioId: number) {
-    try {
-      await this.comentariosService.deleteComentario(comentarioId);
+      const partiallyUpdateObject = {
+        estado: 'C',
+        comentarioReclamacionRequest: comentario
+      };
+
+      let reclamacionUpdated = await this.reclamacionesService.partiallyUpdateReclamacion(this.reclamacion.id, partiallyUpdateObject)
+
+      this.reclamacion.estado = reclamacionUpdated.estado
+      this.readOnlyForm = true
+      this.loading = false
       await this.loadComentarios();
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Comentario eliminado',
-        detail: 'Comentario eliminado con éxito'
-      });
+      await this.cargarImagenesComentarios()
     } catch (error) {
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar el comentario'});
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al cerrar la reclamacion'});
+      this.loading = false
     }
   }
 
@@ -273,6 +392,55 @@ export class AddReclamacionesComponent implements OnInit {
       console.error('Error al cargar los comentarios', error);
     }
   }
+
+  onNewCommentImageSelect(event: any): void {
+
+    this.newCommentImage = event.files[0];
+    this.nombreDocumentoComment = this.newCommentImage.name
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.newCommentImagePreview = e.target.result;
+    };
+    reader.readAsDataURL(this.newCommentImage);
+  }
+
+  onEditCommentImageSelect(event: any): void {
+    this.editImageComment = true
+    this.editCommentImage = event.files[0];
+    this.comentarioEdit.nombreDocumento = this.editCommentImage.name
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.comentarioEdit.imagePreview = e.target.result;
+    };
+    reader.readAsDataURL(this.editCommentImage);
+  }
+
+
+  async deleteComentario(comentario: any) {
+    this.confirmationService.confirm({
+      message: 'Estás seguro de eliminar el comentario ' + comentario.contenido + '?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: async () => {
+        this.loading = true
+        await this.comentariosService.deleteComentario(comentario.id);
+        await this.loadComentarios();
+        this.loading = false
+
+        await this.cargarImagenesComentarios()
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Enhorabuena!',
+          detail: 'Registro eliminado exitosamente',
+          life: 3000,
+        });
+      },
+    });
+  }
+
 
   onFileSelect(event) {
     if (this.reclamacion)
@@ -303,7 +471,57 @@ export class AddReclamacionesComponent implements OnInit {
   }
 
   showDialogImage() {
+    this.imageComplete = this.imagePreview
+    this.editingCommentImageComplete = this.editImage
+    this.nombreDocumentoComplete = this.nombreDocumento
     this.displayDialog = true;
+  }
+
+  showDialogImageComments(comentario) {
+    this.imageComplete = comentario.imagePreview
+    this.editingCommentImageComplete = false
+    this.nombreDocumentoComplete = comentario.nombreDocumento
+    this.displayDialog = true;
+  }
+
+  showDialogNuevaImageComments() {
+    this.imageComplete = this.newCommentImagePreview
+    this.editingCommentImageComplete = true
+    this.nombreDocumentoComplete = this.nombreDocumentoComment
+    this.displayDialog = true;
+  }
+
+  onFileSelectCommentUpdate(event, comentario) {
+    if (comentario.reclamacion)
+      comentario.editImage = true;
+
+    const file = event.files[0];
+    comentario.imagen = file;
+    comentario.nombreDocumento = comentario.name
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      comentario.imagePreview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    comentario.imagenCambiadaEdit = true
+  }
+
+  removeNewCommentImage(fileUploadRef): void {
+    this.newCommentImage = null;
+    this.newCommentImagePreview = null;
+    this.nombreDocumentoComment = null
+    fileUploadRef.clear();
+  }
+
+  removeEditCommentImage(fileUploadRef): void {
+    this.editImageComment = true;
+    this.editCommentImage = null;
+
+    this.comentarioEdit.nombreDocumento  = null;
+    this.comentarioEdit.imagePreview  = null;
+    fileUploadRef.clear();
   }
 
   async prepareData() {
@@ -405,6 +623,12 @@ export class AddReclamacionesComponent implements OnInit {
       } else {
         let reclamoSaved = await this.reclamacionesService.guardarReclamacion(formData);
         this.codigoDocumento = "# " + reclamoSaved.codigo
+
+        this.reclamacion.id = reclamoSaved.id
+        this.reclamacionId = reclamoSaved.id
+        this.reclamacion.estado = reclamoSaved.estado
+        localStorage.setItem("reclamacionId", reclamoSaved.id);
+        localStorage.setItem("reclamacion", JSON.stringify(reclamoSaved));
       }
 
       this.loading = false;

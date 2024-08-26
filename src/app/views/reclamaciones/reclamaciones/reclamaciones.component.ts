@@ -96,6 +96,22 @@ export class ReclamacionesComponent implements OnInit {
     this.filteredCasos = filteredCasos.data
   }
 
+
+  getEstadoLabel(estado: string): string {
+    switch (estado) {
+      case 'C':
+        return 'CERRADO';
+      case 'N':
+        return 'POR GESTIONAR';
+      case 'G':
+        return 'GESTIONANDO';
+      case 'I':
+        return 'ELIMINADO';
+      default:
+        return 'DRAFT';
+    }
+  }
+
   async onChangeCaso() {
     if (this.caso?.id) {
       const response = await this.reclamacionesService.obtenerReclamaciones(
@@ -174,9 +190,20 @@ export class ReclamacionesComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
+        if (reclamacion.estado != "N")
+          return this.messageService.add({
+            severity: 'error',
+            summary: 'Error!',
+            detail: 'No es posible eliminar un reclamo en estado GESTIONANDO o CERRADO',
+            life: 3000,
+          });
+
+        this.loading = true
+
         await this.reclamacionesService.eliminarReclamacion(reclamacion.id);
         this.first = 0
         await this.manageListado()
+        this.loading = false
 
         this.messageService.add({
           severity: 'success',
@@ -287,6 +314,7 @@ export class ReclamacionesComponent implements OnInit {
     if (this.selectedCaso?.id) {
       localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
       localStorage.setItem("caso", JSON.stringify(this.caso));
+      localStorage.removeItem('reclamacion')
 
       const queryParamsClientePoliza = {
         clientePolizaId: this.selectedClientePoliza.id,
@@ -302,7 +330,7 @@ export class ReclamacionesComponent implements OnInit {
     }
     localStorage.removeItem("clientePoliza");
     localStorage.removeItem("caso");
-    
+
     this.router.navigate([redirect]);
 
   }

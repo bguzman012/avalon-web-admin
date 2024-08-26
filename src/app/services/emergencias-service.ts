@@ -77,9 +77,10 @@ export class EmergenciasService {
     }
   }
 
-  async partiallyUpdateEmergencia(emergenciaId: number, estado: string): Promise<any> {
+  async partiallyUpdateEmergencia(emergenciaId: number,
+                                  partiallyUpdateObject): Promise<any> {
     try {
-      const response = await this.http.patch<any>(`${this.apiUrl}/emergencias/${emergenciaId}`, {estado: estado}).toPromise();
+      const response = await this.http.patch<any>(`${this.apiUrl}/emergencias/${emergenciaId}`, partiallyUpdateObject).toPromise();
       return response;
     } catch (error) {
       console.error('Error al actualizar  part. cita medica:', error);

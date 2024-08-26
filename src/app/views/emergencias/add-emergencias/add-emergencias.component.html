@@ -1,10 +1,14 @@
-
 <p-toast></p-toast>
 
-<div class="card">
+<div class="card" id="main-card">
+  <div class="estado-flag" *ngIf="emergencia?.estado"
+       [ngClass]="{'estado-verde': emergencia?.estado === 'N', 'estado-rojo' : emergencia?.estado === 'C',
+               'estado-azul' : emergencia?.estado === 'G', 'estado-eliminado' : emergencia?.estado === 'I'}">{{ getEstadoLabel(emergencia?.estado) }}
+  </div>
+
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left">
-      <h5 class="p-m-0">{{codigoDocumento}}</h5>
+      <h5 class="p-m-0">{{ codigoDocumento }}</h5>
     </ng-template>
 
     <ng-template pTemplate="right">
@@ -52,17 +56,19 @@
     </p-panel>
   </div>
 
-  <div class="card">
+  <div class="card" *ngIf="emergencia">
     <p-panel styleClass="p-fluid" header="Detalles de Emergencia">
       <div class="p-field" *ngIf="selectedClientePoliza?.id">
         <label for="aseguradora">Aseguradora</label>
-        <input type="text" pInputText id="aseguradora" [(ngModel)]="selectedClientePoliza.poliza.aseguradora.nombre" readonly />
+        <input type="text" pInputText id="aseguradora" [(ngModel)]="selectedClientePoliza.poliza.aseguradora.nombre"
+               readonly/>
       </div>
 
       <div class="p-field">
         <label for="centroMedicoId">Hospital *</label>
         <p-autoComplete
-          dropdown = "true"
+          [readonly]="readOnlyForm"
+          [dropdown]="!readOnlyForm"
           [(ngModel)]="centroMedico"
           [showEmptyMessage]="true"
           [suggestions]="filteredCentrosMedicos"
@@ -87,6 +93,7 @@
           id="direccionUno"
           [(ngModel)]="direccion.direccionUno"
           required
+          [readonly]="readOnlyForm"
           autofocus
         />
         <small class="p-invalid" *ngIf="submitted && !direccion.direccionUno"
@@ -99,6 +106,7 @@
         <input
           type="text"
           pInputText
+          [readonly]="readOnlyForm"
           id="direccionDos"
           [(ngModel)]="direccion.direccionDos"
           required
@@ -116,7 +124,8 @@
           [showEmptyMessage]="true"
           [suggestions]="filteredPaises"
           (completeMethod)="filterPaises($event)"
-          dropdown="true"
+          [readonly]="readOnlyForm"
+          [dropdown]="!readOnlyForm"
           field="nombre"
           (ngModelChange)="loadEstados()"
           [minLength]="1"
@@ -134,8 +143,8 @@
           [showEmptyMessage]="true"
           [suggestions]="filteredEstados"
           (completeMethod)="filterEstados($event)"
-          [readonly]="!pais"
-          dropdown="true"
+          [dropdown]="!readOnlyForm"
+          [readonly]="!pais || readOnlyForm"
           field="nombre"
           [minLength]="1"
           [appendTo]="'body'"
@@ -154,6 +163,7 @@
           id="ciudad"
           [(ngModel)]="direccion.ciudad"
           required
+          [readonly]="readOnlyForm"
           autofocus
         />
         <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
@@ -167,6 +177,7 @@
           type="text"
           pInputText
           id="codigoPostal"
+          [readonly]="readOnlyForm"
           [(ngModel)]="direccion.codigoPostal"
           required
           autofocus
@@ -181,12 +192,14 @@
 
       <div class="p-field">
         <label for="diagnostico">Diagnóstico</label>
-        <textarea pInputTextarea id="diagnostico" [(ngModel)]="emergencia.diagnostico"></textarea>
+        <textarea pInputTextarea id="diagnostico" [readonly]="readOnlyForm"
+                  [(ngModel)]="emergencia.diagnostico "></textarea>
       </div>
 
       <div class="p-field">
         <label for="sintomas">Sintomas *</label>
-        <textarea pInputTextarea id="sintomas" [(ngModel)]="emergencia.sintomas" required></textarea>
+        <textarea pInputTextarea id="sintomas" [readonly]="readOnlyForm" [(ngModel)]="emergencia.sintomas"
+                  required></textarea>
         <small class="p-invalid" *ngIf="submitted && !emergencia.sintomas"
         >Sintomas es required.</small>
       </div>
@@ -194,7 +207,8 @@
       <div class="p-field">
         <label for="medicoId">Dr. *</label>
         <p-autoComplete
-          dropdown = "true"
+          [readonly]="readOnlyForm"
+          [dropdown]="!readOnlyForm"
           [(ngModel)]="medicoCentroMedicoAseguradora"
           [showEmptyMessage]="true"
           [suggestions]="filteredMedicoCentroMedicoAseguradoras"
@@ -204,34 +218,36 @@
           [appendTo]="'body'"
           required>
         </p-autoComplete>
-        <small class="p-invalid" *ngIf="submitted && !medicoCentroMedicoAseguradora">Dr. Preferencia es requerido.</small>
+        <small class="p-invalid" *ngIf="submitted && !medicoCentroMedicoAseguradora">Dr. Preferencia es
+          requerido.</small>
       </div>
 
-      <div class="p-field">
-        <label for="estado">Estado</label>
-        <input type="text" pInputText id="estado" readonly [(ngModel)]="emergencia.estado" />
-      </div>
       <div class="p-field">
         <label for="fotoEmergencia">Foto Emergencia (*)</label>
         <div class="upload-container">
-          <p-fileUpload [disabled]="readOnlyForm" name="fotoEmergencia" #fileUploadRef (onSelect)="onFileSelect($event)" mode="basic" [auto]="false"
-            accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'" customUpload="true"></p-fileUpload>
-          <button *ngIf="imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash" class="p-button-danger p-button-icon-only"
-            (click)="clearImageSelection(fileUploadRef)"></button>
+          <p-fileUpload [disabled]="readOnlyForm" name="fotoEmergencia" #fileUploadRef (onSelect)="onFileSelect($event)"
+                        mode="basic" [auto]="false"
+                        accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
+                        customUpload="true"></p-fileUpload>
+          <button *ngIf="imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
+                  class="p-button-danger p-button-icon-only"
+                  (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
         <img *ngIf="(imagePreview && !emergencia.id) || (imagePreview && editImage)" [src]="imagePreview"
-          alt="Vista Previa" class="image-preview" (click)="showDialogImage()"    loading="lazy"  />
+             alt="Vista Previa" class="image-preview" (click)="showDialogImage()" loading="lazy"/>
         <img *ngIf="imagePreview && emergencia.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
-          alt="Vista Previa" class="image-preview" (click)="showDialogImage()"    loading="lazy" />
+             alt="Vista Previa" class="image-preview" (click)="showDialogImage()" loading="lazy"/>
 
-        <br />
+        <br/>
       </div>
 
       <div class="custom-button-container">
-        <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm" class="p-button-secondary" style="width: 30%;"
-          (click)="hideDialog()"></button>
-        <button pButton pRipple label="Guardar" icon="pi pi-check" [disabled]="readOnlyForm" class="p-button-primary" style="width: 30%;"
-          (click)="saveEmergencia()"></button>
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm" class="p-button-secondary"
+                style="width: 30%;"
+                (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" [disabled]="readOnlyForm" class="p-button-primary"
+                style="width: 30%;"
+                (click)="saveEmergencia()"></button>
       </div>
 
       <p-blockUI [blocked]="loading">
@@ -242,35 +258,119 @@
     </p-panel>
   </div>
 </div>
-<div class="card">
+<div class="card" *ngIf="emergencia?.id && !habilitarEdicionComentario">
   <p-panel styleClass="p-fluid" header="Comentarios">
-    <div *ngFor="let comentario of comentarios">
-      <label for="nuevoComentario" style="font-weight: bold;">{{comentario.usuarioComenta.nombreUsuario}}
-        ({{comentario.usuarioComenta.rol.nombre}})</label>
+    <div *ngFor="let comentario of comentarios; let i = index">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px">
+        <label for="nuevoComentario" style="font-weight: bold;">
+          {{ comentario.usuarioComenta.nombreUsuario }} ({{ comentario.usuarioComenta.rol.nombre }})
+        </label>
+        <div class="custom-button-container"
+             *ngIf="comentario.usuarioComenta.nombreUsuario == user.nombreUsuario && !readOnlyForm">
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
+                  (click)="iniciarEdicion(comentario)"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning p-mr-2 small-button"
+                  (click)="deleteComentario(comentario)"></button>
+        </div>
+      </div>
       <textarea id="nuevoComentario" [(ngModel)]="comentario.contenido" rows="3" pInputTextarea readonly></textarea>
-      <!-- <button pButton pRipple icon="pi pi-trash" class="p-button-danger p-button-icon-only" (click)="deleteComentario(comentario.id)"></button> -->
+      <div style="display: flex; justify-content: space-between; margin-bottom: 5px" *ngIf="comentario.imagenId">
+        <div *ngIf="!comentario.imagePreview">
+          <span style="color: #3B82F6"><b> Cargando Imágen... </b></span>
+        </div>
+        <img *ngIf="comentario.imagePreview"
+             [src]="'data:image/jpeg;base64,' + comentario.imagePreview"
+             alt="Vista Previa" class="image-preview" (click)="showDialogImageComments(comentario)" loading="lazy"/>
+        <!-- Fecha de creación -->
+        <div style="text-align: right; font-size: small" >
+          <span>{{ comentario.lastModifiedDate | date: 'short' }}</span>
+        </div>
+      </div>
+      <div style="text-align: right; font-size: small" *ngIf="!comentario.imagenId">
+        <span>{{ comentario.lastModifiedDate | date: 'short' }}</span>
+      </div>
+
+      <hr class="comment-separator"/>
+
     </div>
-    <hr class="comment-separator"/>
 
     <div class="p-field">
-      <label for="nuevoComentario">Añadir Comentario</label>
-      <textarea id="nuevoComentario" [readonly]="readOnlyForm" [(ngModel)]="nuevoComentario" rows="3" pInputTextarea></textarea>
+      <h5>Añadir Comentario</h5>
+      <textarea id="nuevoComentario" [readonly]="readOnlyForm" [(ngModel)]="nuevoComentario" rows="3"
+                pInputTextarea></textarea>
+
+      <div class="upload-container">
+        <p-fileUpload [disabled]="readOnlyForm" name="newCommentImage" #fileUploadRefNew
+                      (onSelect)="onNewCommentImageSelect($event)"
+                      mode="basic" [auto]="false"
+                      accept="image/*"
+                      [chooseLabel]="nombreDocumentoComment ? nombreDocumentoComment : 'Seleccionar Archivo'"
+                      customUpload="true"></p-fileUpload>
+        <button *ngIf="newCommentImagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
+                class="p-button-danger p-button-icon-only"
+                (click)="removeNewCommentImage(fileUploadRefNew)"></button>
+      </div>
+
+      <img *ngIf="newCommentImagePreview" [src]="newCommentImagePreview" (click)="showDialogNuevaImageComments()" alt="Vista Previa de Imagen"
+           class="image-preview"/>
     </div>
     <div class="custom-button-container">
-      <button pButton pRipple label="Cerrar" [disabled]="readOnlyForm" icon="pi pi-check" class="p-button-danger" style="width: 30%;"
-        (click)="cerrarTramite()"></button>
-      <button pButton pRipple label="Guardar" [disabled]="readOnlyForm" icon="pi pi-check" class="p-button-primary" style="width: 30%;"
-        (click)="addComentario()"></button>
+      <button pButton pRipple label="Cerrar"
+              [disabled]="readOnlyForm || !habilitarCierreTramite"
+              icon="pi pi-check"
+              class="p-button-danger"
+              style="width: 30%;"
+              (click)="cerrarTramite()"></button>
+      <button pButton pRipple label="Guardar"
+              [disabled]="readOnlyForm" icon="pi pi-check" class="p-button-primary"
+              style="width: 30%;"
+              (click)="addComentario(fileUploadRefNew)"></button>
+    </div>
+  </p-panel>
+</div>
+<div class="card" *ngIf="habilitarEdicionComentario">
+  <p-panel styleClass="p-fluid" header="Editar Comentario">
+    <div class="p-field">
+      <label for="editComentario" style="font-weight: bold;">{{ comentarioEdit.usuarioComenta.nombreUsuario }}
+        ({{ comentarioEdit.usuarioComenta.rol.nombre }})</label>
+      <textarea id="editComentario" [(ngModel)]="comentarioEdit.contenido" rows="3" pInputTextarea></textarea>
+
+      <div class="upload-container">
+        <p-fileUpload [disabled]="readOnlyForm" name="newCommentImage" #fileUploadRef
+                      (onSelect)="onEditCommentImageSelect($event)"
+                      mode="basic" [auto]="false"
+                      accept="image/*"
+                      [chooseLabel]="comentarioEdit.nombreDocumento ? comentarioEdit.nombreDocumento : 'Seleccionar Archivo'"
+                      customUpload="true"></p-fileUpload>
+        <button *ngIf="comentarioEdit.imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
+                class="p-button-danger p-button-icon-only"
+                (click)="removeEditCommentImage(fileUploadRef)"></button>
+      </div>
+
+      <img *ngIf="comentarioEdit.imagePreview && editImageComment" [src]="comentarioEdit.imagePreview"
+           alt="Vista Previa" class="image-preview" (click)="showDialogImageComments(comentarioEdit)" loading="lazy"/>
+      <img *ngIf="comentarioEdit.imagePreview && !editImageComment"
+           [src]="'data:image/jpeg;base64,' + comentarioEdit.imagePreview"
+           alt="Vista Previa" class="image-preview" (click)="showDialogImageComments(comentarioEdit)" loading="lazy"/>
+    </div>
+    <div class="custom-button-container">
+      <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-secondary" style="width: 30%;"
+              (click)="cancelarEdicion()"></button>
+      <button pButton pRipple label="Guardar"
+              [disabled]="readOnlyForm" icon="pi pi-check" class="p-button-primary"
+              style="width: 30%;"
+              (click)="actualizarComentario()"></button>
     </div>
   </p-panel>
 </div>
 
 <!-- Agrega el siguiente código al final de tu plantilla -->
-<p-dialog header="Vista Previa de la Imagen" [(visible)]="displayDialog" [modal]="true" [style]="{width: '50vw'}">
-  <img *ngIf="(imagePreview && !emergencia.id) || (imagePreview && editImage)" [src]="imagePreview"
-    alt="Vista Previa Completa" class="full-image-preview" />
-  <img *ngIf="imagePreview && emergencia.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
-    alt="Vista Previa Completa" class="full-image-preview" />
+<p-dialog header="{{nombreDocumentoComplete}}" [(visible)]="displayDialog" [modal]="true" [style]="{width: '50vw'}">
+  <img *ngIf="imageComplete && editingCommentImageComplete" [src]="imageComplete"
+       alt="Vista Previa Completa" class="full-image-preview"/>
+  <img *ngIf="imageComplete && !editingCommentImageComplete" [src]="'data:image/jpeg;base64,' + imageComplete"
+       alt="Vista Previa Completa" class="full-image-preview"/>
 </p-dialog>
+
 
 <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

@@ -54,15 +54,21 @@ export class AddEmergenciasComponent implements OnInit {
   displayDialog: boolean = false;
   imagenCambiadaEdit: boolean = false;
 
+  editImageComment = false
   editImage = false
   readOnlyForm = false
 
   imagePreview: SafeUrl | null = null; // Utilizamos SafeUrl para la URL segura de la imagen
 
+  imageComplete: SafeUrl | null = null; // Utilizamos SafeUrl para la URL segura de la imagen
+
   comentarios: any[] = [];
   nuevoComentario: string = '';
   imagen
   nombreDocumento
+  nombreDocumentoComplete
+  nombreDocumentoComment = "Seleccionar imagen"
+
   medicoCentroMedicoAseguradora: any;
 
   filteredCentrosMedicos
@@ -82,6 +88,18 @@ export class AddEmergenciasComponent implements OnInit {
   filteredEstados: any[];
 
   originCaso: boolean = false
+  habilitarCierreTramite: boolean = false
+  habilitarEdicionComentario: boolean = false
+
+  rolesCierreTramite = ["ASR", "BRO"]
+  user
+
+  comentarioEdit
+  newCommentImage: File | null = null;
+  editCommentImage: File | null = null;
+  editingCommentImageComplete: boolean = false;
+
+  newCommentImagePreview: string | null = null;
 
   constructor(
     private messageService: MessageService,
@@ -93,6 +111,7 @@ export class AddEmergenciasComponent implements OnInit {
     private imagenService: ImagenesService,
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
+    private confirmationService: ConfirmationService,
     private authService: AuthService,
     private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService,
     private centrosMedicosService: CentrosMedicosService,
@@ -103,21 +122,25 @@ export class AddEmergenciasComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
-    this.openNew();
+    this.user = await this.authService.obtenerUsuarioLoggeado()
 
+    this.habilitarCierreTramite = this.rolesCierreTramite.includes(this.user.rol.codigo)
+
+    this.openNew();
     await this.prepareData();
 
-    if (await this.getRouteParams('emergenciaId')) {
+    if (await this.getRouteParams('emergenciaId') || localStorage.getItem('emergencia')) {
       this.nombreDocumento = 'Cargando ...'
       const emergencia = JSON.parse(localStorage.getItem('emergencia'));
 
       this.emergenciaId = +(await this.getRouteParams('emergenciaId'));
-      this.emergencia = emergencia
+      if (!this.emergenciaId)
+        this.emergenciaId = emergencia.id
+
+      this.emergencia = await this.emergenciasService.getEmergencia(emergencia.id)
 
       this.codigoDocumento = "# " + this.emergencia.codigo
       this.selectedCliente = this.emergencia.clientePoliza.cliente
-
-      console.log(this.emergencia, "  EMERGENCIAS")
 
       if (this.emergencia.direccion) {
         this.direccion = this.emergencia.direccion;
@@ -146,9 +169,12 @@ export class AddEmergenciasComponent implements OnInit {
 
       this.medicoCentroMedicoAseguradora = this.emergencia.medicoCentroMedicoAseguradora
       this.centroMedico = this.emergencia.medicoCentroMedicoAseguradora.centroMedico
+      if (this.emergencia.estado == 'C')
+        this.readOnlyForm = true
+
+      this.loading = false;
 
       this.comentarios = await this.comentariosEmergenciasService.getComentariosByEmergencia(this.emergenciaId);
-      this.loading = false;
 
       if (emergencia.imagenId) {
         let foto = await this.imagenService.getImagen(emergencia.imagenId);
@@ -163,9 +189,7 @@ export class AddEmergenciasComponent implements OnInit {
         this.nombreDocumento = undefined
       }
 
-      if (emergencia.estado == 'C')
-        this.readOnlyForm = true
-
+      this.cargarImagenesComentarios()
       return
     }
 
@@ -191,29 +215,144 @@ export class AddEmergenciasComponent implements OnInit {
     }
 
     this.loading = false;
+    this.emergenciaDialog = true;
   }
 
-  async addComentario() {
+  async iniciarEdicion(comentario: any) {
+    if (comentario.usuarioComenta.nombreUsuario === this.user.nombreUsuario && !this.readOnlyForm) {
+      comentario.enEdicion = true;
+      comentario.contenidoOriginal = comentario.contenido;
+      this.comentarioEdit = comentario
+      this.habilitarEdicionComentario = true
+      this.editImageComment = false
+    }
+  }
+
+  getEstadoLabel(estado: string): string {
+    switch (estado) {
+      case 'C':
+        return 'CERRADO';
+      case 'N':
+        return 'POR GESTIONAR';
+      case 'G':
+        return 'GESTIONANDO';
+      case 'I':
+        return 'ELIMINADO';
+      default:
+        return 'DRAFT';
+    }
+  }
+
+  async actualizarComentario() {
     this.loading = true
+    const comentarioToUpdate = {
+      emergenciaId: this.emergenciaId,
+      contenido: this.comentarioEdit.contenido,
+      usuarioComentaId: this.user.id,
+      estado: 'A', // Estado activo
+      nombreDocumento: this.comentarioEdit.nombreDocumento
+    };
+
+    const formData = new FormData();
+    formData.append('comentarioEmergencia', new Blob([JSON.stringify(comentarioToUpdate)], {type: 'application/json'}));
+
+    if (this.editCommentImage) {
+      formData.append('fotoComentarioEmergencia', this.editCommentImage);
+    }
+
+    try {
+      await this.comentariosEmergenciasService.updateComentario(this.comentarioEdit.id, formData);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Comentario actualizado',
+        detail: 'Comentario actualizado con éxito'
+      });
+
+      this.habilitarEdicionComentario = false
+      await this.loadComentarios();
+      this.loading = false
+      await this.cargarImagenesComentarios();
+    } catch (error) {
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al actualizar el comentario'});
+      this.loading = false
+    }
+    this.loading = false
+  }
+
+  async cancelarEdicion() {
+    this.loading = true
+    await this.loadComentarios()
+    this.habilitarEdicionComentario = false
+    this.comentarioEdit = {}
+    this.loading = false
+    await this.cargarImagenesComentarios()
+  }
+
+
+  async cargarImagenesComentarios(){
+    for (const comentario of this.comentarios) {
+      if (comentario.imagenId) {
+        let foto = await this.imagenService.getImagen(comentario.imagenId);
+        comentario.imagen = foto.documento
+        comentario.nombreDocumento = foto.nombreDocumento
+      }
+
+      if (comentario.imagen) {
+        comentario.imagePreview = comentario.imagen;
+      } else {
+        comentario.nombreDocumento = undefined
+      }
+    }
+
+    console.log(this.comentarios)
+  }
+
+  async addComentario(fileUploadRefNew) {
+    this.loading = true
+    if (this.nuevoComentario == "") {
+      this.loading = false
+      return this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al añadir el comentario, está vacío el texto'
+      });
+    }
+
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
     const comentario = {
       emergenciaId: this.emergenciaId,
       contenido: this.nuevoComentario,
       usuarioComentaId: currentUser.id,
-      estado: 'A' // Estado activo
+      estado: 'A', // Estado activo
+      nombreDocumento: this.nombreDocumentoComment
     };
+    const formData = new FormData();
+    formData.append('comentarioEmergencia', new Blob([JSON.stringify(comentario)], {type: 'application/json'}));
+
+    if (this.newCommentImage) {
+      formData.append('fotoComentarioEmergencia', this.newCommentImage);
+    }
 
     try {
-      await this.comentariosEmergenciasService.createComentario(comentario);
+      let comentarioSaved = await this.comentariosEmergenciasService.createComentario(formData);
+      this.emergencia.estado = comentarioSaved.emergencia.estado
       this.nuevoComentario = '';
+
+      this.newCommentImage = null;
+      this.newCommentImagePreview = null;
+      this.nombreDocumentoComment = null
+
+      fileUploadRefNew.clear()
       await this.loadComentarios();
+      this.loading = false
+      await this.cargarImagenesComentarios()
       this.messageService.add({
         severity: 'success',
         summary: 'Comentario añadido',
         detail: 'Comentario añadido con éxito'
       });
-      this.loading = false
     } catch (error) {
+      console.log(error)
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
       this.loading = false
     }
@@ -221,6 +360,7 @@ export class AddEmergenciasComponent implements OnInit {
 
   async cerrarTramite() {
     this.loading = true
+    try {
     let currentUser = await this.authService.obtenerUsuarioLoggeado();
     const comentario = {
       emergenciaId: this.emergenciaId,
@@ -229,22 +369,20 @@ export class AddEmergenciasComponent implements OnInit {
       estado: 'C' // Estado activo
     };
 
-    await this.emergenciasService.partiallyUpdateEmergencia(this.emergencia.id, 'C')
+      const partiallyUpdateObject = {
+        estado: 'C',
+        comentarioEmergenciaRequest: comentario
+      };
 
-    this.readOnlyForm = true
+      let emergenciaUpdated = await this.emergenciasService.partiallyUpdateEmergencia(this.emergencia.id, partiallyUpdateObject)
 
-    try {
-      await this.comentariosEmergenciasService.createComentario(comentario);
-      this.nuevoComentario = '';
-      await this.loadComentarios();
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Comentario añadido',
-        detail: 'Cita médica cerrada con éxito'
-      });
+      this.emergencia.estado = emergenciaUpdated.estado
+      this.readOnlyForm = true
       this.loading = false
+      await this.loadComentarios();
+      await this.cargarImagenesComentarios()
     } catch (error) {
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al añadir el comentario'});
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al cerrar la emergencia'});
       this.loading = false
     }
   }
@@ -255,6 +393,54 @@ export class AddEmergenciasComponent implements OnInit {
     } catch (error) {
       console.error('Error al cargar los comentarios', error);
     }
+  }
+
+  onNewCommentImageSelect(event: any): void {
+
+    this.newCommentImage = event.files[0];
+    this.nombreDocumentoComment = this.newCommentImage.name
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.newCommentImagePreview = e.target.result;
+    };
+    reader.readAsDataURL(this.newCommentImage);
+  }
+
+  onEditCommentImageSelect(event: any): void {
+    this.editImageComment = true
+    this.editCommentImage = event.files[0];
+    this.comentarioEdit.nombreDocumento = this.editCommentImage.name
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.comentarioEdit.imagePreview = e.target.result;
+    };
+    reader.readAsDataURL(this.editCommentImage);
+  }
+
+
+  async deleteComentario(comentario: any) {
+    this.confirmationService.confirm({
+      message: 'Estás seguro de eliminar el comentario ' + comentario.contenido + '?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: async () => {
+        this.loading = true
+        await this.comentariosEmergenciasService.deleteComentario(comentario.id);
+        await this.loadComentarios();
+        this.loading = false
+
+        await this.cargarImagenesComentarios()
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Enhorabuena!',
+          detail: 'Registro eliminado exitosamente',
+          life: 3000,
+        });
+      },
+    });
   }
 
   onFileSelect(event) {
@@ -286,7 +472,57 @@ export class AddEmergenciasComponent implements OnInit {
   }
 
   showDialogImage() {
+    this.imageComplete = this.imagePreview
+    this.editingCommentImageComplete = this.editImage
+    this.nombreDocumentoComplete = this.nombreDocumento
     this.displayDialog = true;
+  }
+
+  showDialogImageComments(comentario) {
+    this.imageComplete = comentario.imagePreview
+    this.editingCommentImageComplete = false
+    this.nombreDocumentoComplete = comentario.nombreDocumento
+    this.displayDialog = true;
+  }
+
+  showDialogNuevaImageComments() {
+    this.imageComplete = this.newCommentImagePreview
+    this.editingCommentImageComplete = true
+    this.nombreDocumentoComplete = this.nombreDocumentoComment
+    this.displayDialog = true;
+  }
+
+  onFileSelectCommentUpdate(event, comentario) {
+    if (comentario.emergencia)
+      comentario.editImage = true;
+
+    const file = event.files[0];
+    comentario.imagen = file;
+    comentario.nombreDocumento = comentario.name
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      comentario.imagePreview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    comentario.imagenCambiadaEdit = true
+  }
+
+  removeNewCommentImage(fileUploadRef): void {
+    this.newCommentImage = null;
+    this.newCommentImagePreview = null;
+    this.nombreDocumentoComment = null
+    fileUploadRef.clear();
+  }
+
+  removeEditCommentImage(fileUploadRef): void {
+    this.editImageComment = true;
+    this.editCommentImage = null;
+
+    this.comentarioEdit.nombreDocumento  = null;
+    this.comentarioEdit.imagePreview  = null;
+    fileUploadRef.clear();
   }
 
   async prepareClientePolizaData() {
@@ -391,11 +627,18 @@ export class AddEmergenciasComponent implements OnInit {
       } else {
         let emergenciaSaved = await this.emergenciasService.guardarEmergencia(formData);
         this.codigoDocumento = "# " + emergenciaSaved.codigo
+
+        this.emergencia.id = emergenciaSaved.id
+        this.emergenciaId = emergenciaSaved.id
+        this.emergencia.estado = emergenciaSaved.estado
+        localStorage.setItem("emergenciaId", emergenciaSaved.id);
+        localStorage.setItem("emergencia", JSON.stringify(emergenciaSaved));
       }
 
       this.loading = false;
       this.messageService.add({severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito'});
     } catch (error) {
+      console.log(error)
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al guardar el emergencia'});
     } finally {
       this.loading = false; // Ocultar spinner
