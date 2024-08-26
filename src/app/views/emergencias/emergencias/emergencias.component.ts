@@ -312,7 +312,7 @@ export class EmergenciasComponent implements OnInit {
 
     if (this.selectedCaso?.id) {
       localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
-      localStorage.setItem("caso", JSON.stringify(this.caso));
+      localStorage.setItem("caso", JSON.stringify(this.selectedCaso));
       localStorage.removeItem('emergencia')
 
       const queryParamsClientePoliza = {
@@ -329,6 +329,8 @@ export class EmergenciasComponent implements OnInit {
 
     localStorage.removeItem("clientePoliza");
     localStorage.removeItem("caso");
+    localStorage.removeItem('emergencia')
+
     this.router.navigate([redirect]);
 
   }

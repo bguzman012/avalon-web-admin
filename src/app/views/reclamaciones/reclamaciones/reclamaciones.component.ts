@@ -313,7 +313,7 @@ export class ReclamacionesComponent implements OnInit {
 
     if (this.selectedCaso?.id) {
       localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
-      localStorage.setItem("caso", JSON.stringify(this.caso));
+      localStorage.setItem("caso", JSON.stringify(this.selectedCaso));
       localStorage.removeItem('reclamacion')
 
       const queryParamsClientePoliza = {
@@ -330,6 +330,7 @@ export class ReclamacionesComponent implements OnInit {
     }
     localStorage.removeItem("clientePoliza");
     localStorage.removeItem("caso");
+    localStorage.removeItem('reclamacion')
 
     this.router.navigate([redirect]);
 
