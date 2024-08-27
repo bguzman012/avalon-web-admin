@@ -273,7 +273,6 @@ export class ClientesComponent implements OnInit {
       } else {
         this.usuario.rolId = this.ROL_CLIENTE_ID;
         this.usuario.estado = 'P';
-        this.usuario.contrasenia = environment.pass_default;
         this.direccion.paisId = this.pais.id;
         this.direccion.estadoId = this.estado.id;
         this.usuario.direccion = this.direccion;
