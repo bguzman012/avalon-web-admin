@@ -11,29 +11,33 @@ import { IconModule } from '@coreui/icons-angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BlockUIModule } from 'primeng/blockui';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {ChangePasswordComponent} from "./change-password/change-password.component";
 
 
 @NgModule({
   declarations: [
+    ChangePasswordComponent,
     LoginComponent,
     RegisterComponent,
     Page404Component,
     Page500Component
   ],
-  imports: [
-    CommonModule,
-    PagesRoutingModule,
-    CardModule,
-    ButtonModule,
-    ReactiveFormsModule,
-    GridModule,
-    IconModule,
-    FormModule,
-    FormModule,
-    BlockUIModule,
-    ProgressSpinnerModule,
-		
-  ]
+    imports: [
+        CommonModule,
+        PagesRoutingModule,
+        CardModule,
+        ButtonModule,
+        ReactiveFormsModule,
+        GridModule,
+        IconModule,
+        FormModule,
+        FormModule,
+        BlockUIModule,
+        ProgressSpinnerModule,
+        ConfirmDialogModule,
+
+    ]
 })
 export class PagesModule {
 }

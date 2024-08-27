@@ -9,10 +9,10 @@ import * as CryptoJS from 'crypto-js';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  templateUrl: './change-password.component.html',
+  styleUrls: ['./change-password.component.scss']
 })
-export class LoginComponent {
+export class ChangePasswordComponent {
 
   loginForm: FormGroup;
   loginError: boolean = false;
@@ -60,7 +60,7 @@ export class LoginComponent {
                   header: 'Cambio de contraseña requerido',
                   icon: 'pi pi-exclamation-triangle',
                   accept: async () => {
-                    this.router.navigate(['change-password']);
+
                   },
                 });
               } else

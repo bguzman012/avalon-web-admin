@@ -6,6 +6,7 @@ import { Page404Component } from './views/pages/page404/page404.component';
 import { Page500Component } from './views/pages/page500/page500.component';
 import { LoginComponent } from './views/pages/login/login.component';
 import { RegisterComponent } from './views/pages/register/register.component';
+import {ChangePasswordComponent} from "./views/pages/change-password/change-password.component";
 
 const routes: Routes = [
   {
@@ -179,6 +180,12 @@ const routes: Routes = [
     component: LoginComponent,
     data: {
       title: 'Login Page'
+    }
+  },{
+    path: 'change-password',
+    component: ChangePasswordComponent,
+    data: {
+      title: 'Cambiar contraseña'
     }
   },
   {
