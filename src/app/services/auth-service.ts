@@ -14,6 +14,7 @@ export class AuthService {
   private tokenKey = 'token_key';
   private idKey = 'info_ad';
   private credenciales = 'cred';
+  private dosFA = 'fa';
   private secretKey = environment.secret; // Deberías almacenar esta clave de forma segura
 
   constructor(private http: HttpClient) {
@@ -24,6 +25,25 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(
       map(response => response),
       tap(response => this.setCredencials(response.token, response.id, username, password))
+    );
+  }
+
+  verifyCode(username: string, codigo: string): Observable<any> {
+    const data = {
+      usuario: username,
+      codigo: codigo
+    };
+    return this.http.post<any>(`${this.apiUrl}/verify-code`, data).pipe(
+      map(response => response)
+    );
+  }
+
+  enviarCodigo2FA(username: string): Observable<any> {
+    const data = {
+      userName: username
+    };
+    return this.http.post<any>(`${this.apiUrl}/send-code`, data).pipe(
+      map(response => response)
     );
   }
 
@@ -55,6 +75,15 @@ export class AuthService {
     return null;
   }
 
+  getAutenticadoDosFA(): string | null {
+    const encryptedAuthDosFA = localStorage.getItem(this.dosFA);
+    if (encryptedAuthDosFA) {
+      const bytes = CryptoJS.AES.decrypt(encryptedAuthDosFA, this.secretKey);
+      return bytes.toString(CryptoJS.enc.Utf8);
+    }
+    return null;
+  }
+
   getId(): string | null {
     const encryptedId = localStorage.getItem(this.idKey);
     if (encryptedId) {
@@ -63,7 +92,6 @@ export class AuthService {
     }
     return null;
   }
-
 
   getCredencials(): any | null {
     const encryptedCredentials = localStorage.getItem(this.credenciales);
@@ -89,8 +117,18 @@ export class AuthService {
     localStorage.setItem(this.idKey, encryptedId);
   }
 
+  setAutenticado2FA(): void {
+    const encryptedAuthDosFA = CryptoJS.AES.encrypt("AUTENTICADO_2FA", this.secretKey).toString();
+
+    localStorage.setItem(this.dosFA, encryptedAuthDosFA);
+  }
+
   clearToken(): void {
     localStorage.removeItem(this.tokenKey);
+  }
+
+  clearAll(): void {
+    localStorage.clear();
   }
 
   async obtenerUsuarioLoggeado(): Promise<any> {

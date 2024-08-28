@@ -1,9 +1,10 @@
+<p-toast></p-toast>
 <div class="bg-light min-vh-100 d-flex flex-row align-items-center">
   <p-blockUI [blocked]="loading">
     <div class="p-field" *ngIf="loading">
-        <p-progressSpinner></p-progressSpinner>
+      <p-progressSpinner></p-progressSpinner>
     </div>
-</p-blockUI>
+  </p-blockUI>
   <c-container>
     <c-row class="justify-content-center">
       <c-col md="8">
@@ -17,14 +18,14 @@
                   <span cInputGroupText>
                     <svg cIcon name="cilUser"></svg>
                   </span>
-                  <input formControlName="username" autoComplete="username" cFormControl placeholder="Username" />
+                  <input formControlName="username" autoComplete="username" cFormControl placeholder="Username"/>
                 </c-input-group>
                 <c-input-group class="mb-4">
                   <span cInputGroupText>
                     <svg cIcon name="cilLockLocked"></svg>
                   </span>
                   <input formControlName="password" autoComplete="current-password" cFormControl placeholder="Password"
-                    type="password" />
+                         type="password"/>
                 </c-input-group>
                 <span *ngIf="loginError" class="text-danger">{{ loginErrorMessage }}</span>
                 <c-row>
@@ -41,7 +42,7 @@
           <c-card class="image-card">
             <c-card-body class="image-body">
               <img src="assets/img/brand/Isotipo1.png" alt="SignUp Image"
-                class="img-fluid" />
+                   class="img-fluid"/>
             </c-card-body>
           </c-card>
         </c-card-group>
@@ -49,4 +50,71 @@
     </c-row>
   </c-container>
 </div>
+<p-dialog [(visible)]="dosFADialog" [style]="{width: '500px'}" header="Código Doble Autenticación" [modal]="true"
+          styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <label for="codigo2FA">Código 2FA</label>
+      <input
+        type="text"
+        pInputText
+        id="codigo2FA"
+        [(ngModel)]="inputDosFa"
+        required
+        placeholder="Ingrese código de 6 dígitos"
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !inputDosFa"
+      >Código 2FA es requerido.</small
+      >
+    </div>
+    <span *ngIf="verificationCodeMessage" class="text-danger">{{ verificationCodeMessage }}</span>
+
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+<!--    <div>-->
+<!--      <button-->
+<!--        pButton-->
+<!--        label="Reenviar Código"-->
+<!--        icon="pi pi-times"-->
+<!--        class="p-button-danger"-->
+<!--        (click)="cancelar()"-->
+<!--      ></button>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--      <button-->
+<!--        pButton-->
+<!--        label="Verificar"-->
+<!--        icon="pi pi-check"-->
+<!--        type="button"-->
+<!--        (click)="verificarCodigo()"-->
+<!--      ></button>-->
+<!--    </div>-->
+    <div class="button-container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <button
+        pButton
+        style="width: 250px"
+        label="Confirmar"
+        icon="pi pi-check"
+        type="button"
+        (click)="verificarCodigo()"
+      ></button>
+      <button
+        pButton
+        style="width: 250px"
+        label="Reenviar código"
+        icon="pi pi-refresh"
+        class="p-button-text"
+        (click)="reenviarCodigo()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
 <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

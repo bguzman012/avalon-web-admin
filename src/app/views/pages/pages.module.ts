@@ -15,6 +15,11 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ChangePasswordComponent} from "./change-password/change-password.component";
 import {PasswordModule} from "primeng/password";
 import {DividerModule} from "primeng/divider";
+import {AutoCompleteModule} from "primeng/autocomplete";
+import {CalendarModule} from "primeng/calendar";
+import {DialogModule} from "primeng/dialog";
+import {InputTextModule} from "primeng/inputtext";
+import {ToastModule} from "primeng/toast";
 
 
 @NgModule({
@@ -25,24 +30,29 @@ import {DividerModule} from "primeng/divider";
     Page404Component,
     Page500Component
   ],
-  imports: [
-    CommonModule,
-    PagesRoutingModule,
-    CardModule,
-    DividerModule,
-    ButtonModule,
-    ReactiveFormsModule,
-    GridModule,
-    PasswordModule,
-    IconModule,
-    FormModule,
-    FormModule,
-    BlockUIModule,
-    ProgressSpinnerModule,
-    ConfirmDialogModule,
-    FormsModule,
+    imports: [
+        CommonModule,
+        PagesRoutingModule,
+        CardModule,
+        DividerModule,
+        ButtonModule,
+        ReactiveFormsModule,
+        GridModule,
+        PasswordModule,
+        IconModule,
+        FormModule,
+        FormModule,
+        BlockUIModule,
+        ProgressSpinnerModule,
+        ConfirmDialogModule,
+        FormsModule,
+        AutoCompleteModule,
+        CalendarModule,
+        DialogModule,
+        InputTextModule,
+        ToastModule,
 
-  ]
+    ]
 })
 export class PagesModule {
 }

@@ -16,18 +16,27 @@ export class LoginComponent {
 
   loginForm: FormGroup;
   loginError: boolean = false;
+  dosFADialog: boolean = false;
+  submitted: boolean = false;
+
+  inputDosFa: string = ""
+
   loginErrorMessage: string = '';
+  verificationCodeMessage: string = '';
   loading: boolean = false;
   ASUNTO_CAMBIO_CONTRASENIA = "CAMBIO_CONTRASENIA"
+  ASUNTO_LOGIN_EXITOSO_2FA = "LOGIN_EXITOSO_2FA"
 
   constructor(private fb: FormBuilder,
               private authService: AuthService,
               private router: Router,
               private confirmationService: ConfirmationService,
               private messageService: MessageService,) {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (isLoggedIn == true)
-      this.router.navigate(['/pets/usuarios']);
+    const AUTENTICADO_2FA = this.authService.getAutenticadoDosFA();
+
+
+    if (AUTENTICADO_2FA == "AUTENTICADO_2FA")
+      this.router.navigate(['/clientes']);
 
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
@@ -58,9 +67,11 @@ export class LoginComponent {
                   this.router.navigate(['change-password']);
                 },
               });
-            } else {
+            }
+            if (response.asunto === this.ASUNTO_LOGIN_EXITOSO_2FA)  {
               // Lógica para un inicio de sesión exitoso normal
-              this.router.navigate(['/clientes']);
+              // this.router.navigate(['/clientes']);
+              this.dosFADialog = true
             }
           },
           (error) => {
@@ -82,5 +93,70 @@ export class LoginComponent {
       this.loginErrorMessage = "Formulario inválido";
       this.loading = false;
     }
+  }
+
+
+  async verificarCodigo(){
+    this.submitted = true
+    if (!this.inputDosFa) return
+
+    if (this.inputDosFa.length != 6) {
+      this.verificationCodeMessage = "El código ingresado debe tener 6 dígitos"
+      return
+    }
+
+    this.loading = true
+
+    let user = await this.authService.obtenerUsuarioLoggeado()
+
+    // Llamar al servicio para cambiar la contraseña
+    this.authService.verifyCode(user.nombreUsuario, this.inputDosFa)
+      .subscribe(
+        (response) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Enhorabuena!',
+            detail: 'Código verificado correctamente',
+            life: 3000,
+          });
+          this.dosFADialog = false
+          this.authService.setAutenticado2FA();
+          this.router.navigate(['/clientes']);
+        },
+        (error) => {
+          this.loading = false;
+          this.verificationCodeMessage = error.error.message || 'Ocurrió un error al verificar código 2FA';
+        }
+      );
+  }
+
+  async reenviarCodigo(){
+    this.loading = true
+
+    let user = await this.authService.obtenerUsuarioLoggeado()
+
+    // Llamar al servicio para cambiar la contraseña
+    this.authService.enviarCodigo2FA(user.nombreUsuario)
+      .subscribe(
+        (response) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Código 2FA',
+            detail: 'Código 2FA enviado exitosamente',
+            life: 3000,
+          });
+        },
+        (error) => {
+          this.loading = false;
+          this.verificationCodeMessage = error.error.message || 'Ocurrió un error al verificar código 2FA';
+        }
+      );
+  }
+
+  cancelar(){
+    this.submitted = false
+    this.dosFADialog = false
   }
 }
