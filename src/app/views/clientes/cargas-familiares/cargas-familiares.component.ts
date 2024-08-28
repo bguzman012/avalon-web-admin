@@ -7,6 +7,7 @@ import {PaisesService} from "../../../services/paises-service";
 import {EstadosService} from "../../../services/estados-service";
 import {UsuariosService} from "../../../services/usuarios-service";
 import {environment} from "../../../../environments/environment";
+import {AuthService} from "../../../services/auth-service";
 
 @Component({
   selector: 'cargas-familiares',
@@ -55,7 +56,10 @@ export class CargasFamiliaresComponent implements OnInit {
   sortField
   sortOrder
   ROL_CLIENTE_ID = 3;
+  ROL_ADMINISTRADOR_ID = 1;
   ESTADO_ACTIVO = 'A';
+  validarEnable = false;
+  validarCreacion = false;
 
   constructor(
     private messageService: MessageService,
@@ -66,7 +70,8 @@ export class CargasFamiliaresComponent implements OnInit {
     private estadosService: EstadosService,
     private route: ActivatedRoute,
     private router: Router,
-    private usuariosService: UsuariosService
+    private usuariosService: UsuariosService,
+    private authService: AuthService
   ) {
   }
 
@@ -78,6 +83,10 @@ export class CargasFamiliaresComponent implements OnInit {
 
     this.clientePoliza = JSON.parse(localStorage.getItem('clientePoliza'));
 
+    let user = await this.authService.obtenerUsuarioLoggeado();
+
+    if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true;
+    if (user.rol.id != this.ROL_CLIENTE_ID) this.validarCreacion = true;
     await this.refrescarListado();
     this.loading = false
   }

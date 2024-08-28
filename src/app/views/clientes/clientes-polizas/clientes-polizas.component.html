@@ -8,7 +8,7 @@
       </div>
     </ng-template>
     <ng-template pTemplate="right">
-      <button pButton pRipple label="Nueva" icon="pi pi-plus" class="p-button-success p-mr-2"
+      <button pButton pRipple label="Nueva" *ngIf="validarCreacion" icon="pi pi-plus" class="p-button-success p-mr-2"
               (click)="openNew()"></button>
     </ng-template>
   </p-toolbar>
@@ -90,7 +90,7 @@
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
                   (click)="editPoliza(clientePoliza)"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
-                  (click)="deletePoliza(clientePoliza)"></button>
+                  (click)="deletePoliza(clientePoliza)" *ngIf="validarEnable"></button>
         </td>
       </tr>
     </ng-template>
@@ -238,7 +238,7 @@
   </ng-template>
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="savePoliza()"></button>
+    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" [disabled]="!validarCreacion" (click)="savePoliza()"></button>
   </ng-template>
 </p-dialog>
 

@@ -51,6 +51,8 @@ export class ClientesComponent implements OnInit {
   loading: boolean = false;
   rolId;
   validarEnable = false;
+  validarCreacion = false;
+
   filteredAseguradoras;
 
   first: number = 0;
@@ -78,6 +80,8 @@ export class ClientesComponent implements OnInit {
     await this.refrescarListado(this.ESTADO_BUSQUEDA);
     let user = await this.authService.obtenerUsuarioLoggeado();
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true;
+    if (user.rol.id != this.ROL_CLIENTE_ID) this.validarCreacion = true;
+
     this.loading = false;
   }
 

@@ -11,7 +11,7 @@
 
     <ng-template pTemplate="right">
       <button pButton pRipple label="Nueva Carga Familiar" icon="pi pi-plus" class="p-button-success p-mr-2"
-              (click)="openNew()"></button>
+              (click)="openNew()" *ngIf="validarCreacion"></button>
     </ng-template>
   </p-toolbar>
 
@@ -69,7 +69,7 @@
         <td style="text-align: right;">
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
                   (click)="editCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
-          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button" *ngIf="validarEnable"
                   (click)="deleteCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
         </td>
       </tr>
@@ -310,7 +310,7 @@
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
             (click)="hideDialog()"></button>
-    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
+    <button pButton pRipple label="Guardar" [disabled]="!validarCreacion" icon="pi pi-check" class="p-button-text"
             (click)="saveCargaFamiliar()"></button>
   </ng-template>
 </p-dialog>

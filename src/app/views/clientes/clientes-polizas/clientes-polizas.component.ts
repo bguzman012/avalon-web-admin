@@ -49,6 +49,7 @@ export class ClientesPolizasComponent implements OnInit {
 
   ROL_ASESOR_ID = 2;
   ROL_CLIENTE_ID = 3;
+  ROL_ADMINISTRADOR_ID = 1;
   ROL_BROKER_ID = 4;
 
   clienteId
@@ -64,6 +65,8 @@ export class ClientesPolizasComponent implements OnInit {
   sortOrder
 
   codigoDocumento: string = 'Nueva Póliza de Cliente'
+  validarCreacion = false;
+  validarEnable = false;
 
   constructor(
     private messageService: MessageService,
@@ -87,6 +90,10 @@ export class ClientesPolizasComponent implements OnInit {
     await this.refrescarListado();
 
     this.user = await this.authService.obtenerUsuarioLoggeado();
+
+    if (this.user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true;
+    if (this.user.rol.id != this.ROL_CLIENTE_ID) this.validarCreacion = true;
+
     this.loading = false;
   }
 

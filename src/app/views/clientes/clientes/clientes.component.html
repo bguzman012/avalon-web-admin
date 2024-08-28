@@ -7,6 +7,7 @@
     <ng-template pTemplate="right">
       <button
         pButton
+        *ngIf="validarCreacion"
         pRipple
         label="Nuevo Cliente"
         icon="pi pi-plus"
@@ -112,6 +113,7 @@
             pRipple
             icon="pi pi-trash"
             class="p-button-rounded p-button-warning small-button"
+            *ngIf="validarEnable"
             (click)="deleteUsuario(usuario); $event.stopPropagation()"
           ></button>
         </td>
@@ -311,6 +313,7 @@
       label="Guardar"
       icon="pi pi-check"
       class="p-button-text"
+      [disabled]="!validarCreacion"
       (click)="saveUsuario()"
     ></button>
   </ng-template>
