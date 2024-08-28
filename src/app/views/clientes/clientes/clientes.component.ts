@@ -181,6 +181,7 @@ export class ClientesComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
+        this.loading = true
         await this.usuariosService.partiallyUpdateUsuario(
           usuario.id,
           'A',
@@ -188,13 +189,14 @@ export class ClientesComponent implements OnInit {
         );
         this.first = 0;
         await this.refrescarListado(this.ESTADO_BUSQUEDA);
-
+        this.loading = false
         this.messageService.add({
           severity: 'success',
           summary: 'Enhorabuena!',
           detail: 'Usario habilitado exitosamente',
           life: 3000,
         });
+
       },
     });
   }

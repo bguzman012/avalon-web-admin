@@ -13,6 +13,8 @@ import { BlockUIModule } from 'primeng/blockui';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ChangePasswordComponent} from "./change-password/change-password.component";
+import {PasswordModule} from "primeng/password";
+import {DividerModule} from "primeng/divider";
 
 
 @NgModule({
@@ -23,21 +25,24 @@ import {ChangePasswordComponent} from "./change-password/change-password.compone
     Page404Component,
     Page500Component
   ],
-    imports: [
-        CommonModule,
-        PagesRoutingModule,
-        CardModule,
-        ButtonModule,
-        ReactiveFormsModule,
-        GridModule,
-        IconModule,
-        FormModule,
-        FormModule,
-        BlockUIModule,
-        ProgressSpinnerModule,
-        ConfirmDialogModule,
+  imports: [
+    CommonModule,
+    PagesRoutingModule,
+    CardModule,
+    DividerModule,
+    ButtonModule,
+    ReactiveFormsModule,
+    GridModule,
+    PasswordModule,
+    IconModule,
+    FormModule,
+    FormModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    ConfirmDialogModule,
+    FormsModule,
 
-    ]
+  ]
 })
 export class PagesModule {
 }

@@ -36,49 +36,51 @@ export class LoginComponent {
   }
 
   login(): void {
-    this.loading = true
+    this.loading = true;
+
     if (this.loginForm.valid) {
-      const username = this.loginForm.get('username')!.value; // Add '!' here
-      const password = this.loginForm.get('password')!.value; // Add '!' here
+      const username = this.loginForm.get('username')!.value;
+      const password = this.loginForm.get('password')!.value;
 
       this.authService.login(username, password)
         .subscribe(
           (response) => {
-            this.loading = false
-            this.router.navigate(['/clientes']);
+            this.loading = false;
+
+            if (response.asunto === this.ASUNTO_CAMBIO_CONTRASENIA) {
+
+              // Mostrar ConfirmationService si se requiere un cambio de contraseña
+              this.confirmationService.confirm({
+                message: response.message + ". ¿Desea continuar?",
+                header: 'Cambio de contraseña requerido',
+                icon: 'pi pi-exclamation-triangle',
+                accept: () => {
+                  this.router.navigate(['change-password']);
+                },
+              });
+            } else {
+              // Lógica para un inicio de sesión exitoso normal
+              this.router.navigate(['/clientes']);
+            }
           },
           (error) => {
-            // Handle login error
+            // Manejar error de inicio de sesión
             console.error('Login error:', error);
-            this.loginError = true
+            this.loginError = true;
 
             if (error.error) {
-              if (error?.error?.asunto == this.ASUNTO_CAMBIO_CONTRASENIA) {
-                this.confirmationService.confirm({
-                  message:
-                  error.error.message + ". ¿Desea continuar?",
-                  header: 'Cambio de contraseña requerido',
-                  icon: 'pi pi-exclamation-triangle',
-                  accept: async () => {
-                    this.router.navigate(['change-password']);
-                  },
-                });
-              } else
-                this.loginErrorMessage = error.error.message
-
-
+              this.loginErrorMessage = error.error.message;
             } else {
-              this.loginErrorMessage = "Ocurrió un error inesperado en la ejecución de la consulta"
+              this.loginErrorMessage = "Ocurrió un error inesperado en la ejecución de la consulta";
             }
-            this.loading = false
 
+            this.loading = false;
           }
         );
     } else {
-      // Handle form validation errors
-
-      this.loginErrorMessage = "Formulario inválido"
-      this.loading = false
+      // Manejar errores de validación del formulario
+      this.loginErrorMessage = "Formulario inválido";
+      this.loading = false;
     }
   }
 }

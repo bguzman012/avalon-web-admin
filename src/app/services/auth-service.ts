@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, from } from 'rxjs';
-import { catchError, map, tap, switchMap } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable, of, from} from 'rxjs';
+import {catchError, map, tap, switchMap} from 'rxjs/operators';
 import * as CryptoJS from 'crypto-js';
-import { environment } from '../../environments/environment'
+import {environment} from '../../environments/environment'
 
 
 @Injectable({
@@ -12,17 +12,29 @@ import { environment } from '../../environments/environment'
 export class AuthService {
   private apiUrl = `${environment.api_base}:8086`;
   private tokenKey = 'token_key';
-  private idKey= 'info_ad';
+  private idKey = 'info_ad';
   private credenciales = 'cred';
   private secretKey = environment.secret; // Deberías almacenar esta clave de forma segura
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+  }
 
-  login(username: string, password: string): Observable<string> {
-    const data = { usuario: username, contrasenia: password };
+  login(username: string, password: string): Observable<any> {
+    const data = {usuario: username, contrasenia: password};
     return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(
       map(response => response),
       tap(response => this.setCredencials(response.token, response.id, username, password))
+    );
+  }
+
+  changePassw(username: string, contraseniaActual: string, contraseniaNueva: string): Observable<any> {
+    const data = {
+      usuario: username,
+      contraseniaActual: contraseniaActual,
+      contraseniaNueva: contraseniaNueva
+    };
+    return this.http.post<any>(`${this.apiUrl}/change-password`, data).pipe(
+      map(response => response)
     );
   }
 
@@ -65,7 +77,7 @@ export class AuthService {
   setCredencials(token: string, id: number, username: string, password: string): void {
     const encryptedToken = CryptoJS.AES.encrypt(token, this.secretKey).toString();
     const encryptedId = CryptoJS.AES.encrypt(String(id), this.secretKey).toString();
-    
+
     const credenciales = {
       username: username,
       password: password
@@ -77,7 +89,7 @@ export class AuthService {
     localStorage.setItem(this.idKey, encryptedId);
   }
 
-  clearToken(): void {  
+  clearToken(): void {
     localStorage.removeItem(this.tokenKey);
   }
 

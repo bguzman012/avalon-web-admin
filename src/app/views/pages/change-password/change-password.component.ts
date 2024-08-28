@@ -19,61 +19,104 @@ export class ChangePasswordComponent {
   loginErrorMessage: string = '';
   loading: boolean = false;
   ASUNTO_CAMBIO_CONTRASENIA = "CAMBIO_CONTRASENIA"
+  formularioContrasenia: FormGroup;
+
+  contraseniaActual: string;
+  nuevaContrasenia: string;
+  confirmaContrasenia: string;
 
   constructor(private fb: FormBuilder,
               private authService: AuthService,
               private router: Router,
               private confirmationService: ConfirmationService,
               private messageService: MessageService,) {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (isLoggedIn == true)
-      this.router.navigate(['/pets/usuarios']);
 
-    this.loginForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required],
+    this.formularioContrasenia = this.fb.group({
+      contraseniaActual: ['', Validators.required],
+      nuevaContrasenia: ['', Validators.required],
+      confirmarContrasenia: ['', Validators.required],
     });
   }
 
-  login(): void {
+  async confirmar() {
     this.loading = true
-    if (this.loginForm.valid) {
-      const username = this.loginForm.get('username')!.value; // Add '!' here
-      const password = this.loginForm.get('password')!.value; // Add '!' here
+    console.log("CONFIRMAR")
 
-      this.authService.login(username, password)
+    if (this.formularioContrasenia.valid) {
+      const contraseniaActual = this.formularioContrasenia.get('contraseniaActual')!.value; // Add '!' here
+      const nuevaContrasenia = this.formularioContrasenia.get('nuevaContrasenia')!.value; // Add '!' here
+      const confirmarContrasenia = this.formularioContrasenia.get('confirmarContrasenia')!.value; // Add '!' here
+
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
+
+      if (!regex.test(nuevaContrasenia)) {
+        this.loginErrorMessage = "La nueva contraseña no cumple con los parametros de seguridad"
+        this.loading = false
+        return
+      }
+
+      if (nuevaContrasenia != confirmarContrasenia) {
+        this.loginErrorMessage = "Las contraseñas no coinciden"
+        this.loading = false
+        return
+      }
+
+
+      let user = await this.authService.obtenerUsuarioLoggeado()
+
+      // Llamar al servicio para cambiar la contraseña
+      this.authService.changePassw(user.nombreUsuario, contraseniaActual, nuevaContrasenia)
         .subscribe(
           (response) => {
-            this.loading = false
-            this.router.navigate(['/clientes']);
+            this.loading = false;
+            this.confirmationService.confirm({
+              message: "Su contraseña ha sido cambiada con éxito. ¿Desea continuar a la pantalla para iniciar sesión?",
+              header: 'Contraseña cambiada',
+              icon: 'pi pi-exclamation-triangle',
+              accept: () => {
+                this.router.navigate(['/login']);  // Navegar a la página de login u otra página
+              },
+            });
+
           },
           (error) => {
-            // Handle login error
-            console.error('Login error:', error);
-            this.loginError = true
-
-            if (error.error) {
-              if (error?.error?.asunto == this.ASUNTO_CAMBIO_CONTRASENIA) {
-                this.confirmationService.confirm({
-                  message:
-                  error.error.message + ". ¿Desea continuar?",
-                  header: 'Cambio de contraseña requerido',
-                  icon: 'pi pi-exclamation-triangle',
-                  accept: async () => {
-
-                  },
-                });
-              } else
-                this.loginErrorMessage = error.error.message
-
-
-            } else {
-              this.loginErrorMessage = "Ocurrió un error inesperado en la ejecución de la consulta"
-            }
-            this.loading = false
-
+            this.loading = false;
+            this.loginErrorMessage = error.error.message || 'Ocurrió un error al cambiar la contraseña';
           }
         );
+      //   this.authService.login(username, password)
+      //     .subscribe(
+      //       (response) => {
+      //         this.loading = false
+      //         this.router.navigate(['/clientes']);
+      //       },
+      //       (error) => {
+      //         // Handle login error
+      //         console.error('Login error:', error);
+      //         this.loginError = true
+      //
+      //         if (error.error) {
+      //           if (error?.error?.asunto == this.ASUNTO_CAMBIO_CONTRASENIA) {
+      //             this.confirmationService.confirm({
+      //               message:
+      //               error.error.message + ". ¿Desea continuar?",
+      //               header: 'Cambio de contraseña requerido',
+      //               icon: 'pi pi-exclamation-triangle',
+      //               accept: async () => {
+      //
+      //               },
+      //             });
+      //           } else
+      //             this.loginErrorMessage = error.error.message
+      //
+      //
+      //         } else {
+      //           this.loginErrorMessage = "Ocurrió un error inesperado en la ejecución de la consulta"
+      //         }
+      //         this.loading = false
+      //
+      //       }
+      //     );
     } else {
       // Handle form validation errors
 
