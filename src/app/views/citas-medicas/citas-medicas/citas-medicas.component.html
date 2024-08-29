@@ -72,11 +72,23 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        <th pSortableColumn="caso">Caso
+          <p-sortIcon field="caso"></p-sortIcon>
         </th>
         <th pSortableColumn="codigo">Código
           <p-sortIcon field="codigo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="clientePoliza.cliente">
+          Cliente <p-sortIcon field="clientePoliza.cliente"></p-sortIcon>
+        </th>
+        <th pSortableColumn="clientePoliza">
+          Poliza <p-sortIcon field="clientePoliza"></p-sortIcon>
+        </th>
+        <th pSortableColumn="medicoCentroMedicoAseguradora.centroMedico">
+          Centro Médico <p-sortIcon field="medicoCentroMedicoAseguradora.centroMedico"></p-sortIcon>
+        </th>
+        <th pSortableColumn="medicoCentroMedicoAseguradora.medico">
+          Médico <p-sortIcon field="medicoCentroMedicoAseguradora.medico"></p-sortIcon>
         </th>
         <th pSortableColumn="estado">Estado
           <p-sortIcon field="estado"></p-sortIcon>
@@ -86,10 +98,12 @@
     </ng-template>
     <ng-template pTemplate="body" let-citaMedica>
       <tr>
-        <td>
-          <p-tableCheckbox [value]="citaMedica"></p-tableCheckbox>
-        </td>
+        <td>{{ citaMedica.caso.codigo }}</td>
         <td>{{ citaMedica.codigo }}</td>
+        <td>{{ citaMedica.clientePoliza.cliente.nombreUsuario }}</td>
+        <td>{{ citaMedica.clientePoliza.displayName }}</td>
+        <td>{{ citaMedica.medicoCentroMedicoAseguradora.centroMedico.nombre }}</td>
+        <td>{{ citaMedica.medicoCentroMedicoAseguradora.medico.nombres }} {{ citaMedica.medicoCentroMedicoAseguradora.medico.nombresDos }}</td>
         <td>
           <div class="estado-flag-table" *ngIf="citaMedica?.estado"
                [ngClass]="{'estado-verde': citaMedica?.estado === 'N', 'estado-rojo' : citaMedica?.estado === 'C',
@@ -97,9 +111,9 @@
           </div>
         </td>
         <td>
-          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 medium-button"
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
                   (click)="editCitaMedica(citaMedica)"></button>
-          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning medium-button"
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"
                   (click)="deleteCitaMedica(citaMedica); $event.stopPropagation()"></button>
         </td>
       </tr>

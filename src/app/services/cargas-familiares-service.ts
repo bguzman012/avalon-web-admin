@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
+import {Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,23 @@ export class CargaFamiliarService {
       throw error;
     }
   }
+
+  downloadExcel(
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1,
+    clientePoliza: string | null = ""): Observable<Blob> {
+
+    const headers = new HttpHeaders({ 'Accept': 'application/octet-stream' });
+    const order = sortOrder === 1 ? 'asc' : 'desc';
+    const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+    return this.http.get(`${this.apiUrl}/cargasFamiliares/excel?busqueda=${busqueda}${sort}&clientePoliza=${clientePoliza}`, {
+      headers: headers,
+      responseType: 'blob'
+    });
+  }
+
 
   async getCargasFamiliaresByClientePoliza(
     clientePolizaId: number,

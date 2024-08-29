@@ -32,6 +32,9 @@
       </div>
     </div>
     <app-reportes-clientes-aseg *ngIf="opcion == 'CLI_ASEG'"></app-reportes-clientes-aseg>
+    <app-clientes-tit-dep *ngIf="opcion == 'CLI_TITULAR'"></app-clientes-tit-dep>
+    <app-clientes-memb-venc *ngIf="opcion == 'CLI_MEMBR_VENC'"></app-clientes-memb-venc>
+    <app-citas-medicas-reportes *ngIf="opcion == 'CLI_MEDICAS'"></app-citas-medicas-reportes>
   </div>
 </div>
 

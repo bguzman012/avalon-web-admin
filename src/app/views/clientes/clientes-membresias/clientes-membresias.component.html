@@ -57,6 +57,10 @@
           Fecha Fin
           <p-sortIcon field="fechaFin"></p-sortIcon>
         </th>
+        <th pSortableColumn="estado">
+          Estado
+          <p-sortIcon field="estado"></p-sortIcon>
+        </th>
         <th></th>
       </tr>
     </ng-template>
@@ -70,6 +74,12 @@
         <td>{{ clienteMembresia.asesor.nombreUsuario }}</td>
         <td>{{ clienteMembresia.fechaInicio }}</td>
         <td>{{ clienteMembresia.fechaFin }}</td>
+        <td>
+          <div class="estado-flag-table" *ngIf="clienteMembresia?.estado"
+               [ngClass]="{'estado-verde': clienteMembresia?.estado === 'A', 'estado-rojo' : clienteMembresia?.estado === 'V'}">
+            {{ getEstadoLabel(clienteMembresia?.estado) }}
+          </div>
+        </td>
 
         <td>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"

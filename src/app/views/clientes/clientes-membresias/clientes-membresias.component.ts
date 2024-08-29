@@ -96,6 +96,17 @@ export class ClientesMembresiasComponent implements OnInit {
 
   }
 
+  getEstadoLabel(estado: string): string {
+    switch (estado) {
+      case 'A':
+        return 'ACTIVA';
+      case 'V':
+        return 'VENCIDA';
+      default:
+        return 'OTRO';
+    }
+  }
+
   async filterGlobal(event: Event, dt: any) {
     this.first = 0;
     this.busqueda = (event.target as HTMLInputElement).value;

@@ -42,12 +42,20 @@ import {PaginatorModule} from "primeng/paginator";
 import {ReportesComponent} from "./reportes/reportes.component";
 import {PanelModule} from "primeng/panel";
 import {ClientesAsegBroAsesComponent} from "./clientes-aseg-bro-ases/clientes-aseg-bro-ases.component";
+import {
+  ClientesTitularDependientesComponent
+} from "./clientes-titular-dependientes/clientes-titular-dependientes.component";
+import {ClientesMembresiasVencidComponent} from "./clientes-membresias-vencid/clientes-membresias-vencid.component";
+import {CitasMedicasReportesComponent} from "./citas-medicas-reportes/citas-medicas-reportes.component";
 
 
 @NgModule({
   declarations: [
     ReportesComponent,
-    ClientesAsegBroAsesComponent
+    ClientesAsegBroAsesComponent,
+    ClientesTitularDependientesComponent,
+    ClientesMembresiasVencidComponent,
+    CitasMedicasReportesComponent
   ],
   imports: [
     CommonModule,

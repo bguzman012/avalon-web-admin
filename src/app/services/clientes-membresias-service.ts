@@ -34,6 +34,45 @@ export class ClientesMembresiasService {
   //     throw error; // Puedes personalizar esto según tus necesidades
   //   }
   // }
+
+  downloadExcel(
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1,
+    cliente: string | null = "",
+    membresia: string | null = ""): Observable<Blob> {
+
+    const headers = new HttpHeaders({ 'Accept': 'application/octet-stream' });
+    const order = sortOrder === 1 ? 'asc' : 'desc';
+    const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+    return this.http.get(`${this.apiUrl}/clienteMembresias/excel?busqueda=${busqueda}${sort}&cliente=${cliente}&membresia=${membresia}`, {
+      headers: headers,
+      responseType: 'blob'
+    });
+  }
+
+  async obtenerUsuariosMembresias(
+    page: number,
+    size: number,
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1,
+    cliente: string | null = "",
+    membresia: string | null = ""): Promise<any> {
+    try {
+      const order = sortOrder === 1 ? 'asc' : 'desc';
+      const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+      const clientes = await this.http.get<any[]>(`${this.apiUrl}/clienteMembresias?page=${page}&size=${size}&busqueda=${busqueda}${sort}&cliente=${cliente}&membresia=${membresia}`).toPromise();
+      console.log('Resultado de clientes por usuario membresia:', clientes);
+      return clientes;
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      throw error; // Puedes personalizar esto según tus necesidades
+    }
+  }
+
   async obtenerUsuariosMembresiaByMebresiaId(
     membresiaId: number,
     page: number,

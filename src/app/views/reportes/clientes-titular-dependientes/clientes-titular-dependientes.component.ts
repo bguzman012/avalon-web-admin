@@ -3,13 +3,15 @@ import {MessageService, SortEvent} from 'primeng/api';
 import { saveAs } from 'file-saver';
 import { AuthService } from 'src/app/services/auth-service';
 import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
+import {UsuariosService} from "../../../services/usuarios-service";
+import {CargaFamiliarService} from "../../../services/cargas-familiares-service";
 
 @Component({
-  selector: 'app-reportes-clientes-aseg',
-  templateUrl: './clientes-aseg-bro-ases.component.html',
-  styleUrls: ['./clientes-aseg-bro-ases.component.scss'],
+  selector: 'app-clientes-tit-dep',
+  templateUrl: './clientes-titular-dependientes.component.html',
+  styleUrls: ['./clientes-titular-dependientes.component.scss'],
 })
-export class ClientesAsegBroAsesComponent implements OnInit {
+export class ClientesTitularDependientesComponent implements OnInit {
   polizaDialog: boolean;
   clientePolizas: any[]; // Lista de pólizas
   selectedClientesPolizas: any[];
@@ -47,6 +49,8 @@ export class ClientesAsegBroAsesComponent implements OnInit {
   ROL_CLIENTE_ID = 3;
   ROL_ADMINISTRADOR_ID = 1;
   ROL_BROKER_ID = 4;
+  selectedCliente: any; // Cliente seleccionado en el filtro
+  selectedClientePoliza: any; // Poliza seleccionada en el filtro
 
   clienteId
 
@@ -57,8 +61,8 @@ export class ClientesAsegBroAsesComponent implements OnInit {
   totalRecords: number = 0;
 
   busqueda: string = '';
-  sortField = "cliente"
-  sortOrder
+  sortField = "titular"
+  sortOrder = 1
 
   codigoDocumento: string = 'Nueva Póliza de Cliente'
   validarCreacion = false;
@@ -66,7 +70,9 @@ export class ClientesAsegBroAsesComponent implements OnInit {
 
   constructor(
     private clientesPolizasService: ClientePolizaService,
-    private authService: AuthService
+    private cargasFamiliaresService: CargaFamiliarService,
+    private authService: AuthService,
+    private usuariosService: UsuariosService
   ) {}
 
   async ngOnInit() {
@@ -99,17 +105,43 @@ export class ClientesAsegBroAsesComponent implements OnInit {
     this.loading = false;
   }
 
+  async filterClientes(event) {
+    let query = event.query;
+
+    const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
+      this.ROL_CLIENTE_ID,
+      this.ESTADO_ACTIVO,
+      0,
+      10,
+      query
+    );
+
+    this.filteredClientes = responseCliente.data
+  }
+
+  async filterPolizas(event) {
+    let query = event.query;
+
+    const responseClientePoliza = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
+      this.selectedCliente.id,
+      0,
+      10,
+      query);
+
+    this.filteredPolizas = responseClientePoliza.data;
+  }
 
   exportExcel() {
     this.loading = true
     console.log(this.busqueda)
-    this.clientesPolizasService.downloadExcel(
+    this.cargasFamiliaresService.downloadExcel(
       this.busqueda,
       this.sortField,
-      this.sortOrder)
+      this.sortOrder,
+      this.selectedClientePoliza?.id ? this.selectedClientePoliza.id : "")
       .subscribe(response => {
         const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        saveAs(blob, 'clientes_polizas_export_' + new Date().getTime() + '.xlsx');
+        saveAs(blob, 'clientes_dependientes_export_' + new Date().getTime() + '.xlsx');
         this.loading = false
       }, error => {
         console.error('Error downloading the file', error);
@@ -138,5 +170,25 @@ export class ClientesAsegBroAsesComponent implements OnInit {
 
     this.clientePolizas = response.data
     this.totalRecords = response.totalRecords;
+  }
+
+  async cargarCargasFamiliares(){
+    this.loading = true
+    if (this.selectedClientePoliza?.id){
+    const response = await this.cargasFamiliaresService.getCargasFamiliaresByClientePoliza(
+      this.selectedClientePoliza.id,
+      this.first / this.pageSize,
+      this.pageSize,
+      this.busqueda,
+      this.sortField,
+      this.sortOrder
+    );
+
+    this.clientePolizas = response.data
+    this.totalRecords = response.totalRecords;
+    }else {
+      this.refrescarListado()
+    }
+    this.loading = false
   }
 }

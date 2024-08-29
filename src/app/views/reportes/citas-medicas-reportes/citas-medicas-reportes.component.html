@@ -1,0 +1,115 @@
+<p-panel>
+  <div class="filter-container">
+    <!-- Filtro por Cliente -->
+    <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
+                    (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="true"
+                    (ngModelChange)="loadPolizas()"
+                    placeholder="Filtrar por Cliente" [size]="30" [minLength]="1" [disabled]="false"
+                    [forceSelection]="true"
+                    [maxlength]="50">
+    </p-autoComplete>
+
+
+    <!-- Filtro por Póliza -->
+    <p-autoComplete [(ngModel)]="selectedClientePoliza" [suggestions]="filteredPolizas"
+                    (completeMethod)="filterPolizas($event)" field="displayName" [dropdown]="true"
+                    placeholder="Filtrar por Póliza"
+                    [size]="30" [minLength]="1" [disabled]="!selectedCliente" [forceSelection]="true"
+                    [maxlength]="50">
+    </p-autoComplete>
+
+    <p-autoComplete
+      [(ngModel)]="selectedCaso"
+      [suggestions]="filteredCasos"
+      (completeMethod)="filterCasos($event)"
+      field="displayName"
+      [dropdown]="true"
+      placeholder="Filtrar por Caso"
+      [disabled]="!selectedClientePoliza?.id">
+    </p-autoComplete>
+
+    <button pButton pRipple class="p-button-primary p-mr-2" (click)="manageListado()">Buscar</button>
+  </div>
+</p-panel>
+
+<p-table #dt [value]="citasMedicas"
+         [(selection)]="selectedCitasMedicas" [rowHover]="true" dataKey="id"
+         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+         [showCurrentPageReport]="true"
+         (onSort)="onSort($event)"
+         [customSort]="true">
+  <ng-template pTemplate="caption">
+    <div class="p-d-flex p-ai-center p-jc-between">
+      <div>  <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button>
+      </div>
+      <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="filterGlobal($event, dt)"
+            placeholder="Buscar..."
+          />
+        </span>
+    </div>
+
+  </ng-template>
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="caso">Caso
+        <p-sortIcon field="caso"></p-sortIcon>
+      </th>
+      <th pSortableColumn="codigo">Código
+        <p-sortIcon field="codigo"></p-sortIcon>
+      </th>
+      <th pSortableColumn="clientePoliza.cliente">
+        Cliente <p-sortIcon field="clientePoliza.cliente"></p-sortIcon>
+      </th>
+      <th pSortableColumn="clientePoliza">
+        Poliza <p-sortIcon field="clientePoliza"></p-sortIcon>
+      </th>
+      <th pSortableColumn="medicoCentroMedicoAseguradora.centroMedico">
+        Centro Médico <p-sortIcon field="medicoCentroMedicoAseguradora.centroMedico"></p-sortIcon>
+      </th>
+      <th pSortableColumn="medicoCentroMedicoAseguradora.medico">
+        Médico <p-sortIcon field="medicoCentroMedicoAseguradora.medico"></p-sortIcon>
+      </th>
+      <th pSortableColumn="medicoCentroMedicoAseguradora.aseguradora">
+        Aseguradora <p-sortIcon field="medicoCentroMedicoAseguradora.aseguradora"></p-sortIcon>
+      </th>
+      <th pSortableColumn="estado">Estado
+        <p-sortIcon field="estado"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-citaMedica>
+    <tr>
+      <td>{{ citaMedica.caso.codigo }}</td>
+      <td>{{ citaMedica.codigo }}</td>
+      <td>{{ citaMedica.clientePoliza.cliente.nombreUsuario }}</td>
+      <td>{{ citaMedica.clientePoliza.displayName }}</td>
+      <td>{{ citaMedica.medicoCentroMedicoAseguradora.centroMedico.nombre }}</td>
+      <td>{{ citaMedica.medicoCentroMedicoAseguradora.medico.nombres }} {{ citaMedica.medicoCentroMedicoAseguradora.medico.nombresDos }}</td>
+      <td>{{ citaMedica.medicoCentroMedicoAseguradora.aseguradora.nombre }}</td>
+      <td>
+        <div class="estado-flag-table" *ngIf="citaMedica?.estado"
+             [ngClass]="{'estado-verde': citaMedica?.estado === 'N', 'estado-rojo' : citaMedica?.estado === 'C',
+               'estado-azul' : citaMedica?.estado === 'G', 'estado-eliminado' : citaMedica?.estado === 'I'}">{{ getEstadoLabel(citaMedica?.estado) }}
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="summary">
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+    <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first"
+                 (onPageChange)="onPageChange($event)"></p-paginator>
+    <div class="p-d-flex p-ai-center p-jc-between">
+      En total existen {{ totalRecords ? totalRecords : 0 }} registros.
+    </div>
+  </ng-template>
+</p-table>

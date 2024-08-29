@@ -40,7 +40,7 @@ export class ReportesComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.opcion = "CLI_ASEG"
+    this.opcion = "CLI_MEDICAS"
 
   }
 

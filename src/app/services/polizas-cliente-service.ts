@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
+import {Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,21 @@ export class ClientePolizaService {
       console.error('Error al crear ClientePoliza:', error);
       throw error;
     }
+  }
+
+  downloadExcel(
+    busqueda: string,
+    sortField: string | null = 'createdDate',
+    sortOrder: number | null = -1): Observable<Blob> {
+
+    const headers = new HttpHeaders({ 'Accept': 'application/octet-stream' });
+    const order = sortOrder === 1 ? 'asc' : 'desc';
+    const sort = `&sortField=${sortField}&sortOrder=${order}`;
+
+    return this.http.get(`${this.apiUrl}/clientesPolizas/excel?busqueda=${busqueda}${sort}`, {
+      headers: headers,
+      responseType: 'blob'
+    });
   }
 
   async obtenerClientesPolizas(

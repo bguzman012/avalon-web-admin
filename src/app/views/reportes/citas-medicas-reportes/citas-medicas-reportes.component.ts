@@ -11,11 +11,11 @@ import {Router} from '@angular/router';
 import {CasosService} from "../../../services/casos-service";
 
 @Component({
-  selector: 'app-citas',
-  templateUrl: './citas-medicas.component.html',
-  styleUrls: ['./citas-medicas.component.scss'],
+  selector: 'app-citas-medicas-reportes',
+  templateUrl: './citas-medicas-reportes.component.html',
+  styleUrls: ['./citas-medicas-reportes.component.scss'],
 })
-export class CitasMedicasComponent implements OnInit {
+export class CitasMedicasReportesComponent implements OnInit {
   @Input() originCaso: boolean = false;
   @Input() caso: any;
 
@@ -49,7 +49,7 @@ export class CitasMedicasComponent implements OnInit {
   totalRecords: number = 0;
 
   busqueda: string = '';
-  sortField
+  sortField = "estado"
   sortOrder
 
 
@@ -76,11 +76,7 @@ export class CitasMedicasComponent implements OnInit {
     console.log(this.caso, "CASO ")
   }
 
-  async ngOnChanges(changes: SimpleChanges) {
-    if (changes['caso']) {
-      await this.onChangeCaso()
-    }
-  }
+  exportExcel(){}
 
   getEstadoLabel(estado: string): string {
     switch (estado) {
@@ -121,26 +117,6 @@ export class CitasMedicasComponent implements OnInit {
     this.filteredCasos = filteredCasos.data
   }
 
-  async onChangeCaso() {
-    if (this.caso?.id) {
-      const response = await this.citasMedicasService.obtenerCitasMedicas(
-        "",
-        this.caso.clientePoliza.id,
-        0,
-        this.pageSize,
-        "",
-        this.sortField,
-        this.sortOrder,
-        this.caso.id);
-
-      this.citasMedicas = response.data;
-      this.totalRecords = response.totalRecords;
-      this.selectedClientePoliza = this.caso.clientePoliza
-      this.selectedCliente = this.caso.clientePoliza.cliente
-      this.selectedCaso = this.caso
-    }
-  }
-
   async prepareData() {
     const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
@@ -159,61 +135,6 @@ export class CitasMedicasComponent implements OnInit {
     if (this.busqueda.length == 0 || this.busqueda.length >= 3)
       await this.manageListado()
     // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
-
-  async editCitaMedica(citaMedica: any) {
-    this.citaMedica = {...citaMedica};
-    let redirect = !this.originCaso ? 'citas-medicas/detalle-cita-medica' : 'casos/detalle-caso/detalle-cita-medica';
-
-    let queryParamsClientePoliza = {}
-    if (this.selectedCaso?.id) {
-      queryParamsClientePoliza = {
-        clientePolizaId: this.selectedClientePoliza.id,
-        clienteId: this.selectedCliente.id,
-        casoId: this.selectedCaso.id,
-        originCaso: this.originCaso
-      };
-    }
-
-    if (this.citaMedica && this.citaMedica.id) {
-      localStorage.setItem('citaMedica', JSON.stringify(this.citaMedica));
-      queryParamsClientePoliza['citaMedicaId'] = this.citaMedica.id
-      this.router.navigate([redirect], {
-        queryParams: queryParamsClientePoliza,
-      });
-    }
-
-    this.citaMedicaDialog = true;
-  }
-
-  async deleteCitaMedica(citaMedica: any) {
-    this.confirmationService.confirm({
-      message: 'Estás seguro de eliminar la cita médica?',
-      header: 'Confirmar',
-      icon: 'pi pi-exclamation-triangle',
-      accept: async () => {
-        if (citaMedica.estado != "N")
-          return this.messageService.add({
-            severity: 'error',
-            summary: 'Error!',
-            detail: 'No es posible eliminar una cita médica en estado GESTIONANDO o CERRADO',
-            life: 3000,
-          });
-
-        this.loading = true
-        await this.citasMedicasService.eliminarCitaMedica(citaMedica.id);
-        this.first = 0
-        await this.manageListado()
-        this.loading = false
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Enhorabuena!',
-          detail: 'Cita médica eliminada exitosamente',
-          life: 3000,
-        });
-      },
-    });
   }
 
   async refrescarListado(type) {
@@ -309,33 +230,6 @@ export class CitasMedicasComponent implements OnInit {
       await this.refrescarListado("CLIENTE_POLIZA");
     else
       await this.refrescarListado("ALL");
-  }
-
-  redirectToDetailCitaMedicaPage() {
-    let redirect = !this.originCaso ? 'citas-medicas/detalle-cita-medica' : 'casos/detalle-caso/detalle-cita-medica';
-
-    if (this.selectedCaso?.id) {
-      localStorage.setItem("clientePoliza", JSON.stringify(this.selectedClientePoliza));
-      localStorage.setItem("caso", JSON.stringify(this.selectedCaso));
-      localStorage.removeItem('citaMedica')
-      const queryParamsClientePoliza = {
-        clientePolizaId: this.selectedClientePoliza.id,
-        clienteId: this.selectedCliente.id,
-        casoId: this.selectedCaso.id,
-        originCaso: this.originCaso
-      };
-      this.router.navigate([redirect], {
-        queryParams: queryParamsClientePoliza,
-      });
-      return
-    }
-
-    localStorage.removeItem("clientePoliza");
-    localStorage.removeItem("caso");
-    localStorage.removeItem('citaMedica')
-
-    this.router.navigate([redirect]);
-
   }
 
 }
