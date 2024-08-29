@@ -40,52 +40,56 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import {PaginatorModule} from "primeng/paginator";
 import {ReportesComponent} from "./reportes/reportes.component";
+import {PanelModule} from "primeng/panel";
+import {ClientesAsegBroAsesComponent} from "./clientes-aseg-bro-ases/clientes-aseg-bro-ases.component";
 
 
 @NgModule({
   declarations: [
-    ReportesComponent
+    ReportesComponent,
+    ClientesAsegBroAsesComponent
   ],
-    imports: [
-        CommonModule,
-        ReportesRoutingModule,
-        CardModule,
-        FormModule,
-        GridModule,
-        FormsModule,
-        ReactiveFormsModule,
-        FormModule,
-        ButtonGroupModule,
-        DropdownModule,
-        AlertModule,
-        TableModule,
-        SharedModule,
-        ListGroupModule,
-        AutoCompleteModule,
+  imports: [
+    CommonModule,
+    ReportesRoutingModule,
+    CardModule,
+    FormModule,
+    GridModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FormModule,
+    ButtonGroupModule,
+    DropdownModule,
+    AlertModule,
+    TableModule,
+    SharedModule,
+    ListGroupModule,
+    AutoCompleteModule,
 
-        TableModule,
-        CalendarModule,
-        SliderModule,
-        DialogModule,
-        BlockUIModule,
-        ProgressSpinnerModule,
-        MultiSelectModule,
-        ContextMenuModule,
-        DropdownModule,
-        ButtonModule,
-        ToastModule,
-        InputTextModule,
-        ProgressBarModule,
-        FileUploadModule,
-        ToolbarModule,
-        RatingModule,
-        FormsModule,
-        RadioButtonModule,
-        InputNumberModule,
-        ConfirmDialogModule,
-        InputTextareaModule,
-        PaginatorModule,
-    ]
+    TableModule,
+    CalendarModule,
+    SliderModule,
+    DialogModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    MultiSelectModule,
+    ContextMenuModule,
+    DropdownModule,
+    ButtonModule,
+    ToastModule,
+    InputTextModule,
+    ProgressBarModule,
+    FileUploadModule,
+    ToolbarModule,
+    RatingModule,
+    FormsModule,
+    RadioButtonModule,
+    InputNumberModule,
+    ConfirmDialogModule,
+    InputTextareaModule,
+    PaginatorModule,
+    PanelModule,
+  ]
 })
 export class ReportesModule {
 }

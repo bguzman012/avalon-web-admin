@@ -82,12 +82,12 @@ export const navItemsAdmin: INavData[] = [
     iconComponent: {}
 
   }
-  // , {
-  //   name: 'Reportes',
-  //   url: '/reportes',
-  //   iconComponent: {}
-  //
-  // }
+  , {
+    name: 'Reportes',
+    url: '/reportes',
+    iconComponent: {}
+
+  }
 ];
 
 export const navItems: INavData[] = [

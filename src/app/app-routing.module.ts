@@ -108,11 +108,11 @@ const routes: Routes = [
       //   loadChildren: () =>
       //     import('./views/aseguradoras/aseguradoras.module').then((m) => m.AseguradorasModule)
       // },
-      // {
-      //   path: 'reportes',
-      //   loadChildren: () =>
-      //     import('./views/reportes/reportes.module').then((m) => m.ReportesModule)
-      // },
+      {
+        path: 'reportes',
+        loadChildren: () =>
+          import('./views/reportes/reportes.module').then((m) => m.ReportesModule)
+      },
       {
         path: 'notificaciones',
         loadChildren: () =>
