@@ -19,16 +19,10 @@
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
-      <th style="width: 3rem">
 
-      </th>
-      <th pSortableColumn="codigo">
-        Código
-        <p-sortIcon field="codigo"></p-sortIcon>
-      </th>
-      <th pSortableColumn="numeroCertificado">
-        Num. Cert.
-        <p-sortIcon field="numeroCertificado"></p-sortIcon>
+      <th pSortableColumn="cliente">
+        Cliente
+        <p-sortIcon field="cliente"></p-sortIcon>
       </th>
       <th pSortableColumn="poliza">
         Poliza
@@ -42,29 +36,24 @@
         Agente
         <p-sortIcon field="agente"></p-sortIcon>
       </th>
-      <th pSortableColumn="fechaInicio">
-        Fecha Inicio
-        <p-sortIcon field="fechaInicio"></p-sortIcon>
+      <th pSortableColumn="codigo">
+        Código
+        <p-sortIcon field="codigo"></p-sortIcon>
       </th>
-      <th pSortableColumn="fechaFin">
-        Fecha Fin
-        <p-sortIcon field="fechaFin"></p-sortIcon>
+      <th pSortableColumn="numeroCertificado">
+        Num. Cert.
+        <p-sortIcon field="numeroCertificado"></p-sortIcon>
       </th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-clientePoliza>
     <tr>
-      <td>
-
-      </td>
-      <td>{{ clientePoliza.codigo }}</td>
-      <td>{{ clientePoliza.numeroCertificado }}</td>
+      <td>{{ clientePoliza.cliente.nombreUsuario }}</td>
       <td>{{ clientePoliza.poliza.nombre }}</td>
       <td>{{ clientePoliza.asesor.nombreUsuario }}</td>
       <td>{{ clientePoliza.agente.nombreUsuario }}</td>
-      <td>{{ clientePoliza.fechaInicio }}</td>
-      <td>{{ clientePoliza.fechaFin }}</td>
-
+      <td>{{ clientePoliza.codigo }}</td>
+      <td>{{ clientePoliza.numeroCertificado }}</td>
     </tr>
   </ng-template>
   <ng-template pTemplate="summary">

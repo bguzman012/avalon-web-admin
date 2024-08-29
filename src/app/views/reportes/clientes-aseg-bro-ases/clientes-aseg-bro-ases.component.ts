@@ -61,7 +61,7 @@ export class ClientesAsegBroAsesComponent implements OnInit {
   totalRecords: number = 0;
 
   busqueda: string = '';
-  sortField
+  sortField = "cliente"
   sortOrder
 
   codigoDocumento: string = 'Nueva Póliza de Cliente'
@@ -69,23 +69,12 @@ export class ClientesAsegBroAsesComponent implements OnInit {
   validarEnable = false;
 
   constructor(
-    private messageService: MessageService,
-    private polizasService: PolizasService,
     private clientesPolizasService: ClientePolizaService,
-    private confirmationService: ConfirmationService,
-    private usuariosService: UsuariosService,
-    private aseguradorasService: AseguradorasService,
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
     this.loading = true;
-
-    this.clienteId = +(await this.getRouteParams('clienteId'));
-    if (!this.clienteId) this.clienteId = localStorage.getItem('clienteId');
-    this.cliente = JSON.parse(localStorage.getItem('cliente'));
 
     await this.refrescarListado();
 
@@ -125,15 +114,8 @@ export class ClientesAsegBroAsesComponent implements OnInit {
     }
   }
 
-  private getRouteParams(param: string): Promise<string> {
-    return new Promise((resolve) => {
-      this.route.queryParams.subscribe((params) => resolve(params[param]));
-    });
-  }
-
   async refrescarListado() {
-    const response = await this.clientesPolizasService.obtenerClientesPolizasPorCliente(
-      this.clienteId,
+    const response = await this.clientesPolizasService.obtenerClientesPolizas(
       this.first / this.pageSize,
       this.pageSize,
       this.busqueda,
