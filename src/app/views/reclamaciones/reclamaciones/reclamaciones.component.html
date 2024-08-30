@@ -3,8 +3,8 @@
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left">
 
-      <h5 class="p-m-0" *ngIf="!originCaso">Administrar Reclamos</h5>
-      <h6 class="p-m-0" *ngIf="originCaso">Reclamos</h6>
+      <h5 class="p-m-0" *ngIf="!originCaso">Administrar Reembolsos</h5>
+      <h6 class="p-m-0" *ngIf="originCaso">Reembolsos</h6>
 
 
     </ng-template>
@@ -73,11 +73,27 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        <th pSortableColumn="caso">Caso
+          <p-sortIcon field="caso"></p-sortIcon>
         </th>
         <th pSortableColumn="codigo">Código
           <p-sortIcon field="codigo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="clientePoliza.cliente">
+          Cliente
+          <p-sortIcon field="clientePoliza.cliente"></p-sortIcon>
+        </th>
+        <th pSortableColumn="clientePoliza">
+          Poliza
+          <p-sortIcon field="clientePoliza"></p-sortIcon>
+        </th>
+        <th pSortableColumn="medicoCentroMedicoAseguradora.centroMedico">
+          Centro Médico
+          <p-sortIcon field="medicoCentroMedicoAseguradora.centroMedico"></p-sortIcon>
+        </th>
+        <th pSortableColumn="medicoCentroMedicoAseguradora.medico">
+          Médico
+          <p-sortIcon field="medicoCentroMedicoAseguradora.medico"></p-sortIcon>
         </th>
         <th pSortableColumn="estado">Estado
           <p-sortIcon field="estado"></p-sortIcon>
@@ -87,10 +103,12 @@
     </ng-template>
     <ng-template pTemplate="body" let-reclamacion>
       <tr>
-        <td>
-          <p-tableCheckbox [value]="reclamacion"></p-tableCheckbox>
-        </td>
+        <td>{{ reclamacion.caso.codigo }}</td>
         <td>{{ reclamacion.codigo }}</td>
+        <td>{{ reclamacion.clientePoliza.cliente.nombreUsuario }}</td>
+        <td>{{ reclamacion.clientePoliza.displayName }}</td>
+        <td>{{ reclamacion.medicoCentroMedicoAseguradora.centroMedico.nombre }}</td>
+        <td>{{ reclamacion.medicoCentroMedicoAseguradora.medico.nombres }} {{ reclamacion.medicoCentroMedicoAseguradora.medico.nombresDos }}</td>
         <td>
           <div class="estado-flag-table" *ngIf="reclamacion?.estado"
                [ngClass]="{'estado-verde': reclamacion?.estado === 'N', 'estado-rojo' : reclamacion?.estado === 'C',

@@ -47,6 +47,8 @@ import {
 } from "./clientes-titular-dependientes/clientes-titular-dependientes.component";
 import {ClientesMembresiasVencidComponent} from "./clientes-membresias-vencid/clientes-membresias-vencid.component";
 import {CitasMedicasReportesComponent} from "./citas-medicas-reportes/citas-medicas-reportes.component";
+import {CasosReportesComponent} from "./casos-reportes/casos-reportes.component";
+import {ReclamacionesReportesComponent} from "./reclamaciones-reportes/reclamaciones-reportes.component";
 
 
 @NgModule({
@@ -55,7 +57,9 @@ import {CitasMedicasReportesComponent} from "./citas-medicas-reportes/citas-medi
     ClientesAsegBroAsesComponent,
     ClientesTitularDependientesComponent,
     ClientesMembresiasVencidComponent,
-    CitasMedicasReportesComponent
+    CitasMedicasReportesComponent,
+    CasosReportesComponent,
+    ReclamacionesReportesComponent
   ],
   imports: [
     CommonModule,

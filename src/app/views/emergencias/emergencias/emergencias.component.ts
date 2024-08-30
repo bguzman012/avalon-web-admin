@@ -240,6 +240,7 @@ export class EmergenciasComponent implements OnInit {
         this.selectedCaso.id);
 
     this.emergencias = response.data
+    this.totalRecords = response.totalRecords
   }
 
   async filterClientes(event) {

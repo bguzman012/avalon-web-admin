@@ -56,7 +56,7 @@
   </div>
 
   <div class="card"  *ngIf="reclamacion">
-    <p-panel styleClass="p-fluid" header="Detalles de Reclamo">
+    <p-panel styleClass="p-fluid" header="Detalles de Reembolso">
       <div class="p-field">
         <label>Fecha Tentativa *</label>
         <p-calendar [(ngModel)]="reclamacion.fechaServicio" dateFormat="dd/mm/yy" [disabled]="readOnlyForm" [showIcon]="true"
@@ -127,7 +127,7 @@
       </div>
 
       <div class="p-field">
-        <label for="fotoReclamo">Foto Reclamo (*)</label>
+        <label for="fotoReclamo">Foto Reembolso (*)</label>
         <div class="upload-container">
           <p-fileUpload [disabled]="readOnlyForm" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"

@@ -72,11 +72,27 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        <th pSortableColumn="caso">Caso
+          <p-sortIcon field="caso"></p-sortIcon>
         </th>
         <th pSortableColumn="codigo">Código
           <p-sortIcon field="codigo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="clientePoliza.cliente">
+          Cliente
+          <p-sortIcon field="clientePoliza.cliente"></p-sortIcon>
+        </th>
+        <th pSortableColumn="clientePoliza">
+          Poliza
+          <p-sortIcon field="clientePoliza"></p-sortIcon>
+        </th>
+        <th pSortableColumn="medicoCentroMedicoAseguradora.centroMedico">
+          Centro Médico
+          <p-sortIcon field="medicoCentroMedicoAseguradora.centroMedico"></p-sortIcon>
+        </th>
+        <th pSortableColumn="medicoCentroMedicoAseguradora.medico">
+          Médico
+          <p-sortIcon field="medicoCentroMedicoAseguradora.medico"></p-sortIcon>
         </th>
         <th pSortableColumn="estado">Estado
           <p-sortIcon field="estado"></p-sortIcon>
@@ -86,10 +102,12 @@
     </ng-template>
     <ng-template pTemplate="body" let-emergencia>
       <tr>
-        <td>
-          <p-tableCheckbox [value]="emergencia"></p-tableCheckbox>
-        </td>
+        <td>{{ emergencia.caso.codigo }}</td>
         <td>{{ emergencia.codigo }}</td>
+        <td>{{ emergencia.clientePoliza.cliente.nombreUsuario }}</td>
+        <td>{{ emergencia.clientePoliza.displayName }}</td>
+        <td>{{ emergencia.medicoCentroMedicoAseguradora.centroMedico.nombre }}</td>
+        <td>{{ emergencia.medicoCentroMedicoAseguradora.medico.nombres }} {{ emergencia.medicoCentroMedicoAseguradora.medico.nombresDos }}</td>
         <td>
           <div class="estado-flag-table" *ngIf="emergencia?.estado"
                [ngClass]="{'estado-verde': emergencia?.estado === 'N', 'estado-rojo' : emergencia?.estado === 'C',

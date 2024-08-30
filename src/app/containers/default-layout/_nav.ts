@@ -72,7 +72,7 @@ export const navItemsAdmin: INavData[] = [
     iconComponent: {}
 
   }, {
-    name: 'Reclamos',
+    name: 'Reembolsos',
     url: '/reclamaciones',
     iconComponent: {}
 
@@ -107,7 +107,7 @@ export const navItems: INavData[] = [
     iconComponent: {}
 
   }, {
-    name: 'Reclamos',
+    name: 'Reembolsos',
     url: '/reclamaciones',
     iconComponent: {}
 

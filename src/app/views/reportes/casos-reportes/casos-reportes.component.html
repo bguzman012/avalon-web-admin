@@ -1,0 +1,87 @@
+  <p-panel>
+    <div class="filter-container">
+      <!-- Filtro por Cliente -->
+      <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
+                      (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="true"
+                      (ngModelChange)="loadPolizas()"
+                      placeholder="Filtrar por Cliente" [size]="30" [minLength]="1" [disabled]="false"
+                      [forceSelection]="true"
+                      [maxlength]="50">
+      </p-autoComplete>
+
+
+      <!-- Filtro por Póliza -->
+      <p-autoComplete [(ngModel)]="selectedClientePoliza" [suggestions]="filteredPolizas"
+                      (completeMethod)="filterPolizas($event)" field="displayName" [dropdown]="true"
+                      placeholder="Filtrar por Póliza"
+                      [size]="30" [minLength]="1" [disabled]="!selectedCliente" [forceSelection]="true"
+                      [maxlength]="50">
+      </p-autoComplete>
+
+
+
+      <button pButton pRipple class="p-button-primary p-mr-2" (click)="refrescarListado()">Buscar</button>
+    </div>
+  </p-panel>
+
+  <p-table
+    #dt
+    [value]="casos"
+    [(selection)]="selectedCasos"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    [showCurrentPageReport]="true"
+    (onSort)="onSort($event)"
+    [customSort]="true"
+  >
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <div>  <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button>
+        </div>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="filterGlobal($event, dt)"
+            placeholder="Buscar..."
+          />
+        </span>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="codigo">
+          Código <p-sortIcon field="codigo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="clientePoliza.cliente">
+          Cliente <p-sortIcon field="clientePoliza.cliente"></p-sortIcon>
+        </th>
+        <th pSortableColumn="clientePoliza">
+          Poliza <p-sortIcon field="clientePoliza"></p-sortIcon>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-caso>
+      <tr>
+        <td>{{ caso.codigo }}</td>
+        <td>{{ caso.clienteDisplayName }}</td>
+        <td>{{ caso.clientePoliza.displayName }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="summary">
+      <p-blockUI [blocked]="loading">
+        <div class="p-field" *ngIf="loading">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </p-blockUI>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
+      <div class="p-d-flex p-ai-center p-jc-between">
+        En total existen {{totalRecords ? totalRecords : 0  }} registros.
+      </div>
+    </ng-template>
+
+  </p-table>

@@ -208,7 +208,7 @@ export class ReclamacionesComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Enhorabuena!',
-          detail: 'Reclamo eliminado exitosamente',
+          detail: 'Reembolso eliminado exitosamente',
           life: 3000,
         });
       },
@@ -239,6 +239,7 @@ export class ReclamacionesComponent implements OnInit {
         this.selectedCaso.id);
 
     this.reclamaciones = response.data
+    this.totalRecords = response.totalRecords
   }
 
   async filterClientes(event) {

@@ -181,7 +181,7 @@ export class AddEmergenciasComponent implements OnInit {
         this.imagen = foto.documento
         this.nombreDocumento = foto.nombreDocumento
       }
-      // this.emergencia.fotoReclamo = emergenciaFoto.fotoReclamo
+      // this.emergencia.fotoReembolso = emergenciaFoto.fotoReembolso
 
       if (this.imagen) {
         this.imagePreview = this.imagen;

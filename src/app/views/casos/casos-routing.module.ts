@@ -66,7 +66,7 @@ const routes: Routes = [
           {
             path: 'detalle-reclamacion',
             data: {
-              breadcrumb: 'Detalle Reclamo'
+              breadcrumb: 'Detalle Reembolso'
             },
             children: [
               {

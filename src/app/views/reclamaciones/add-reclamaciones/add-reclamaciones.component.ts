@@ -64,7 +64,7 @@ export class AddReclamacionesComponent implements OnInit {
   nuevoComentario: string = '';
   imagen
   nombreDocumento
-  codigoDocumento: string = 'Nuevo Reclamo'
+  codigoDocumento: string = 'Nuevo Reembolso'
 
   filteredCentrosMedicos
   filteredMedicoCentroMedicoAseguradoras

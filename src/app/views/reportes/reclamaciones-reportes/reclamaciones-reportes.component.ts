@@ -1,26 +1,27 @@
 import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
 import {ConfirmationService, MessageService, SortEvent} from 'primeng/api';
-import {CitasMedicasService} from '../../../services/citas-medicas-service';
+import {ReclamacionesService} from '../../../services/reclamaciones-service';
 import {UsuariosService} from '../../../services/usuarios-service';
-import {saveAs} from 'file-saver';
 import {ClientePolizaService} from 'src/app/services/polizas-cliente-service';
 import {Router} from '@angular/router';
 import {CasosService} from "../../../services/casos-service";
+import {saveAs} from 'file-saver';
+
 
 @Component({
-  selector: 'app-citas-medicas-reportes',
-  templateUrl: './citas-medicas-reportes.component.html',
-  styleUrls: ['./citas-medicas-reportes.component.scss'],
+  selector: 'app-reclamaciones-reportes',
+  templateUrl: './reclamaciones-reportes.component.html',
+  styleUrls: ['./reclamaciones-reportes.component.scss'],
 })
-export class CitasMedicasReportesComponent implements OnInit {
+export class ReclamacionesReportesComponent implements OnInit {
   @Input() originCaso: boolean = false;
   @Input() caso: any;
 
-  citaMedicaDialog: boolean;
-  citasMedicas: any[];
-  selectedCitasMedicas: any[];
+  reclamacionDialog: boolean;
+  reclamaciones: any[];
+  selectedReclamaciones: any[];
   submitted: boolean;
-  citaMedica: any;
+  reclamacion: any;
   loading: boolean = false;
 
   clientes: any[]; // Lista de clientes para el autocompletado
@@ -31,12 +32,10 @@ export class CitasMedicasReportesComponent implements OnInit {
   selectedClientePoliza: any; // Poliza seleccionada en el filtro
   selectedCaso: any; // Poliza seleccionada en el filtro
 
-
   filteredClientes: any[]; // Clientes filtrados para el autocompletado
   filteredAseguradoras: any[]; // Aseguradoras filtradas para el autocompletado
   filteredPolizas: any[]; // Pólizas filtradas para el autocompletado
   filteredCasos: any[]; // Pólizas filtradas para el autocompletado
-
 
   ROL_CLIENTE_ID = 3;
   ESTADO_ACTIVO = 'A';
@@ -46,44 +45,63 @@ export class CitasMedicasReportesComponent implements OnInit {
   totalRecords: number = 0;
 
   busqueda: string = '';
-  sortField = "estado"
+  sortField
   sortOrder
 
+  constructor(
+    private reclamacionesService: ReclamacionesService,
+    private usuariosService: UsuariosService,
+    private router: Router,
+    private clientesPolizasService: ClientePolizaService,
+    private casosService: CasosService
+  ) {
+  }
 
   async ngOnInit() {
 
     this.loading = true
     if (!this.originCaso) {
       this.prepareData();
-      const response = await this.citasMedicasService.obtenerCitasMedicas(
+      const response = await this.reclamacionesService.obtenerReclamaciones(
         "",
         "",
         0,
-        this.pageSize,
+        10,
         "",
         this.sortField,
         this.sortOrder);
 
-      this.citasMedicas = response.data;
+      this.reclamaciones = response.data;
       this.totalRecords = response.totalRecords;
+
     } else
       this.pageSize = 5
-
     this.loading = false
-    console.log(this.caso, "CASO ")
+  }
+
+  async filterCasos(event) {
+    let query = event.query;
+
+    const filteredCasos = await this.casosService.obtenerCasos(
+      0,
+      10,
+      query,
+      this.selectedClientePoliza?.id ? this.selectedClientePoliza?.id : "");
+
+    this.filteredCasos = filteredCasos.data
   }
 
   exportExcel() {
     this.loading = true
     console.log(this.busqueda)
-    this.citasMedicasService.downloadExcel(
+    this.reclamacionesService.downloadExcel(
       this.busqueda,
       this.sortField,
       this.sortOrder,
       this.selectedCaso?.id ? this.selectedCaso.id : "")
       .subscribe(response => {
         const blob = new Blob([response], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-        saveAs(blob, 'citas_medicas_export_' + new Date().getTime() + '.xlsx');
+        saveAs(blob, 'reembolsos_export_' + new Date().getTime() + '.xlsx');
         this.loading = false
       }, error => {
         console.error('Error downloading the file', error);
@@ -107,27 +125,12 @@ export class CitasMedicasReportesComponent implements OnInit {
   }
 
 
-  constructor(
-    private messageService: MessageService,
-    private citasMedicasService: CitasMedicasService,
-    private usuariosService: UsuariosService,
-    private confirmationService: ConfirmationService,
-    private router: Router,
-    private clientesPolizasService: ClientePolizaService,
-    private casosService: CasosService
-  ) {
-  }
-
-  async filterCasos(event) {
-    let query = event.query;
-
-    const filteredCasos = await this.casosService.obtenerCasos(
-      0,
-      10,
-      query,
-      this.selectedClientePoliza?.id ? this.selectedClientePoliza?.id : "");
-
-    this.filteredCasos = filteredCasos.data
+  async filterGlobal(event: Event, dt: any) {
+    this.first = 0;
+    this.busqueda = (event.target as HTMLInputElement).value;
+    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
+      await this.manageListado()
+    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
   async prepareData() {
@@ -142,29 +145,20 @@ export class CitasMedicasReportesComponent implements OnInit {
     this.clientes = responseCliente.data
   }
 
-  async filterGlobal(event: Event, dt: any) {
-    this.first = 0;
-    this.busqueda = (event.target as HTMLInputElement).value;
-    if (this.busqueda.length == 0 || this.busqueda.length >= 3)
-      await this.manageListado()
-    // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
-
   async refrescarListado(type) {
-    console.log(this.selectedClientePoliza, this.selectedCaso)
     let response;
     if (type == "ALL")
-      response = await this.citasMedicasService.obtenerCitasMedicas(
+
+      response = await this.reclamacionesService.obtenerReclamaciones(
         "",
         "",
         this.first / this.pageSize,
         this.pageSize,
         this.busqueda,
         this.sortField,
-        this.sortOrder,
-        "");
+        this.sortOrder);
     else
-      response = await this.citasMedicasService.obtenerCitasMedicas(
+      response = await this.reclamacionesService.obtenerReclamaciones(
         "",
         this.selectedClientePoliza.id,
         this.first / this.pageSize,
@@ -174,7 +168,7 @@ export class CitasMedicasReportesComponent implements OnInit {
         this.sortOrder,
         this.selectedCaso.id);
 
-    this.citasMedicas = response.data
+    this.reclamaciones = response.data
     this.totalRecords = response.totalRecords
   }
 
@@ -202,6 +196,7 @@ export class CitasMedicasReportesComponent implements OnInit {
       query);
 
     this.filteredPolizas = responseClientePoliza.data;
+
 
   }
 
@@ -233,13 +228,12 @@ export class CitasMedicasReportesComponent implements OnInit {
         10,
         "");
 
-      this.clientePolizas = responseClientePoliza.data
+      this.clientePolizas = responseClientePoliza.data;
     }
   }
 
   async manageListado() {
-    console.log(this.selectedCaso, " SELECT ")
-    if (this.selectedCaso)
+    if (this.selectedClientePoliza)
       await this.refrescarListado("CLIENTE_POLIZA");
     else
       await this.refrescarListado("ALL");
