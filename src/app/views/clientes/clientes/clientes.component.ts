@@ -9,6 +9,8 @@ import { environment } from '../../../../environments/environment';
 import { FilterService } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth-service';
 import { Router } from '@angular/router';
+import {TipoAdm} from "../../../enums/tipo-adm";
+import {TipoIdentificacion} from "../../../enums/tipo-identificacion";
 
 @Component({
   selector: 'clientes',
@@ -63,14 +65,14 @@ export class ClientesComponent implements OnInit {
   sortField
   sortOrder
 
+  tipoDocumentoIdentOptions: { label: string, value: string }[];
+
   constructor(
     private messageService: MessageService,
     private usuariosService: UsuariosService,
     private paisesService: PaisesService,
     private estadosService: EstadosService,
     private confirmationService: ConfirmationService,
-    private aseguradorasService: AseguradorasService,
-    private filterService: FilterService,
     private router: Router,
     private authService: AuthService
   ) {}
@@ -78,6 +80,7 @@ export class ClientesComponent implements OnInit {
   async ngOnInit() {
     this.loading = true;
     await this.refrescarListado(this.ESTADO_BUSQUEDA);
+
     let user = await this.authService.obtenerUsuarioLoggeado();
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true;
     if (user.rol.id != this.ROL_CLIENTE_ID) this.validarCreacion = true;
@@ -104,6 +107,11 @@ export class ClientesComponent implements OnInit {
 
   async prepareData() {
     this.paises = await this.paisesService.obtenerPaises();
+
+    this.tipoDocumentoIdentOptions = Object.keys(TipoIdentificacion).map(key => {
+      return { label: key, value: TipoIdentificacion[key] };
+    });
+
   }
 
   async onSort(event: SortEvent) {

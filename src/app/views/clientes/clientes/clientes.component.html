@@ -170,6 +170,32 @@
                 </div>
             </div>
         </div>
+      <div class="p-grid p-fluid">
+        <div class="p-col-12 p-md-6">
+          <div class="p-field">
+            <label for="tipoIdentificacion">Tipo de Identificación</label>
+            <p-dropdown
+              id="tipoIdentificacion"
+              [options]="tipoDocumentoIdentOptions"
+              [(ngModel)]="usuario.tipoIdentificacion"
+              optionLabel="value"
+              optionValue="label"
+              placeholder="Seleccione un tipo de identificación">
+            </p-dropdown>
+            <small class="p-invalid" *ngIf="submitted && !usuario.tipoIdentificacion">Tipo de identificación es
+              requerido.</small>
+          </div>
+        </div>
+        <div class="p-col-12 p-md-6">
+          <div class="p-field">
+            <label for="numeroIdentificacion">Número de Identificación</label>
+            <input type="text" pInputText id="numeroIdentificacion" [(ngModel)]="usuario.numeroIdentificacion"
+                   required/>
+            <small class="p-invalid" *ngIf="submitted && !usuario.numeroIdentificacion">Número de identificación es
+              requerido.</small>
+          </div>
+        </div>
+      </div>
 
     <div class="p-field">
       <label class="p-mb-3">Correo Electrónico</label>

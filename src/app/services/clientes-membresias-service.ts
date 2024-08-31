@@ -99,12 +99,13 @@ export class ClientesMembresiasService {
     size: number,
     busqueda: string,
     sortField: string | null = 'createdDate',
-    sortOrder: number | null = -1): Promise<any> {
+    sortOrder: number | null = -1,
+    estado: string | null = ""): Promise<any> {
     try {
       const order = sortOrder === 1 ? 'asc' : 'desc';
       const sort = `&sortField=${sortField}&sortOrder=${order}`;
 
-      const clientes = await this.http.get<any[]>(`${this.apiUrl}/clientes/${usuarioId}/clienteMembresias?page=${page}&size=${size}&busqueda=${busqueda}${sort}`).toPromise();
+      const clientes = await this.http.get<any[]>(`${this.apiUrl}/clientes/${usuarioId}/clienteMembresias?page=${page}&size=${size}&busqueda=${busqueda}${sort}&estado=${estado}`).toPromise();
       console.log('Resultado de clientes por usuario membresia:', clientes);
       return clientes;
     } catch (error) {

@@ -71,11 +71,11 @@
     <tr>
       <td>{{ cargaFamiliar.titular?.cliente.nombreUsuario }} </td>
       <td>{{ cargaFamiliar.displayName }} </td>
-      <td>{{ cargaFamiliar.titular?.numeroCertificado }} </td>
+      <td>{{ cargaFamiliar.numeroCertificado }} </td>
       <td>{{ cargaFamiliar.cliente.nombres }} {{ cargaFamiliar.cliente.apellidos }}</td>
       <td>{{ cargaFamiliar.cliente.correoElectronico }}</td>
       <td>{{ cargaFamiliar.cliente.nombreUsuario }}</td>
-      <td>{{ cargaFamiliar.parentesco }}</td>
+      <td>{{ cargaFamiliar.parentesco ? cargaFamiliar.parentesco : 'TITULAR' }}</td>
     </tr>
   </ng-template>
   <ng-template pTemplate="summary">

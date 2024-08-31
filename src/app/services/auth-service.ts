@@ -20,9 +20,11 @@ export class AuthService {
   constructor(private http: HttpClient) {
   }
 
-  login(username: string, password: string): Observable<any> {
+  login(username: string,
+        password: string,
+        generate2FA: string | null = ''): Observable<any> {
     const data = {usuario: username, contrasenia: password};
-    return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(
+    return this.http.post<any>(`${this.apiUrl}/login?generate2FA=${generate2FA}`, data).pipe(
       map(response => response),
       tap(response => this.setCredencials(response.token, response.id, username, password))
     );

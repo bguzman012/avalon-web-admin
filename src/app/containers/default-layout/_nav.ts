@@ -42,6 +42,11 @@ export const navItemsAdmin: INavData[] = [
     iconComponent: {}
 
   }, {
+    name: 'Empresas',
+    url: '/empresas',
+    iconComponent: {}
+
+  }, {
     name: 'Aseguradoras',
     url: '/aseguradoras',
     iconComponent: {}

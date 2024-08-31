@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AseguradorasService } from 'src/app/services/aseguradoras-service';
 import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
 import { UsuariosService } from 'src/app/services/usuarios-service';
+import {EmpresasService} from "../../../services/empresas-service";
 
 @Component({
   selector: 'app-clientes-polizas',
@@ -28,7 +29,10 @@ export class ClientesPolizasComponent implements OnInit {
 
   aseguradoras: any[];
   filteredAseguradoras;
+  filteredEmpresas;
+
   aseguradora;
+  empresa;
 
   clientes: any[];
   filteredClientes;
@@ -70,6 +74,7 @@ export class ClientesPolizasComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private usuariosService: UsuariosService,
     private authService: AuthService,
+    private empresasService: EmpresasService,
     private route: ActivatedRoute,
   ) {}
 
@@ -163,6 +168,16 @@ export class ClientesPolizasComponent implements OnInit {
       await this.refrescarListado();
 
     // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  async filterEmpresas(event) {
+    const responseAseguradora = await this.empresasService.obtenerEmpresas(
+      0,
+      10,
+      event.query
+    )
+
+    this.filteredEmpresas = responseAseguradora.data;
   }
 
   async onPageChange(event) {
@@ -299,20 +314,18 @@ export class ClientesPolizasComponent implements OnInit {
     this.loading = true;
 
     try {
+      this.polizaCliente.clienteId = this.cliente.id;
+      this.polizaCliente.asesorId = this.asesor.id;
+      this.polizaCliente.agenteId = this.broker.id;
+      this.polizaCliente.polizaId = this.poliza.id;
+      this.polizaCliente.empresaId = this.empresa?.id;
+
       if (this.polizaCliente.id) {
-        this.polizaCliente.clienteId = this.cliente.id;
-        this.polizaCliente.asesorId = this.asesor.id;
-        this.polizaCliente.agenteId = this.broker.id;
-        this.polizaCliente.polizaId = this.poliza.id;
         await this.clientesPolizasService.actualizarClientePoliza(
           this.polizaCliente.id,
           this.polizaCliente
         );
       } else {
-        this.polizaCliente.clienteId = this.cliente.id;
-        this.polizaCliente.asesorId = this.asesor.id;
-        this.polizaCliente.agenteId = this.broker.id;
-        this.polizaCliente.polizaId = this.poliza.id;
         await this.clientesPolizasService.crearClientePoliza(
           this.polizaCliente
         );

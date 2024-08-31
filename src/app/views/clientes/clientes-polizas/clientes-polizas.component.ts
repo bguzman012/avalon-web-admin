@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AseguradorasService } from 'src/app/services/aseguradoras-service';
 import { ClientePolizaService } from 'src/app/services/polizas-cliente-service';
 import { UsuariosService } from 'src/app/services/usuarios-service';
+import {EmpresasService} from "../../../services/empresas-service";
 
 @Component({
   selector: 'app-clientes-polizas',
@@ -28,7 +29,10 @@ export class ClientesPolizasComponent implements OnInit {
 
   aseguradoras: any[];
   filteredAseguradoras;
+  filteredEmpresas;
+
   aseguradora;
+  empresa;
 
   clientes: any[];
   filteredClientes;
@@ -72,6 +76,7 @@ export class ClientesPolizasComponent implements OnInit {
     private messageService: MessageService,
     private polizasService: PolizasService,
     private clientesPolizasService: ClientePolizaService,
+    private empresasService: EmpresasService,
     private confirmationService: ConfirmationService,
     private usuariosService: UsuariosService,
     private aseguradorasService: AseguradorasService,
@@ -255,6 +260,16 @@ export class ClientesPolizasComponent implements OnInit {
     this.filteredAseguradoras = responseAseguradora.data;
   }
 
+  async filterEmpresas(event) {
+    const responseAseguradora = await this.empresasService.obtenerEmpresas(
+      0,
+      10,
+      event.query
+    )
+
+    this.filteredEmpresas = responseAseguradora.data;
+  }
+
   async filterAsesores(event) {
     const responseAsesor = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_ASESOR_ID,
@@ -344,6 +359,7 @@ export class ClientesPolizasComponent implements OnInit {
       this.polizaCliente.asesorId = this.asesor.id;
       this.polizaCliente.agenteId = this.broker.id;
       this.polizaCliente.polizaId = this.poliza.id;
+      this.polizaCliente.empresaId = this.empresa?.id;
       if (this.polizaCliente.id) {
         await this.clientesPolizasService.actualizarClientePoliza(
           this.polizaCliente.id,

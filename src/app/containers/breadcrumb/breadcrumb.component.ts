@@ -10,7 +10,7 @@ import { filter } from 'rxjs/operators';
 })
 export class BreadcrumbComponent implements OnInit {
   static readonly ROUTE_DATA_BREADCRUMB = 'breadcrumb';
-  readonly home = { icon: 'pi pi-home', url: '/#/usuarios' };
+  readonly home = { icon: 'pi pi-home', url: '/#/clientes' };
   menuItems: MenuItem[];
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute) { }

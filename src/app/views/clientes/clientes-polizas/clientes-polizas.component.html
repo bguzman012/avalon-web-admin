@@ -47,6 +47,10 @@
           Poliza
           <p-sortIcon field="poliza"></p-sortIcon>
         </th>
+        <th pSortableColumn="empresa">
+          Empresa
+          <p-sortIcon field="empresa"></p-sortIcon>
+        </th>
         <th pSortableColumn="asesor">
           Asesor
           <p-sortIcon field="asesor"></p-sortIcon>
@@ -74,6 +78,7 @@
         <td>{{ clientePoliza.codigo }}</td>
         <td>{{ clientePoliza.numeroCertificado }}</td>
         <td>{{ clientePoliza.poliza.nombre }}</td>
+        <td>{{ clientePoliza?.empresa?.nombre }}</td>
         <td>{{ clientePoliza.asesor.nombreUsuario }}</td>
         <td>{{ clientePoliza.agente.nombreUsuario }}</td>
         <td>{{ clientePoliza.fechaInicio }}</td>
@@ -117,6 +122,22 @@
       <input type="text" pInputText [(ngModel)]="polizaCliente.numeroCertificado" required/>
       <small class="p-invalid" *ngIf="submitted && !polizaCliente.numeroCertificado"
       >Número de certificado es requerido.</small>
+    </div>
+
+
+    <div class="p-field">
+      <label for="empresaId">Empresa</label>
+      <p-autoComplete
+        dropdown="true"
+        [(ngModel)]="empresa"
+        [showEmptyMessage]="true"
+        [suggestions]="filteredEmpresas"
+        (completeMethod)="filterEmpresas($event)"
+        field="nombre"
+        [minLength]="1"
+        [appendTo]="'body'"
+      ></p-autoComplete>
+      >
     </div>
 
     <div class="p-field">

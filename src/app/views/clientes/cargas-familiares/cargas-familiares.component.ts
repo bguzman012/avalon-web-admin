@@ -8,6 +8,9 @@ import {EstadosService} from "../../../services/estados-service";
 import {UsuariosService} from "../../../services/usuarios-service";
 import {environment} from "../../../../environments/environment";
 import {AuthService} from "../../../services/auth-service";
+import {MembresiasService} from "../../../services/membresias-service";
+import {ClientesMembresiasService} from "../../../services/clientes-membresias-service";
+import {TipoIdentificacion} from "../../../enums/tipo-identificacion";
 
 @Component({
   selector: 'cargas-familiares',
@@ -30,6 +33,7 @@ export class CargasFamiliaresComponent implements OnInit {
   selectedCliente: any; // Cliente seleccionado en el filtro
 
   direccion: any;
+  membresia: any;
 
   paises: any[];
   estados: any[];
@@ -40,12 +44,15 @@ export class CargasFamiliaresComponent implements OnInit {
   filteredPaises: any[];
   filteredEstados: any[];
   filteredClientes: any[]; // Clientes filtrados para el autocompletado
+  filteredMembresias: any[];
 
   loading: boolean = false;
   clientePolizaId;
   clientePoliza
+  clienteMembresia
 
   numeroCertificado
+  numeroMembresia
   parentesco
 
   first: number = 0;
@@ -60,16 +67,19 @@ export class CargasFamiliaresComponent implements OnInit {
   ESTADO_ACTIVO = 'A';
   validarEnable = false;
   validarCreacion = false;
+  vigenciaMeses
+  noMembresia = false
+  tipoDocumentoIdentOptions: { label: string, value: string }[];
 
   constructor(
     private messageService: MessageService,
     private cargasFamiliaresService: CargaFamiliarService,
     private confirmationService: ConfirmationService,
-    private clientePolizaService: ClientePolizaService,
+    private clienteMembresiaService: ClientesMembresiasService,
     private paisesService: PaisesService,
     private estadosService: EstadosService,
     private route: ActivatedRoute,
-    private router: Router,
+    private membresiasService: MembresiasService,
     private usuariosService: UsuariosService,
     private authService: AuthService
   ) {
@@ -87,14 +97,56 @@ export class CargasFamiliaresComponent implements OnInit {
 
     if (user.rol.id == this.ROL_ADMINISTRADOR_ID) this.validarEnable = true;
     if (user.rol.id != this.ROL_CLIENTE_ID) this.validarCreacion = true;
+
     await this.refrescarListado();
+    await this.cargarMembresiasCliente()
     this.loading = false
+  }
+
+  async cargarMembresiasCliente(){
+    console.log(this.clientePoliza.cliente)
+    let response = await this.clienteMembresiaService.obtenerUsuariosMembresiaByUsuarioId(
+      this.clientePoliza.cliente.id,
+      0,
+      1,
+      "",
+      "fechaFin",
+      -1,
+      "A")
+
+    const clienteMembresiasTitular = response.data
+    if (clienteMembresiasTitular.length >= 1 ){
+      this.membresia = clienteMembresiasTitular[0].membresia;
+      this.clienteMembresia = clienteMembresiasTitular[0]
+      this.clienteMembresia.fechaInicio = new Date(this.clienteMembresia.fechaInicio + 'T23:59:00Z');
+      this.clienteMembresia.fechaFin = new Date(this.clienteMembresia.fechaFin + 'T23:59:00Z');
+
+      if (this.membresia.vigenciaMeses) {
+        this.vigenciaMeses = `${this.membresia.vigenciaMeses} ${this.membresia.vigenciaMeses > 1 ? 'meses' : 'mes'}`;
+      } else {
+        this.vigenciaMeses = undefined;
+      }
+    }
+
+    if (clienteMembresiasTitular.length == 0 ){
+      this.noMembresia = true
+      this.messageService.add({severity: 'error', summary: 'Error!', detail: 'El cliente titular no tiene una membresía en estado activo, no es posible crear cargas familiares'});
+    }
+
   }
 
   private getRouteParams(param: string): Promise<string> {
     return new Promise((resolve) => {
       this.route.queryParams.subscribe((params) => resolve(params[param]));
     });
+  }
+
+  async filterMembresia(event) {
+    const responseMembresia = await this.membresiasService.obtenerMembresiasByEstado(
+      this.ESTADO_ACTIVO, 0, 10, event.query
+    )
+
+    this.filteredMembresias = responseMembresia.data;
   }
 
   async filterGlobal(event: Event, dt: any) {
@@ -157,7 +209,7 @@ export class CargasFamiliaresComponent implements OnInit {
     this.cargaFamiliar = {};
     this.selectedCliente = null
     this.direccion = {};
-
+    this.numeroCertificado = this.clientePoliza.numeroCertificado
     this.cargaFamiliar.fechaNacimiento = new Date();
 
     this.submitted = false;
@@ -167,6 +219,11 @@ export class CargasFamiliaresComponent implements OnInit {
 
   async prepareData() {
     this.paises = await this.paisesService.obtenerPaises();
+
+    this.tipoDocumentoIdentOptions = Object.keys(TipoIdentificacion).map(key => {
+      return { label: key, value: TipoIdentificacion[key] };
+    });
+
   }
 
   async onPageChange(event) {
@@ -233,9 +290,11 @@ export class CargasFamiliaresComponent implements OnInit {
         } else
           this.cargaFamiliar.clienteId = this.selectedCliente.id
 
+        this.cargaFamiliar.clienteMembresiaTitularId = this.clienteMembresia.id
+        this.cargaFamiliar.codigoMembresia = this.numeroMembresia
+
         this.cargaFamiliar.rolId = this.ROL_CLIENTE_ID
         this.cargaFamiliar.estado = 'P';
-        this.cargaFamiliar.contrasenia = environment.pass_default;
         this.cargaFamiliar.clientePolizaTitularId = this.clientePolizaId;
 
         await this.cargasFamiliaresService.createCargaFamiliar(this.cargaFamiliar);

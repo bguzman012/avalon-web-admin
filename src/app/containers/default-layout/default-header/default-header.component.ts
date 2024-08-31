@@ -24,7 +24,7 @@ export class DefaultHeaderComponent extends HeaderComponent {
   }
 
   redirigirMenu(){
-    this.router.navigate([`/usuarios/edit-personal-info`]);
+    this.router.navigate([`/edit-personal-info`]);
   }
 
   cerrarSesion() {

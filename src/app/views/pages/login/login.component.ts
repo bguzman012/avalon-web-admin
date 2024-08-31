@@ -51,7 +51,7 @@ export class LoginComponent {
       const username = this.loginForm.get('username')!.value;
       const password = this.loginForm.get('password')!.value;
 
-      this.authService.login(username, password)
+      this.authService.login(username, password, "SI")
         .subscribe(
           (response) => {
             this.loading = false;

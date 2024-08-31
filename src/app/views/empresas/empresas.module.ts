@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   ButtonGroupModule,
   AlertModule,
+  CardModule,
   FormModule,
   GridModule,
   ListGroupModule,
@@ -12,7 +13,7 @@ import {
 } from '@coreui/angular';
 
 
-import { UsuariosRoutingModule } from './usuarios-routing.module';
+import { EmpresasRoutingModule } from './empresas-routing.module';
 
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
@@ -24,11 +25,7 @@ import {DialogModule} from 'primeng/dialog';
 import {ButtonModule} from 'primeng/button';
 import {DropdownModule} from 'primeng/dropdown';
 import {ProgressBarModule} from 'primeng/progressbar';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import {InputTextModule} from 'primeng/inputtext';
-import {AutoCompleteModule} from 'primeng/autocomplete';
-import { CardModule } from 'primeng/card';
 import {FileUploadModule} from 'primeng/fileupload';
 import {ToolbarModule} from 'primeng/toolbar';
 import {RatingModule} from 'primeng/rating';
@@ -38,59 +35,57 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { BlockUIModule } from 'primeng/blockui';
 import { MessageService } from 'primeng/api';
-import { DataViewModule } from 'primeng/dataview';
-import {PanelModule} from 'primeng/panel';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextareaModule } from 'primeng/inputtextarea';
-import { EditPersonalInfoComponent } from './edit-personal-info/edit-personal-info.component';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import {PaginatorModule} from "primeng/paginator";
+import {EmpresasComponent} from "./empresas/empresas.component";
+
 
 @NgModule({
   declarations: [
-
-    EditPersonalInfoComponent,
+    EmpresasComponent
   ],
-  imports: [
-    CommonModule,
-    UsuariosRoutingModule,
-    FormModule,
-    PanelModule,
-    GridModule,
-    FormsModule,
-    ReactiveFormsModule,
-    FormModule,
-    ButtonGroupModule,
-    DropdownModule,
-    AlertModule,
-    AutoCompleteModule,
-    TableModule,
-    SharedModule,
-    ListGroupModule,
-    InputGroupModule,
-    InputGroupAddonModule,
-    DataViewModule,
-    TableModule,
-    CalendarModule,
-		SliderModule,
-		DialogModule,
-		MultiSelectModule,
-		ContextMenuModule,
-		DropdownModule,
-		ButtonModule,
-		ToastModule,
-    CardModule,
-    BlockUIModule,
-    InputTextModule,
-    ProgressBarModule,
-    FileUploadModule,
-    ToolbarModule,
-    RatingModule,
-    ProgressSpinnerModule,
-    FormsModule,
-    RadioButtonModule,
-    InputNumberModule,
-    ConfirmDialogModule,
-    InputTextareaModule,
-  ]
+    imports: [
+        CommonModule,
+        EmpresasRoutingModule,
+        CardModule,
+        FormModule,
+        GridModule,
+        FormsModule,
+        ReactiveFormsModule,
+        FormModule,
+        ButtonGroupModule,
+        DropdownModule,
+        AlertModule,
+        TableModule,
+        SharedModule,
+        ListGroupModule,
+        AutoCompleteModule,
+
+        TableModule,
+        CalendarModule,
+        SliderModule,
+        DialogModule,
+        BlockUIModule,
+        ProgressSpinnerModule,
+        MultiSelectModule,
+        ContextMenuModule,
+        DropdownModule,
+        ButtonModule,
+        ToastModule,
+        InputTextModule,
+        ProgressBarModule,
+        FileUploadModule,
+        ToolbarModule,
+        RatingModule,
+        FormsModule,
+        RadioButtonModule,
+        InputNumberModule,
+        ConfirmDialogModule,
+        InputTextareaModule,
+        PaginatorModule,
+    ]
 })
-export class UsuariosModule {
+export class EmpresasModule {
 }

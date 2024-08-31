@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
-import { DefaultLayoutComponent } from './containers';
-import { Page404Component } from './views/pages/page404/page404.component';
-import { Page500Component } from './views/pages/page500/page500.component';
-import { LoginComponent } from './views/pages/login/login.component';
-import { RegisterComponent } from './views/pages/register/register.component';
+import {DefaultLayoutComponent} from './containers';
+import {Page404Component} from './views/pages/page404/page404.component';
+import {Page500Component} from './views/pages/page500/page500.component';
+import {LoginComponent} from './views/pages/login/login.component';
+import {RegisterComponent} from './views/pages/register/register.component';
 import {ChangePasswordComponent} from "./views/pages/change-password/change-password.component";
 
 const routes: Routes = [
@@ -32,7 +32,7 @@ const routes: Routes = [
       //     import('./views/theme/theme.module').then((m) => m.ThemeModule)
       // },
       {
-        path: 'usuarios',
+        path: 'edit-personal-info',
         loadChildren: () =>
           import('./views/usuarios/usuarios.module').then((m) => m.UsuariosModule)
       },
@@ -66,6 +66,10 @@ const routes: Routes = [
         loadChildren: () =>
           import('./views/centros-medicos/centro-medicos.module').then((m) => m.CentroMedicosModule)
       },{
+        path: 'empresas',
+        loadChildren: () =>
+          import('./views/empresas/empresas.module').then((m) => m.EmpresasModule)
+      }, {
         path: 'medicos',
         loadChildren: () =>
           import('./views/medicos/medicos.module').then((m) => m.MedicosModule)
@@ -84,11 +88,11 @@ const routes: Routes = [
         path: 'citas-medicas',
         loadChildren: () =>
           import('./views/citas-medicas/citas-medicas.module').then((m) => m.CitasMedicasModule)
-      },{
+      }, {
         path: 'emergencias',
         loadChildren: () =>
           import('./views/emergencias/emergencias.module').then((m) => m.EmergenciasModule)
-      },{
+      }, {
         path: 'preguntas',
         loadChildren: () =>
           import('./views/arbol-preguntas/arbol-preguntas.module').then((m) => m.PreguntasModule)
@@ -181,7 +185,7 @@ const routes: Routes = [
     data: {
       title: 'Login Page'
     }
-  },{
+  }, {
     path: 'change-password',
     component: ChangePasswordComponent,
     data: {

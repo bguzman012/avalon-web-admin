@@ -11,7 +11,7 @@
 
     <ng-template pTemplate="right">
       <button pButton pRipple label="Nueva Carga Familiar" icon="pi pi-plus" class="p-button-success p-mr-2"
-              (click)="openNew()" *ngIf="validarCreacion"></button>
+              (click)="openNew()" [disabled]="noMembresia" *ngIf="validarCreacion"></button>
     </ng-template>
   </p-toolbar>
 
@@ -35,6 +35,10 @@
       <tr>
         <th style="width: 3rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="numeroCertificado">
+          Num. Cert.
+          <p-sortIcon field="numeroCertificado"></p-sortIcon>
         </th>
         <th pSortableColumn="cliente">Nombres
           <p-sortIcon field="cliente"></p-sortIcon>
@@ -61,15 +65,16 @@
         <td>
           <p-tableCheckbox [value]="cargaFamiliar"></p-tableCheckbox>
         </td>
+        <td>{{ cargaFamiliar.numeroCertificado }}</td>
         <td>{{ cargaFamiliar.cliente.nombres }} {{ cargaFamiliar.cliente.nombresDos }}</td>
         <td>{{ cargaFamiliar.cliente.apellidos }} {{ cargaFamiliar.cliente.apellidosDos }}</td>
         <td>{{ cargaFamiliar.cliente.correoElectronico }}</td>
         <td>{{ cargaFamiliar.cliente.nombreUsuario }}</td>
         <td>{{ cargaFamiliar.parentesco }}</td>
         <td style="text-align: right;">
-          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
+          <button [disabled]="noMembresia" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
                   (click)="editCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
-          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button" *ngIf="validarEnable"
+          <button [disabled]="noMembresia" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button" *ngIf="validarEnable"
                   (click)="deleteCargaFamiliar(cargaFamiliar); $event.stopPropagation()"></button>
         </td>
       </tr>
@@ -153,6 +158,33 @@
                        autofocus/>
                 <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidosDos">Apellido dos is
                   required.</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-grid p-fluid">
+            <div class="p-col-12 p-md-6">
+              <div class="p-field">
+                <label for="tipoIdentificacion">Tipo de Identificación</label>
+                <p-dropdown
+                  id="tipoIdentificacion"
+                  [options]="tipoDocumentoIdentOptions"
+                  [(ngModel)]="cargaFamiliar.tipoIdentificacion"
+                  optionLabel="value"
+                  optionValue="label"
+                  placeholder="Seleccione un tipo de identificación">
+                </p-dropdown>
+                <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.tipoIdentificacion">Tipo de identificación es
+                  requerido.</small>
+              </div>
+            </div>
+            <div class="p-col-12 p-md-6">
+              <div class="p-field">
+                <label for="numeroIdentificacion">Número de Identificación</label>
+                <input type="text" pInputText id="numeroIdentificacion" [(ngModel)]="cargaFamiliar.numeroIdentificacion"
+                       required/>
+                <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.numeroIdentificacion">Número de identificación es
+                  requerido.</small>
               </div>
             </div>
           </div>
@@ -285,8 +317,7 @@
           <div class="p-col-12 p-md-6">
             <div class="p-field">
               <label for="numeroCertificado">Número Certificado</label>
-              <input type="text" pInputText id="numeroCertificado" [(ngModel)]="numeroCertificado" required autofocus/>
-              <small class="p-invalid" *ngIf="submitted && !numeroCertificado">Número certificado is required.</small>
+              <input type="text" pInputText id="numeroCertificado" [(ngModel)]="numeroCertificado" readonly autofocus/>
             </div>
           </div>
           <div class="p-col-12 p-md-6">
@@ -298,7 +329,59 @@
           </div>
         </div>
       </p-accordionTab>
+      <p-accordionTab header="Datos Cliente Membresía" [selected]="true" *ngIf="!selectedCliente && !cargaFamiliar?.id">
+        <div class="p-field">
+          <label for="numeroMembresia">Número Membresía</label>
+          <input type="text" pInputText id="numeroMembresia" [(ngModel)]="numeroMembresia" autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !numeroMembresia">Numero membresía es requerido.</small>
+        </div>
+          <div class="p-field">
+            <label for="membresiaId">Membresia</label>
+            <p-autoComplete
+              dropdown = "true"
+              [(ngModel)]="membresia"
+              [showEmptyMessage]="true"
+              readonly
+              [suggestions]="filteredMembresias"
+              (completeMethod)="filterMembresia($event)"
+              field="nombres"
+              [minLength]="1"
+              [appendTo]="'body'"
+              required>
 
+              <!-- Template for the items in the suggestion list -->
+              <ng-template let-membresia pTemplate="item">
+                <div>
+                  <span>{{ membresia.nombres }} [{{ membresia.vigenciaMeses }} meses]</span>
+                </div>
+              </ng-template>
+            </p-autoComplete>
+            <small class="p-invalid" *ngIf="submitted && !membresia">Membresia es requerido.</small>
+          </div>
+          <div class="p-field" *ngIf="vigenciaMeses">
+            <label for="vigencia">Vigencia</label>
+            <input
+              type="text"
+              pInputText
+              id="vigencia"
+              [(ngModel)]="vigenciaMeses"
+              required
+              readonly
+              autofocus
+            />
+          </div>
+          <div class="p-field">
+            <label for="fechaInicio">Fecha de Inicio</label>
+            <p-calendar [(ngModel)]="clienteMembresia.fechaInicio" dateFormat="dd/mm/yy" [disabled]="true"
+                        [showIcon]="true"></p-calendar>
+          </div>
+          <div class="p-field">
+            <label for="fechaFin">Fecha de Fin</label>
+            <p-calendar [(ngModel)]="clienteMembresia.fechaFin" dateFormat="dd/mm/yy" [showIcon]="true"
+                        [disabled]="true"></p-calendar>
+          </div>
+
+      </p-accordionTab>
     </p-accordion>
     <p-blockUI [blocked]="loading">
       <div class="p-field" *ngIf="loading">

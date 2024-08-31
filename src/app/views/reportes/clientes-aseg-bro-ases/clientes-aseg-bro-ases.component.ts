@@ -57,8 +57,8 @@ export class ClientesAsegBroAsesComponent implements OnInit {
   totalRecords: number = 0;
 
   busqueda: string = '';
-  sortField = "cliente"
-  sortOrder
+  sortField = "numeroCertificado"
+  sortOrder = 1
 
   codigoDocumento: string = 'Nueva Póliza de Cliente'
   validarCreacion = false;
@@ -102,7 +102,6 @@ export class ClientesAsegBroAsesComponent implements OnInit {
 
   exportExcel() {
     this.loading = true
-    console.log(this.busqueda)
     this.clientesPolizasService.downloadExcel(
       this.busqueda,
       this.sortField,
