@@ -92,6 +92,11 @@ export const navItemsAdmin: INavData[] = [
     url: '/reportes',
     iconComponent: {}
 
+  }  , {
+    name: 'Migraciones',
+    url: '/migraciones',
+    iconComponent: {}
+
   }
 ];
 

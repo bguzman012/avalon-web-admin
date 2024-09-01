@@ -116,6 +116,10 @@ const routes: Routes = [
         path: 'reportes',
         loadChildren: () =>
           import('./views/reportes/reportes.module').then((m) => m.ReportesModule)
+      },{
+        path: 'migraciones',
+        loadChildren: () =>
+          import('./views/migraciones/migraciones.module').then((m) => m.MigracionesModule)
       },
       {
         path: 'notificaciones',

@@ -9,7 +9,7 @@ import {PaisesService} from "../../../services/paises-service";
 import {EstadosService} from "../../../services/estados-service";
 
 @Component({
-  selector: 'app-reportes',
+  selector: 'app-migraciones',
   templateUrl: './reportes.component.html',
   styles: [`
     :host ::ng-deep .p-dialog .product-image {

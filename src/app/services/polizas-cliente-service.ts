@@ -21,6 +21,16 @@ export class ClientePolizaService {
     }
   }
 
+  async crearClientePolizaMigracion(request: any): Promise<any> {
+    try {
+      const response = await this.http.post<any>(`${this.apiUrl}/clientesPolizas/migracion`, request).toPromise();
+      return response;
+    } catch (error) {
+      console.error('Error al crear ClientePoliza:', error);
+      throw error;
+    }
+  }
+
   downloadExcel(
     busqueda: string,
     sortField: string | null = 'createdDate',

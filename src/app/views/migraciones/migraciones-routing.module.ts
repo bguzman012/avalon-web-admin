@@ -1,15 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {MedicosComponent} from "./medicos/medicos.component";
-import {
-  MedCentrosMedicosAseguradorasComponent
-} from "./med-centros-medicos-aseguradoras/med-centros-medicos-aseguradoras.component";
+import {MigracionesComponent} from "./migraciones/migraciones.component";
 
 const routes: Routes = [
   {
     path: '',
     data: {
-      breadcrumb: 'Medicos'
+      breadcrumb: 'Migraciones'
     },
     children: [
       {
@@ -17,23 +14,23 @@ const routes: Routes = [
         data: {
           breadcrumb: null
         },
-        component: MedicosComponent,
-       },
-      {
-        path: 'migraciones-aseguradoras',
-        data: {
-          breadcrumb: 'Centros Médicos'
-        },
-        children: [
-          {
-            path: '',
-            data: {
-              breadcrumb: null
-            },
-            component: MedCentrosMedicosAseguradorasComponent,
-          },
-        ]
-      },
+        component: MigracionesComponent,
+       }
+      // {
+      //   path: 'beneficios',
+      //   data: {
+      //     breadcrumb: 'Beneficios'
+      //   },
+      //   children: [
+      //     {
+      //       path: '',
+      //       data: {
+      //         breadcrumb: null
+      //       },
+      //       component: BeneficiosComponent,
+      //     },
+      //   ]
+      // },
       // {
       //   path: 'clientes',
       //   data: {
@@ -68,5 +65,5 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class MedicosRoutingModule {
+export class MigracionesRoutingModule {
 }
