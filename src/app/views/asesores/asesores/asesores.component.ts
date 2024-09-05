@@ -57,7 +57,7 @@ export class AsesoresComponent implements OnInit {
 
     // dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
-  
+
   openNew() {
     this.usuario = {};
     this.submitted = false;
@@ -160,6 +160,8 @@ export class AsesoresComponent implements OnInit {
         summary: 'Enhorabuena!',
         detail: 'Operación ejecutada con éxito',
       });
+    } catch (error) {
+      this.messageService.add({severity: 'error', summary: 'Error', detail: error.error});
     } finally {
       this.loading = false; // Ocultar spinner
     }

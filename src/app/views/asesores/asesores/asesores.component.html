@@ -11,8 +11,8 @@
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="usuarios" 
-        [(selection)]="selectedUsuarios" 
+    <p-table #dt [value]="usuarios"
+        [(selection)]="selectedUsuarios"
         [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
         [showCurrentPageReport]="true"
@@ -125,7 +125,7 @@
             <input type="text" pInputText [(ngModel)]="usuario.numeroTelefono" />
         </div>
 
-        <div class="p-field">
+        <div class="p-field" *ngIf="usuario?.id">
             <label class="p-mb-3">Nombre Usuario</label>
             <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
         </div>

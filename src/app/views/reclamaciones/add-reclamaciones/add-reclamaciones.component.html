@@ -26,7 +26,7 @@
           ($event)" field="nombreUsuario"
           [dropdown]="!reclamacion?.id  && !originCaso"
           (ngModelChange)="loadPolizas()"
-          [readonly]="reclamacion?.id  && originCaso"
+          [readonly]="reclamacion?.id  || originCaso"
           placeholder="Filtrar por Cliente"
           [forceSelection]="true" [maxlength]="50">
         </p-autoComplete>
@@ -38,8 +38,8 @@
           field="displayName"
           [dropdown]="!reclamacion?.id && !originCaso"
           placeholder="Filtrar por Póliza"
-          [disabled]="!selectedCliente?.id  && originCaso"
-          [readonly]="reclamacion?.id" [forceSelection]="true" [maxlength]="50">
+          [disabled]="!selectedCliente?.id"
+          [readonly]="reclamacion?.id || originCaso" [forceSelection]="true" [maxlength]="50">
         </p-autoComplete>
         <p-autoComplete
           [(ngModel)]="selectedCaso"
@@ -49,7 +49,7 @@
           [dropdown]="!reclamacion?.id && !originCaso"
           placeholder="Filtrar por Caso"
           [disabled]="!selectedClientePoliza?.id"
-          [readonly]="reclamacion?.id && originCaso">
+          [readonly]="reclamacion?.id || originCaso">
         </p-autoComplete>
       </div>
     </p-panel>

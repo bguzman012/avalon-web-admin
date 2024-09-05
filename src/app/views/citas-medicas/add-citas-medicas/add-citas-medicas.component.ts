@@ -204,6 +204,9 @@ export class AddCitasMedicasComponent implements OnInit {
       this.selectedCaso = casoParam
     }
 
+    console.log(this.selectedCaso, "  CASO PARAM")
+    console.log(this.selectedCaso?.id , "  CASO ID")
+
     this.citaMedica.fechaTentativa = new Date();
 
     this.loading = false;
