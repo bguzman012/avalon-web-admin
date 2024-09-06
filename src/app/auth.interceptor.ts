@@ -3,18 +3,28 @@ import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/c
 import { Observable, throwError } from 'rxjs';
 import { AuthService } from './services/auth-service';
 import { catchError, switchMap } from 'rxjs/operators';
+import {Router} from "@angular/router";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService,
+              private router: Router) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    console.log("INTERCEPTING");
+    console.log("INTER")
     const authToken = this.authService.getToken();
-    
+
     const isExcludedUrl = request.url.includes('login');
-    
+
+    // const AUTENTICADO_2FA = this.authService.getAutenticadoDosFA();
+    // const VERIFICANDO_2FA = localStorage.getItem("VERIFICANDO_2FA")
+    //
+    // if (!isExcludedUrl && VERIFICANDO_2FA != "SI" && AUTENTICADO_2FA != "AUTENTICADO_2FA") {
+    //   this.router.navigate(['/login']);
+    //   return throwError('No autenticado con 2FA');
+    // }
+
     let authReq = request;
 
     if (authToken !== null && !isExcludedUrl) {

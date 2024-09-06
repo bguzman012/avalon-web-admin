@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {NgModule, OnInit} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
 import {DefaultLayoutComponent} from './containers';
@@ -7,13 +7,9 @@ import {Page500Component} from './views/pages/page500/page500.component';
 import {LoginComponent} from './views/pages/login/login.component';
 import {RegisterComponent} from './views/pages/register/register.component';
 import {ChangePasswordComponent} from "./views/pages/change-password/change-password.component";
+import {AuthGuard} from "./auth.guard";
 
 const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full'
-  },
   {
     path: '',
     component: DefaultLayoutComponent,
@@ -21,89 +17,95 @@ const routes: Routes = [
       title: 'Home'
     },
     children: [
-      // {
-      //   path: 'dashboard',
-      //   loadChildren: () =>
-      //     import('./views/dashboard/dashboard.module').then((m) => m.DashboardModule)
-      // },
-      // {
-      //   path: 'theme',
-      //   loadChildren: () =>
-      //     import('./views/theme/theme.module').then((m) => m.ThemeModule)
-      // },
       {
         path: 'edit-personal-info',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/usuarios/usuarios.module').then((m) => m.UsuariosModule)
       },
       {
         path: 'brokers',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/brokers/brokers.module').then((m) => m.BrokersModule)
       },
       {
         path: 'membresias',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/membresias/membresias.module').then((m) => m.MembresiasModule)
       },
       {
         path: 'asesores',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/asesores/asesores.module').then((m) => m.AsesoresModule)
       },
       {
         path: 'clientes',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/clientes/clientes.module').then((m) => m.ClientesModule)
       },
       {
         path: 'aseguradoras',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/aseguradoras/aseguradoras.module').then((m) => m.AseguradorasModule)
       },
       {
         path: 'centros-medicos',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/centros-medicos/centro-medicos.module').then((m) => m.CentroMedicosModule)
       },{
         path: 'empresas',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/empresas/empresas.module').then((m) => m.EmpresasModule)
       }, {
         path: 'medicos',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/medicos/medicos.module').then((m) => m.MedicosModule)
       },
       {
         path: 'audits',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/audits/audits.module').then((m) => m.AuditsModule)
       },
       {
         path: 'reclamaciones',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/reclamaciones/reclamaciones.module').then((m) => m.ReclamacionesModule)
       },
       {
         path: 'citas-medicas',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/citas-medicas/citas-medicas.module').then((m) => m.CitasMedicasModule)
       }, {
         path: 'emergencias',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/emergencias/emergencias.module').then((m) => m.EmergenciasModule)
       }, {
         path: 'preguntas',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/arbol-preguntas/arbol-preguntas.module').then((m) => m.PreguntasModule)
       },
       {
         path: 'metodos-pago',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/metodos-pago/metodos-pago.module').then((m) => m.MetodosPagoModule)
       },
       {
         path: 'casos',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/casos/casos.module').then((m) => m.CasosModule)
       },
@@ -114,56 +116,24 @@ const routes: Routes = [
       // },
       {
         path: 'reportes',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/reportes/reportes.module').then((m) => m.ReportesModule)
       },{
         path: 'migraciones',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/migraciones/migraciones.module').then((m) => m.MigracionesModule)
       },
       {
         path: 'notificaciones',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/notificaciones/notificaciones.module').then((m) => m.NotificacionesModule)
       },
-
-      // {
-      //   path: 'base',
-      //   loadChildren: () =>
-      //     import('./views/base/base.module').then((m) => m.BaseModule)
-      // },
-      // {
-      //   path: 'buttons',
-      //   loadChildren: () =>
-      //     import('./views/buttons/buttons.module').then((m) => m.ButtonsModule)
-      // },
-      // {
-      //   path: 'forms',
-      //   loadChildren: () =>
-      //     import('./views/forms/forms.module').then((m) => m.CoreUIFormsModule)
-      // },
-      // {
-      //   path: 'charts',
-      //   loadChildren: () =>
-      //     import('./views/charts/charts.module').then((m) => m.ChartsModule)
-      // },
-      // {
-      //   path: 'icons',
-      //   loadChildren: () =>
-      //     import('./views/icons/icons.module').then((m) => m.IconsModule)
-      // },
-      // {
-      //   path: 'notifications',
-      //   loadChildren: () =>
-      //     import('./views/notifications/notifications.module').then((m) => m.NotificationsModule)
-      // },
-      // {
-      //   path: 'widgets',
-      //   loadChildren: () =>
-      //     import('./views/widgets/widgets.module').then((m) => m.WidgetsModule)
-      // },
       {
         path: 'pages',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('./views/pages/pages.module').then((m) => m.PagesModule)
       },
@@ -194,13 +164,6 @@ const routes: Routes = [
     component: ChangePasswordComponent,
     data: {
       title: 'Cambiar contraseña'
-    }
-  },
-  {
-    path: 'register',
-    component: RegisterComponent,
-    data: {
-      title: 'Register Page'
     }
   },
   {path: '**', redirectTo: 'dashboard'}

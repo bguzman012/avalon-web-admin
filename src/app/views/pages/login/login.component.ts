@@ -17,9 +17,11 @@ export class LoginComponent {
   loginForm: FormGroup;
   loginError: boolean = false;
   dosFADialog: boolean = false;
+  forgotPassDialog: boolean = false;
   submitted: boolean = false;
 
   inputDosFa: string = ""
+  inputCorreo: string = ""
 
   loginErrorMessage: string = '';
   verificationCodeMessage: string = '';
@@ -34,6 +36,7 @@ export class LoginComponent {
               private messageService: MessageService,) {
     const AUTENTICADO_2FA = this.authService.getAutenticadoDosFA();
 
+    console.log("CONSTR")
 
     if (AUTENTICADO_2FA == "AUTENTICADO_2FA")
       this.router.navigate(['/clientes']);
@@ -68,7 +71,7 @@ export class LoginComponent {
                 },
               });
             }
-            if (response.asunto === this.ASUNTO_LOGIN_EXITOSO_2FA)  {
+            if (response.asunto === this.ASUNTO_LOGIN_EXITOSO_2FA) {
               // Lógica para un inicio de sesión exitoso normal
               // this.router.navigate(['/clientes']);
               this.dosFADialog = true
@@ -96,7 +99,7 @@ export class LoginComponent {
   }
 
 
-  async verificarCodigo(){
+  async verificarCodigo() {
     this.submitted = true
     if (!this.inputDosFa) return
 
@@ -105,33 +108,44 @@ export class LoginComponent {
       return
     }
 
+    localStorage.setItem("VERIFICANDO_2FA", "SI")
+
     this.loading = true
+    try {
+      let user = await this.authService.obtenerUsuarioLoggeado()
 
-    let user = await this.authService.obtenerUsuarioLoggeado()
-
-    // Llamar al servicio para cambiar la contraseña
-    this.authService.verifyCode(user.nombreUsuario, this.inputDosFa)
-      .subscribe(
-        (response) => {
-          this.loading = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Enhorabuena!',
-            detail: 'Código verificado correctamente',
-            life: 3000,
-          });
-          this.dosFADialog = false
-          this.authService.setAutenticado2FA();
-          this.router.navigate(['/clientes']);
-        },
-        (error) => {
-          this.loading = false;
-          this.verificationCodeMessage = error.error.message || 'Ocurrió un error al verificar código 2FA';
-        }
-      );
+      // Llamar al servicio para cambiar la contraseña
+      this.authService.verifyCode(user.nombreUsuario, this.inputDosFa)
+        .subscribe(
+          (response) => {
+            this.loading = false;
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Enhorabuena!',
+              detail: 'Código verificado correctamente',
+              life: 3000,
+            });
+            this.dosFADialog = false
+            localStorage.removeItem("VERIFICANDO_2FA")
+            this.authService.setAutenticado2FA();
+            this.router.navigate(['/clientes']);
+          },
+          (error) => {
+            this.loading = false;
+            this.verificationCodeMessage = error.error.message || 'Ocurrió un error al verificar código 2FA';
+          }
+        );
+    } catch (error) {
+      this.verificationCodeMessage = 'Ocurrió un error al verificar código 2FA';
+      this.loading = false;
+    }
   }
 
-  async reenviarCodigo(){
+  showForgotPasswordDialog(){
+    this.forgotPassDialog = true
+  }
+
+  async reenviarCodigo() {
     this.loading = true
 
     let user = await this.authService.obtenerUsuarioLoggeado()
@@ -155,7 +169,7 @@ export class LoginComponent {
       );
   }
 
-  cancelar(){
+  cancelar() {
     this.submitted = false
     this.dosFADialog = false
   }

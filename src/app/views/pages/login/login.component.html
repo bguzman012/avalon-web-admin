@@ -34,6 +34,9 @@
                       Login
                     </button>
                   </c-col>
+                  <c-col xs="6" class="text-right">
+                    <a href="#" (click)="showForgotPasswordDialog()">Olvidé mi contraseña</a>
+                  </c-col>
                   <!-- ... otros botones ... -->
                 </c-row>
               </form>
@@ -78,24 +81,6 @@
   </ng-template>
 
   <ng-template pTemplate="footer">
-<!--    <div>-->
-<!--      <button-->
-<!--        pButton-->
-<!--        label="Reenviar Código"-->
-<!--        icon="pi pi-times"-->
-<!--        class="p-button-danger"-->
-<!--        (click)="cancelar()"-->
-<!--      ></button>-->
-<!--    </div>-->
-<!--    <div>-->
-<!--      <button-->
-<!--        pButton-->
-<!--        label="Verificar"-->
-<!--        icon="pi pi-check"-->
-<!--        type="button"-->
-<!--        (click)="verificarCodigo()"-->
-<!--      ></button>-->
-<!--    </div>-->
     <div class="button-container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
       <button
         pButton
@@ -116,5 +101,54 @@
     </div>
   </ng-template>
 </p-dialog>
+<p-dialog [(visible)]="forgotPassDialog" [style]="{width: '500px'}" header="Reestablecer contraseña" [modal]="true"
+          styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <label for="correoElectronico">Código 2FA</label>
+      <input
+        type="text"
+        pInputText
+        id="correoElectronico"
+        [(ngModel)]="inputCorreo"
+        required
+        placeholder="Ingrese correo electrónico"
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !inputCorreo"
+      >Correo electrónico es requerido.</small
+      >
+    </div>
+    <span *ngIf="verificationCodeMessage" class="text-danger">{{ verificationCodeMessage }}</span>
+
+    <p-blockUI [blocked]="loading">
+      <div class="p-field" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </p-blockUI>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <div class="button-container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <button
+        pButton
+        style="width: 250px"
+        label="Confirmar"
+        icon="pi pi-check"
+        type="button"
+        (click)="verificarCodigo()"
+      ></button>
+      <button
+        pButton
+        style="width: 250px"
+        label="Reenviar código"
+        icon="pi pi-refresh"
+        class="p-button-text"
+        (click)="reenviarCodigo()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
 
 <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

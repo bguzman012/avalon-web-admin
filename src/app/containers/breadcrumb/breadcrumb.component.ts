@@ -16,6 +16,7 @@ export class BreadcrumbComponent implements OnInit {
   constructor(private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
+    console.log("BREAD")
     // Escucha los eventos de navegación
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
