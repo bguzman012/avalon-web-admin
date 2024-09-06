@@ -10,18 +10,19 @@ import { filter } from 'rxjs/operators';
 })
 export class BreadcrumbComponent implements OnInit {
   static readonly ROUTE_DATA_BREADCRUMB = 'breadcrumb';
-  readonly home = { icon: 'pi pi-home', url: '/#/clientes' };
+  readonly home = { icon: 'pi pi-home', routerLink: '/clientes' }; // Usar routerLink en lugar de url
   menuItems: MenuItem[];
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
+    // Escucha los eventos de navegación
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => this.menuItems = this.createBreadcrumbs(this.activatedRoute.root));
   }
 
-  private createBreadcrumbs(route: ActivatedRoute, url: string = '#', breadcrumbs: MenuItem[] = []): MenuItem[] {
+  private createBreadcrumbs(route: ActivatedRoute, url: string = '', breadcrumbs: MenuItem[] = []): MenuItem[] {
     const children: ActivatedRoute[] = route.children;
 
     if (children.length === 0) {
@@ -36,14 +37,14 @@ export class BreadcrumbComponent implements OnInit {
 
       const label = child.snapshot.data[BreadcrumbComponent.ROUTE_DATA_BREADCRUMB];
       if (label !== undefined) {
-        breadcrumbs.push({ label, url });
+        // Usar routerLink para navegación con el enrutador de Angular
+        breadcrumbs.push({ label, routerLink: url });
       }
 
-      // Recursively process children and update breadcrumbs
+      // Procesa recursivamente los hijos para generar las migas de pan
       return this.createBreadcrumbs(child, url, breadcrumbs);
     }
 
-    // Return breadcrumbs if there are no more children
     return breadcrumbs;
   }
 }
