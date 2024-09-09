@@ -98,6 +98,9 @@ export class LoginComponent {
     }
   }
 
+  enviarCodigoPorCorreo(){
+
+  }
 
   async verificarCodigo() {
     this.submitted = true

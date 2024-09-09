@@ -35,7 +35,7 @@
                     </button>
                   </c-col>
                   <c-col xs="6" class="text-right">
-                    <a href="#" (click)="showForgotPasswordDialog()">Olvidé mi contraseña</a>
+                    <a style="color: #033E80; cursor: pointer" (click)="showForgotPasswordDialog()">Olvidé mi contraseña</a>
                   </c-col>
                   <!-- ... otros botones ... -->
                 </c-row>
@@ -105,7 +105,7 @@
           styleClass="p-fluid">
   <ng-template pTemplate="content">
     <div class="p-field">
-      <label for="correoElectronico">Código 2FA</label>
+      <label for="correoElectronico">Correo electrónico</label>
       <input
         type="text"
         pInputText
@@ -133,10 +133,10 @@
       <button
         pButton
         style="width: 250px"
-        label="Confirmar"
+        label="Enviar"
         icon="pi pi-check"
         type="button"
-        (click)="verificarCodigo()"
+        (click)="enviarCodigoPorCorreo()"
       ></button>
       <button
         pButton
