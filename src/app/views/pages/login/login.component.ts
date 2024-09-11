@@ -1,4 +1,4 @@
-// En ChangePasswordComponent
+// En RestartPasswordComponent
 import {Component} from '@angular/core';
 import {AuthService} from '../../../services/auth-service';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
@@ -98,8 +98,32 @@ export class LoginComponent {
     }
   }
 
-  enviarCodigoPorCorreo(){
+  enviarCodigoPorCorreo() {
+    this.loading = true
+    this.authService.sendCodeByMail(this.inputCorreo)
+      .subscribe(
+        (response) => {
+          setTimeout(() => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Enhorabuena!',
+              detail: 'Código enviado exitosamente',
+              life: 2000,
+            });
+          }, 2000); // 2000 milisegundos = 2 segundos
 
+          localStorage.setItem("CORREO_PASS", this.inputCorreo)
+          this.router.navigate(['restart-password']);
+          this.loading = false;
+        },
+        (error) => {
+          // Manejar error de inicio de sesión
+          console.error('Login error:', error);
+          this.loginError = true;
+          this.loginErrorMessage = "Ocurrió un error inesperado en la ejecución de la consulta";
+          this.loading = false;
+        }
+      );
   }
 
   async verificarCodigo() {
@@ -144,7 +168,7 @@ export class LoginComponent {
     }
   }
 
-  showForgotPasswordDialog(){
+  showForgotPasswordDialog() {
     this.forgotPassDialog = true
   }
 

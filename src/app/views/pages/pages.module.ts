@@ -20,11 +20,13 @@ import {CalendarModule} from "primeng/calendar";
 import {DialogModule} from "primeng/dialog";
 import {InputTextModule} from "primeng/inputtext";
 import {ToastModule} from "primeng/toast";
+import {RestartPasswordComponent} from "./restart-password/restart-password.component";
 
 
 @NgModule({
   declarations: [
     ChangePasswordComponent,
+    RestartPasswordComponent,
     LoginComponent,
     RegisterComponent,
     Page404Component,

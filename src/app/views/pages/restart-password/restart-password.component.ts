@@ -8,22 +8,19 @@ import {environment} from '../../../../environments/environment'
 import * as CryptoJS from 'crypto-js';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.scss']
+  selector: 'app-restart',
+  templateUrl: './restart-password.component.html',
+  styleUrls: ['./restart-password.component.scss']
 })
-export class ChangePasswordComponent {
+export class RestartPasswordComponent {
 
   loginForm: FormGroup;
   loginError: boolean = false;
   loginErrorMessage: string = '';
   loading: boolean = false;
-  ASUNTO_CAMBIO_CONTRASENIA = "CAMBIO_CONTRASENIA"
   formularioContrasenia: FormGroup;
 
-  contraseniaActual: string;
-  nuevaContrasenia: string;
-  confirmaContrasenia: string;
+  correoElectronico: string;
 
   constructor(private fb: FormBuilder,
               private authService: AuthService,
@@ -32,18 +29,23 @@ export class ChangePasswordComponent {
               private messageService: MessageService,) {
 
     this.formularioContrasenia = this.fb.group({
-      contraseniaActual: ['', Validators.required],
+      codigo2FARestartPass: ['', Validators.required],
       nuevaContrasenia: ['', Validators.required],
       confirmarContrasenia: ['', Validators.required],
     });
+
+    this.correoElectronico = localStorage.getItem("CORREO_PASS")
+  }
+  async cancelar(){
+    this.router.navigate(['/login']);
+    localStorage.removeItem("CORREO_PASS")
   }
 
   async confirmar() {
     this.loading = true
-    console.log("CONFIRMAR")
 
     if (this.formularioContrasenia.valid) {
-      const contraseniaActual = this.formularioContrasenia.get('contraseniaActual')!.value; // Add '!' here
+      const codigo2FA = this.formularioContrasenia.get('codigo2FARestartPass')!.value; // Add '!' here
       const nuevaContrasenia = this.formularioContrasenia.get('nuevaContrasenia')!.value; // Add '!' here
       const confirmarContrasenia = this.formularioContrasenia.get('confirmarContrasenia')!.value; // Add '!' here
 
@@ -61,11 +63,14 @@ export class ChangePasswordComponent {
         return
       }
 
-
-      let user = await this.authService.obtenerUsuarioLoggeado()
+      if (!this.correoElectronico) {
+        this.loginErrorMessage = "Correo electrónico es requerido"
+        this.loading = false
+        return
+      }
 
       // Llamar al servicio para cambiar la contraseña
-      this.authService.changePassw(user.nombreUsuario, contraseniaActual, nuevaContrasenia)
+      this.authService.restartPassw(this.correoElectronico, codigo2FA, nuevaContrasenia)
         .subscribe(
           (response) => {
             this.loading = false;
@@ -77,6 +82,7 @@ export class ChangePasswordComponent {
                 this.router.navigate(['/login']);  // Navegar a la página de login u otra página
               },
             });
+            localStorage.removeItem("CORREO_PASS")
 
           },
           (error) => {
@@ -84,42 +90,7 @@ export class ChangePasswordComponent {
             this.loginErrorMessage = error.error.message || 'Ocurrió un error al cambiar la contraseña';
           }
         );
-      //   this.authService.login(username, password)
-      //     .subscribe(
-      //       (response) => {
-      //         this.loading = false
-      //         this.router.navigate(['/clientes']);
-      //       },
-      //       (error) => {
-      //         // Handle login error
-      //         console.error('Login error:', error);
-      //         this.loginError = true
-      //
-      //         if (error.error) {
-      //           if (error?.error?.asunto == this.ASUNTO_CAMBIO_CONTRASENIA) {
-      //             this.confirmationService.confirm({
-      //               message:
-      //               error.error.message + ". ¿Desea continuar?",
-      //               header: 'Cambio de contraseña requerido',
-      //               icon: 'pi pi-exclamation-triangle',
-      //               accept: async () => {
-      //
-      //               },
-      //             });
-      //           } else
-      //             this.loginErrorMessage = error.error.message
-      //
-      //
-      //         } else {
-      //           this.loginErrorMessage = "Ocurrió un error inesperado en la ejecución de la consulta"
-      //         }
-      //         this.loading = false
-      //
-      //       }
-      //     );
     } else {
-      // Handle form validation errors
-
       this.loginErrorMessage = "Formulario inválido"
       this.loading = false
     }

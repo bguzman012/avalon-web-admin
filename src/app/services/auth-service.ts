@@ -30,6 +30,13 @@ export class AuthService {
     );
   }
 
+  sendCodeByMail(correoElectronico: string): Observable<any> {
+    const data = {correoElectronico: correoElectronico};
+    return this.http.post<any>(`${this.apiUrl}/sendCodeByMail`, data).pipe(
+      map(response => response)
+    );
+  }
+
   verifyCode(username: string, codigo: string): Observable<any> {
     const data = {
       usuario: username,
@@ -56,6 +63,17 @@ export class AuthService {
       contraseniaNueva: contraseniaNueva
     };
     return this.http.post<any>(`${this.apiUrl}/change-password`, data).pipe(
+      map(response => response)
+    );
+  }
+
+  restartPassw(correoElectronico: string, codigo2FA: string, contraseniaNueva: string): Observable<any> {
+    const data = {
+      correoElectronico: correoElectronico,
+      codigo2FA: codigo2FA,
+      contraseniaNueva: contraseniaNueva
+    };
+    return this.http.post<any>(`${this.apiUrl}/restart-password`, data).pipe(
       map(response => response)
     );
   }

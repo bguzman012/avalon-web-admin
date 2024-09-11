@@ -17,14 +17,6 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const isExcludedUrl = request.url.includes('login');
 
-    // const AUTENTICADO_2FA = this.authService.getAutenticadoDosFA();
-    // const VERIFICANDO_2FA = localStorage.getItem("VERIFICANDO_2FA")
-    //
-    // if (!isExcludedUrl && VERIFICANDO_2FA != "SI" && AUTENTICADO_2FA != "AUTENTICADO_2FA") {
-    //   this.router.navigate(['/login']);
-    //   return throwError('No autenticado con 2FA');
-    // }
-
     let authReq = request;
 
     if (authToken !== null && !isExcludedUrl) {

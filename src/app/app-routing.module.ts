@@ -8,6 +8,7 @@ import {LoginComponent} from './views/pages/login/login.component';
 import {RegisterComponent} from './views/pages/register/register.component';
 import {ChangePasswordComponent} from "./views/pages/change-password/change-password.component";
 import {AuthGuard} from "./auth.guard";
+import {RestartPasswordComponent} from "./views/pages/restart-password/restart-password.component";
 
 const routes: Routes = [
   {
@@ -164,6 +165,12 @@ const routes: Routes = [
     component: ChangePasswordComponent,
     data: {
       title: 'Cambiar contraseña'
+    }
+  }, {
+    path: 'restart-password',
+    component: RestartPasswordComponent,
+    data: {
+      title: 'Reinicio de contraseña'
     }
   },
   {path: '**', redirectTo: 'dashboard'}
