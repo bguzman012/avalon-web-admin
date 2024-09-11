@@ -18,8 +18,13 @@ export class DefaultLayoutComponent implements OnInit {
     const AUTENTICADO_2FA = this.authService.getAutenticadoDosFA();
     if (AUTENTICADO_2FA != "AUTENTICADO_2FA") {
       this.router.navigate(['/login']);
-    }else{
-      this.router.navigate(['/clientes']);
+    }else {
+      // Verificar si la ruta es "/" o "/#/"
+      const currentUrl = this.router.url;
+      console.log(this.router.url)
+      if (currentUrl === '/' || currentUrl === '/#/' || currentUrl === '/#') {
+        this.router.navigate(['/clientes']);
+      }
     }
   }
 
