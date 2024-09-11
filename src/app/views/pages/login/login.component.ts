@@ -110,7 +110,7 @@ export class LoginComponent {
               detail: 'Código enviado exitosamente',
               life: 2000,
             });
-          }, 2000); // 2000 milisegundos = 2 segundos
+          }, 2000);
 
           localStorage.setItem("CORREO_PASS", this.inputCorreo)
           this.router.navigate(['restart-password']);
