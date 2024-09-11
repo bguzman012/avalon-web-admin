@@ -89,10 +89,8 @@
           [minLength]="1"
           [readonly]="readOnlyForm"
           [dropdown]="!readOnlyForm"
-          [appendTo]="'body'"
-          required>
+          [appendTo]="'body'">
         </p-autoComplete>
-        <small class="p-invalid" *ngIf="submitted && !centroMedico">Hospital es requerido.</small>
       </div>
       <div class="p-field">
         <label for="medicoId">Dr. Preferencia</label>
@@ -104,13 +102,11 @@
           (completeMethod)="filterMedicoCentroMedicoAseguradora($event)"
           field="medico.nombreCompleto"
           [minLength]="1"
+          [disabled]="!centroMedico?.id"
           [readonly]="readOnlyForm"
           [dropdown]="!readOnlyForm"
-          [appendTo]="'body'"
-          required>
+          [appendTo]="'body'">
         </p-autoComplete>
-        <small class="p-invalid" *ngIf="submitted && !medicoCentroMedicoAseguradora">Dr. Preferencia es
-          requerido.</small>
       </div>
 
       <div class="p-field">
@@ -147,7 +143,7 @@
 
 
       <div class="p-field">
-        <label for="fotoCitaMedica">Foto Cita Médica (*)</label>
+        <label for="fotoCitaMedica">Foto Cita Médica</label>
         <div class="upload-container">
           <p-fileUpload [disabled]="readOnlyForm" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"

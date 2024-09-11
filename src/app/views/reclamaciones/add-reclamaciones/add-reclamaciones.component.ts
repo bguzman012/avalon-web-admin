@@ -573,15 +573,15 @@ export class AddReclamacionesComponent implements OnInit {
       return
     }
 
-    if (!this.imagen) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error!',
-        detail: 'Imagen es requerido',
-        life: 3000,
-      });
-      return
-    }
+    // if (!this.imagen) {
+    //   this.messageService.add({
+    //     severity: 'error',
+    //     summary: 'Error!',
+    //     detail: 'Imagen es requerido',
+    //     life: 3000,
+    //   });
+    //   return
+    // }
 
     if (!this.selectedTipoAdm) {
       this.messageService.add({
@@ -593,21 +593,21 @@ export class AddReclamacionesComponent implements OnInit {
       return
     }
 
-    if (!this.medicoCentroMedicoAseguradora) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error!',
-        detail: 'Médico es requerido',
-        life: 3000,
-      });
-      return
-    }
+    // if (!this.medicoCentroMedicoAseguradora) {
+    //   this.messageService.add({
+    //     severity: 'error',
+    //     summary: 'Error!',
+    //     detail: 'Médico es requerido',
+    //     life: 3000,
+    //   });
+    //   return
+    // }
 
     this.loading = true; // Mostrar spinner
     const formData = new FormData();
     this.reclamacion.clientePolizaId = this.selectedClientePoliza.id
     this.reclamacion.tipoAdm = this.selectedTipoAdm
-    this.reclamacion.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora.id
+    this.reclamacion.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora?.id
     this.reclamacion.nombreDocumento = this.nombreDocumento
     this.reclamacion.casoId = this.selectedCaso.id
 

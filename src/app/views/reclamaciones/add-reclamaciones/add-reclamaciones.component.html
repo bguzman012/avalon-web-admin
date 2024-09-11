@@ -70,7 +70,7 @@
       </div>
 
       <div class="p-field">
-        <label>Hospital *</label>
+        <label>Hospital</label>
         <p-autoComplete
           [readonly]="readOnlyForm"
           [dropdown]="!readOnlyForm"
@@ -80,13 +80,11 @@
           (completeMethod)="filterCentrosMedicos($event)"
           field="nombre"
           [minLength]="1"
-          [appendTo]="'body'"
-          required>
+          [appendTo]="'body'">
         </p-autoComplete>
-        <small class="p-invalid" *ngIf="submitted && !centroMedico">Hospital es requerido.</small>
       </div>
       <div class="p-field">
-        <label for="medicoId">Dr. *</label>
+        <label for="medicoId">Dr.</label>
         <p-autoComplete
           [readonly]="readOnlyForm"
           [dropdown]="!readOnlyForm"
@@ -96,10 +94,9 @@
           (completeMethod)="filterMedicoCentroMedicoAseguradora($event)"
           field="medico.nombreCompleto"
           [minLength]="1"
-          [appendTo]="'body'"
-          required>
+          [disabled]="!centroMedico?.id"
+          [appendTo]="'body'">
         </p-autoComplete>
-        <small class="p-invalid" *ngIf="submitted && !medicoCentroMedicoAseguradora">Dr. es requerido.</small>
       </div>
       <div class="p-field">
         <label for="tipoAdmId">Tipo Adm. *</label>
@@ -127,7 +124,7 @@
       </div>
 
       <div class="p-field">
-        <label for="fotoReclamo">Foto Reembolso (*)</label>
+        <label for="fotoReclamo">Foto Reembolso</label>
         <div class="upload-container">
           <p-fileUpload [disabled]="readOnlyForm" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"

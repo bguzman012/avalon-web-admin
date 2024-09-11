@@ -65,7 +65,7 @@
       </div>
 
       <div class="p-field">
-        <label for="centroMedicoId">Hospital *</label>
+        <label for="centroMedicoId">Hospital</label>
         <p-autoComplete
           [readonly]="readOnlyForm"
           [dropdown]="!readOnlyForm"
@@ -75,10 +75,8 @@
           (completeMethod)="filterCentrosMedicos($event)"
           field="nombre"
           [minLength]="1"
-          [appendTo]="'body'"
-          required>
+          [appendTo]="'body'">
         </p-autoComplete>
-        <small class="p-invalid" *ngIf="submitted && !centroMedico">Hospital es requerido.</small>
       </div>
 
       <p-divider align="left" type="dashed">
@@ -205,25 +203,23 @@
       </div>
 
       <div class="p-field">
-        <label for="medicoId">Dr. *</label>
+        <label for="medicoId">Dr.</label>
         <p-autoComplete
           [readonly]="readOnlyForm"
           [dropdown]="!readOnlyForm"
           [(ngModel)]="medicoCentroMedicoAseguradora"
           [showEmptyMessage]="true"
+          [disabled]="!centroMedico?.id"
           [suggestions]="filteredMedicoCentroMedicoAseguradoras"
           (completeMethod)="filterMedicoCentroMedicoAseguradora($event)"
           field="medico.nombreCompleto"
           [minLength]="1"
-          [appendTo]="'body'"
-          required>
+          [appendTo]="'body'">
         </p-autoComplete>
-        <small class="p-invalid" *ngIf="submitted && !medicoCentroMedicoAseguradora">Dr. Preferencia es
-          requerido.</small>
       </div>
 
       <div class="p-field">
-        <label for="fotoEmergencia">Foto Emergencia (*)</label>
+        <label for="fotoEmergencia">Foto Emergencia</label>
         <div class="upload-container">
           <p-fileUpload [disabled]="readOnlyForm" name="fotoEmergencia" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"

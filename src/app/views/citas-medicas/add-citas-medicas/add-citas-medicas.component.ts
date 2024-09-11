@@ -579,30 +579,30 @@ export class AddCitasMedicasComponent implements OnInit {
       });
       return
     }
+    //
+    // if (!this.imagen) {
+    //   this.messageService.add({
+    //     severity: 'error',
+    //     summary: 'Error!',
+    //     detail: 'Imagen es requerido',
+    //     life: 3000,
+    //   });
+    //   return
+    // }
 
-    if (!this.imagen) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error!',
-        detail: 'Imagen es requerido',
-        life: 3000,
-      });
-      return
-    }
-
-    if (!this.medicoCentroMedicoAseguradora?.id) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error!',
-        detail: 'Médico es requerido',
-        life: 3000,
-      });
-      return
-    }
+    // if (!this.medicoCentroMedicoAseguradora?.id) {
+    //   this.messageService.add({
+    //     severity: 'error',
+    //     summary: 'Error!',
+    //     detail: 'Médico es requerido',
+    //     life: 3000,
+    //   });
+    //   return
+    // }
 
     this.loading = true; // Mostrar spinner
     const formData = new FormData();
-    this.citaMedica.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora.id
+    this.citaMedica.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora?.id
     this.citaMedica.clientePolizaId = this.selectedClientePoliza.id
     this.citaMedica.nombreDocumento = this.nombreDocumento
     this.citaMedica.casoId = this.selectedCaso.id
