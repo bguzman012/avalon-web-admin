@@ -107,8 +107,8 @@
         <td>{{ reclamacion.codigo }}</td>
         <td>{{ reclamacion.clientePoliza.cliente.nombreUsuario }}</td>
         <td>{{ reclamacion.clientePoliza.displayName }}</td>
-        <td>{{ reclamacion.medicoCentroMedicoAseguradora.centroMedico.nombre }}</td>
-        <td>{{ reclamacion.medicoCentroMedicoAseguradora.medico.nombres }} {{ reclamacion.medicoCentroMedicoAseguradora.medico.nombresDos }}</td>
+        <td>{{ reclamacion?.medicoCentroMedicoAseguradora?.centroMedico.nombre }}</td>
+        <td>{{ reclamacion?.medicoCentroMedicoAseguradora?.medico.nombres }} {{ reclamacion?.medicoCentroMedicoAseguradora?.medico.nombresDos }}</td>
         <td>
           <div class="estado-flag-table" *ngIf="reclamacion?.estado"
                [ngClass]="{'estado-verde': reclamacion?.estado === 'N', 'estado-rojo' : reclamacion?.estado === 'C',

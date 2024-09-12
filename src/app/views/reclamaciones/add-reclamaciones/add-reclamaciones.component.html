@@ -26,7 +26,7 @@
           ($event)" field="nombreUsuario"
           [dropdown]="!reclamacion?.id  && !originCaso"
           (ngModelChange)="loadPolizas()"
-          [readonly]="reclamacion?.id  || originCaso"
+          [readonly]="reclamacion  || originCaso"
           placeholder="Filtrar por Cliente"
           [forceSelection]="true" [maxlength]="50">
         </p-autoComplete>
@@ -39,7 +39,7 @@
           [dropdown]="!reclamacion?.id && !originCaso"
           placeholder="Filtrar por Póliza"
           [disabled]="!selectedCliente?.id"
-          [readonly]="reclamacion?.id || originCaso" [forceSelection]="true" [maxlength]="50">
+          [readonly]="reclamacion || originCaso" [forceSelection]="true" [maxlength]="50">
         </p-autoComplete>
         <p-autoComplete
           [(ngModel)]="selectedCaso"
@@ -49,7 +49,7 @@
           [dropdown]="!reclamacion?.id && !originCaso"
           placeholder="Filtrar por Caso"
           [disabled]="!selectedClientePoliza?.id"
-          [readonly]="reclamacion?.id || originCaso">
+          [readonly]="reclamacion || originCaso">
         </p-autoComplete>
       </div>
     </p-panel>
@@ -59,7 +59,7 @@
     <p-panel styleClass="p-fluid" header="Detalles de Reembolso">
       <div class="p-field">
         <label>Fecha Tentativa *</label>
-        <p-calendar [(ngModel)]="reclamacion.fechaServicio" dateFormat="dd/mm/yy" [disabled]="readOnlyForm" [showIcon]="true"
+        <p-calendar [(ngModel)]="reclamacion.fechaServicio" dateFormat="dd/mm/yy" [disabled]="readOnlyForm || reclamacion?.id" [showIcon]="true"
                     required></p-calendar>
         <small class="p-invalid" *ngIf="submitted && !reclamacion.fechaServicio">Fecha servicio es requerida.</small>
       </div>
@@ -72,8 +72,8 @@
       <div class="p-field">
         <label>Hospital</label>
         <p-autoComplete
-          [readonly]="readOnlyForm"
-          [dropdown]="!readOnlyForm"
+          [readonly]="readOnlyForm || reclamacion?.id"
+          [dropdown]="!readOnlyForm && !reclamacion?.id"
           [(ngModel)]="centroMedico"
           [showEmptyMessage]="true"
           [suggestions]="filteredCentrosMedicos"
@@ -86,8 +86,8 @@
       <div class="p-field">
         <label for="medicoId">Dr.</label>
         <p-autoComplete
-          [readonly]="readOnlyForm"
-          [dropdown]="!readOnlyForm"
+          [readonly]="readOnlyForm || reclamacion?.id"
+          [dropdown]="!readOnlyForm && !reclamacion?.id"
           [(ngModel)]="medicoCentroMedicoAseguradora"
           [showEmptyMessage]="true"
           [suggestions]="filteredMedicoCentroMedicoAseguradoras"
@@ -103,7 +103,7 @@
         <p-dropdown
           [options]="tipoAdmOptions"
           [(ngModel)]="selectedTipoAdm"
-          [readonly]="readOnlyForm"
+          [readonly]="readOnlyForm || reclamacion?.id"
           optionLabel="value"
           optionValue="label"
           placeholder="Seleccione un tipo de administración">
@@ -113,24 +113,24 @@
 
       <div class="p-field">
         <label>Padecimiento/diagnóstico *</label>
-        <textarea pInputTextarea [(ngModel)]="reclamacion.padecimientoDiagnostico" [readonly]="readOnlyForm" required></textarea>
+        <textarea pInputTextarea [(ngModel)]="reclamacion.padecimientoDiagnostico" [readonly]="readOnlyForm || reclamacion?.id" required></textarea>
         <small class="p-invalid" *ngIf="submitted && !reclamacion.padecimientoDiagnostico">Padecimiento/diagnóstico es requerido.</small>
       </div>
 
       <div class="p-field">
         <label>Información Adicional  *</label>
-        <textarea pInputTextarea [(ngModel)]="reclamacion.infoAdicional" [readonly]="readOnlyForm" required></textarea>
+        <textarea pInputTextarea [(ngModel)]="reclamacion.infoAdicional" [readonly]="readOnlyForm || reclamacion?.id" required></textarea>
         <small class="p-invalid" *ngIf="submitted && !reclamacion.infoAdicional">Información adicional es requerida.</small>
       </div>
 
       <div class="p-field">
         <label for="fotoReclamo">Foto Reembolso</label>
         <div class="upload-container">
-          <p-fileUpload [disabled]="readOnlyForm" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)"
+          <p-fileUpload [disabled]="readOnlyForm || reclamacion?.id" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"
                         accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
                         customUpload="true"></p-fileUpload>
-          <button *ngIf="imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
+          <button *ngIf="imagePreview" [disabled]="readOnlyForm || reclamacion?.id" pButton pRipple icon="pi pi-trash"
                   class="p-button-danger p-button-icon-only"
                   (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
@@ -143,10 +143,10 @@
       </div>
 
       <div class="custom-button-container">
-        <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm" class="p-button-secondary"
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm || reclamacion?.id" class="p-button-secondary"
                 style="width: 30%;"
                 (click)="hideDialog()"></button>
-        <button pButton pRipple label="Guardar" icon="pi pi-check" [disabled]="readOnlyForm" class="p-button-primary"
+        <button pButton pRipple label="Guardar" icon="pi pi-check" [disabled]="readOnlyForm || reclamacion?.id" class="p-button-primary"
                 style="width: 30%;"
                 (click)="saveReclamacion()"></button>
       </div>

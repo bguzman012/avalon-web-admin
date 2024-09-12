@@ -167,8 +167,8 @@ export class AddEmergenciasComponent implements OnInit {
       this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.emergencia.clientePoliza
       this.selectedCaso = casoParam ? casoParam : this.emergencia.caso
 
-      this.medicoCentroMedicoAseguradora = this.emergencia.medicoCentroMedicoAseguradora
-      this.centroMedico = this.emergencia.medicoCentroMedicoAseguradora.centroMedico
+      this.medicoCentroMedicoAseguradora = this.emergencia?.medicoCentroMedicoAseguradora
+      this.centroMedico = this.emergencia?.medicoCentroMedicoAseguradora?.centroMedico
       if (this.emergencia.estado == 'C')
         this.readOnlyForm = true
 

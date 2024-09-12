@@ -89,9 +89,9 @@
       <td>{{ citaMedica.codigo }}</td>
       <td>{{ citaMedica.clientePoliza.cliente.nombreUsuario }}</td>
       <td>{{ citaMedica.clientePoliza.displayName }}</td>
-      <td>{{ citaMedica.medicoCentroMedicoAseguradora.centroMedico.nombre }}</td>
-      <td>{{ citaMedica.medicoCentroMedicoAseguradora.medico.nombres }} {{ citaMedica.medicoCentroMedicoAseguradora.medico.nombresDos }}</td>
-      <td>{{ citaMedica.medicoCentroMedicoAseguradora.aseguradora.nombre }}</td>
+      <td>{{ citaMedica?.medicoCentroMedicoAseguradora?.centroMedico.nombre }}</td>
+      <td>{{ citaMedica?.medicoCentroMedicoAseguradora?.medico.nombres }} {{ citaMedica?.medicoCentroMedicoAseguradora?.medico.nombresDos }}</td>
+      <td>{{ citaMedica?.medicoCentroMedicoAseguradora?.aseguradora.nombre }}</td>
       <td>
         <div class="estado-flag-table" *ngIf="citaMedica?.estado"
              [ngClass]="{'estado-verde': citaMedica?.estado === 'N', 'estado-rojo' : citaMedica?.estado === 'C',

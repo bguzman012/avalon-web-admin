@@ -130,10 +130,12 @@ export class AddCitasMedicasComponent implements OnInit {
 
     this.habilitarCierreTramite = this.rolesCierreTramite.includes(this.user.rol.codigo)
 
+
     this.openNew();
     await this.prepareData();
 
     if (await this.getRouteParams('citaMedicaId') || localStorage.getItem('citaMedica')) {
+
       this.nombreDocumento = 'Cargando ...'
       const citaMedica = JSON.parse(localStorage.getItem('citaMedica'));
 
@@ -156,8 +158,8 @@ export class AddCitasMedicasComponent implements OnInit {
       this.selectedClientePoliza = clientePolizaParm ? clientePolizaParm : this.citaMedica.clientePoliza
       this.selectedCaso = casoParam ? casoParam : this.citaMedica.caso
 
-      this.medicoCentroMedicoAseguradora = this.citaMedica.medicoCentroMedicoAseguradora
-      this.centroMedico = this.citaMedica.medicoCentroMedicoAseguradora.centroMedico
+      this.medicoCentroMedicoAseguradora = this.citaMedica?.medicoCentroMedicoAseguradora
+      this.centroMedico = this.citaMedica?.medicoCentroMedicoAseguradora?.centroMedico
 
       // await this.loadPolizas(true);
       if (this.citaMedica.estado == 'C')
@@ -186,6 +188,9 @@ export class AddCitasMedicasComponent implements OnInit {
     if (await this.getRouteParamsBoolean('originCaso'))
       this.originCaso = await this.getRouteParamsBoolean('originCaso');
 
+    console.log(!this.citaMedica, " BOOLEAN")
+    console.log(this.originCaso, " BOOLEAN")
+
     if (await this.getRouteParams('clientePolizaId'))
       this.clientePolizaId = +(await this.getRouteParams('clientePolizaId'));
 
@@ -204,9 +209,6 @@ export class AddCitasMedicasComponent implements OnInit {
       this.selectedCaso = casoParam
     }
 
-    console.log(this.selectedCaso, "  CASO PARAM")
-    console.log(this.selectedCaso?.id , "  CASO ID")
-
     this.citaMedica.fechaTentativa = new Date();
 
     this.loading = false;
@@ -215,7 +217,6 @@ export class AddCitasMedicasComponent implements OnInit {
   }
 
   async cargarImagenesComentarios(){
-    console.log(this.comentarios, " THISSCOMETNS")
     for (const comentario of this.comentarios) {
       if (comentario.imagenId) {
         let foto = await this.imagenService.getImagen(comentario.imagenId);
@@ -230,7 +231,6 @@ export class AddCitasMedicasComponent implements OnInit {
       }
     }
 
-    console.log(this.comentarios)
   }
 
   initializeRequisitosAdicionales(requisitos: { [key: string]: boolean }): void {

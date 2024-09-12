@@ -43,7 +43,6 @@ export class AddCasosComponent implements OnInit {
   ESTADO_ACTIVO = 'A';
   clientePolizaId: number;
   clienteId: number;
-  displayDialog: boolean = false;
   readOnlyForm = false
 
   codigoDocumento: string = 'Nuevo Caso'
@@ -52,13 +51,8 @@ export class AddCasosComponent implements OnInit {
     private messageService: MessageService,
     private casosService: CasosService,
     private usuariosService: UsuariosService,
-    private comentariosCitasMedicasService: ComentariosCitasMedicasService,
-    private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService,
-    private imagenService: ImagenesService,
-    private centrosMedicosService: CentrosMedicosService,
     private route: ActivatedRoute,
-    private clientesPolizasService: ClientePolizaService,
-    private authService: AuthService
+    private clientesPolizasService: ClientePolizaService
   ) {
   }
 
@@ -102,13 +96,6 @@ export class AddCasosComponent implements OnInit {
     this.loading = false;
   }
 
-  async prepareClientePolizaData() {
-    this.selectedCliente = this.clientes.find(x => x.id === this.clienteId);
-    await this.loadPolizas();
-    this.selectedClientePoliza = this.clientePolizas.find(x => x.id === this.clientePolizaId);
-  }
-
-
   async prepareData() {
     const responseCliente = await this.usuariosService.obtenerUsuariosPorRolAndEstado(
       this.ROL_CLIENTE_ID,
@@ -142,8 +129,8 @@ export class AddCasosComponent implements OnInit {
       if (this.caso.id) {
         await this.casosService.actualizarCaso(this.caso.id, this.caso);
       } else {
-        let casoSaved = await this.casosService.guardarCaso(this.caso);
-        this.codigoDocumento = "# " + casoSaved.codigo
+        this.caso = await this.casosService.guardarCaso(this.caso);
+        this.codigoDocumento = "# " + this.caso.codigo
       }
 
       this.loading = false;

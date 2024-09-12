@@ -138,8 +138,8 @@ export class AddReclamacionesComponent implements OnInit {
       this.selectedCaso = casoParam ? casoParam : this.reclamacion.caso
 
 
-      this.medicoCentroMedicoAseguradora = this.reclamacion.medicoCentroMedicoAseguradora
-      this.centroMedico = this.reclamacion.medicoCentroMedicoAseguradora.centroMedico
+      this.medicoCentroMedicoAseguradora = this.reclamacion?.medicoCentroMedicoAseguradora
+      this.centroMedico = this.reclamacion?.medicoCentroMedicoAseguradora?.centroMedico
 
       // await this.loadPolizas(true);
       if (this.reclamacion.estado == 'C')

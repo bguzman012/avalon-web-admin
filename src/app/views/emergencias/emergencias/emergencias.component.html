@@ -106,8 +106,8 @@
         <td>{{ emergencia.codigo }}</td>
         <td>{{ emergencia.clientePoliza.cliente.nombreUsuario }}</td>
         <td>{{ emergencia.clientePoliza.displayName }}</td>
-        <td>{{ emergencia.medicoCentroMedicoAseguradora.centroMedico.nombre }}</td>
-        <td>{{ emergencia.medicoCentroMedicoAseguradora.medico.nombres }} {{ emergencia.medicoCentroMedicoAseguradora.medico.nombresDos }}</td>
+        <td>{{ emergencia?.medicoCentroMedicoAseguradora?.centroMedico.nombre }}</td>
+        <td>{{ emergencia?.medicoCentroMedicoAseguradora?.medico.nombres }} {{ emergencia?.medicoCentroMedicoAseguradora?.medico.nombresDos }}</td>
         <td>
           <div class="estado-flag-table" *ngIf="emergencia?.estado"
                [ngClass]="{'estado-verde': emergencia?.estado === 'N', 'estado-rojo' : emergencia?.estado === 'C',

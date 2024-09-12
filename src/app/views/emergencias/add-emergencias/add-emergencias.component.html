@@ -27,7 +27,7 @@
           field="nombreUsuario"
           [dropdown]="!emergencia?.id  && !originCaso"
           (ngModelChange)="loadPolizas()"
-          [readonly]="emergencia?.id || originCaso" placeholder="Filtrar por Cliente">
+          [readonly]="emergencia || originCaso" placeholder="Filtrar por Cliente">
         </p-autoComplete>
 
         <!-- Filtro por Póliza -->
@@ -39,7 +39,7 @@
           [dropdown]="!emergencia?.id && !originCaso"
           placeholder="Filtrar por Póliza"
           [disabled]="!selectedCliente?.id"
-          [readonly]="emergencia?.id || originCaso">
+          [readonly]="emergencia || originCaso">
         </p-autoComplete>
 
         <p-autoComplete
@@ -50,7 +50,7 @@
           [dropdown]="!emergencia?.id && !originCaso"
           placeholder="Filtrar por Caso"
           [disabled]="!selectedClientePoliza?.id"
-          [readonly]="emergencia?.id || originCaso">
+          [readonly]="emergencia || originCaso">
         </p-autoComplete>
       </div>
     </p-panel>
@@ -67,8 +67,8 @@
       <div class="p-field">
         <label for="centroMedicoId">Hospital</label>
         <p-autoComplete
-          [readonly]="readOnlyForm"
-          [dropdown]="!readOnlyForm"
+          [readonly]="readOnlyForm || emergencia?.id"
+          [dropdown]="!readOnlyForm && !emergencia?.id"
           [(ngModel)]="centroMedico"
           [showEmptyMessage]="true"
           [suggestions]="filteredCentrosMedicos"
@@ -91,7 +91,7 @@
           id="direccionUno"
           [(ngModel)]="direccion.direccionUno"
           required
-          [readonly]="readOnlyForm"
+          [readonly]="readOnlyForm || emergencia?.id"
           autofocus
         />
         <small class="p-invalid" *ngIf="submitted && !direccion.direccionUno"
@@ -104,7 +104,7 @@
         <input
           type="text"
           pInputText
-          [readonly]="readOnlyForm"
+          [readonly]="readOnlyForm || emergencia?.id"
           id="direccionDos"
           [(ngModel)]="direccion.direccionDos"
           required
@@ -122,8 +122,8 @@
           [showEmptyMessage]="true"
           [suggestions]="filteredPaises"
           (completeMethod)="filterPaises($event)"
-          [readonly]="readOnlyForm"
-          [dropdown]="!readOnlyForm"
+          [readonly]="readOnlyForm || emergencia?.id"
+          [dropdown]="!readOnlyForm && !emergencia?.id"
           field="nombre"
           (ngModelChange)="loadEstados()"
           [minLength]="1"
@@ -141,8 +141,8 @@
           [showEmptyMessage]="true"
           [suggestions]="filteredEstados"
           (completeMethod)="filterEstados($event)"
-          [dropdown]="!readOnlyForm"
-          [readonly]="!pais || readOnlyForm"
+          [dropdown]="!readOnlyForm && !emergencia?.id"
+          [readonly]="!pais || readOnlyForm || emergencia?.id"
           field="nombre"
           [minLength]="1"
           [appendTo]="'body'"
@@ -161,7 +161,7 @@
           id="ciudad"
           [(ngModel)]="direccion.ciudad"
           required
-          [readonly]="readOnlyForm"
+          [readonly]="readOnlyForm || emergencia?.id"
           autofocus
         />
         <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
@@ -175,7 +175,7 @@
           type="text"
           pInputText
           id="codigoPostal"
-          [readonly]="readOnlyForm"
+          [readonly]="readOnlyForm || emergencia?.id"
           [(ngModel)]="direccion.codigoPostal"
           required
           autofocus
@@ -190,13 +190,13 @@
 
       <div class="p-field">
         <label for="diagnostico">Diagnóstico</label>
-        <textarea pInputTextarea id="diagnostico" [readonly]="readOnlyForm"
+        <textarea pInputTextarea id="diagnostico" [readonly]="readOnlyForm || emergencia?.id"
                   [(ngModel)]="emergencia.diagnostico "></textarea>
       </div>
 
       <div class="p-field">
         <label for="sintomas">Sintomas *</label>
-        <textarea pInputTextarea id="sintomas" [readonly]="readOnlyForm" [(ngModel)]="emergencia.sintomas"
+        <textarea pInputTextarea id="sintomas" [readonly]="readOnlyForm || emergencia?.id" [(ngModel)]="emergencia.sintomas"
                   required></textarea>
         <small class="p-invalid" *ngIf="submitted && !emergencia.sintomas"
         >Sintomas es required.</small>
@@ -205,8 +205,8 @@
       <div class="p-field">
         <label for="medicoId">Dr.</label>
         <p-autoComplete
-          [readonly]="readOnlyForm"
-          [dropdown]="!readOnlyForm"
+          [readonly]="readOnlyForm || emergencia?.id"
+          [dropdown]="!readOnlyForm && !emergencia?.id"
           [(ngModel)]="medicoCentroMedicoAseguradora"
           [showEmptyMessage]="true"
           [disabled]="!centroMedico?.id"
@@ -221,11 +221,11 @@
       <div class="p-field">
         <label for="fotoEmergencia">Foto Emergencia</label>
         <div class="upload-container">
-          <p-fileUpload [disabled]="readOnlyForm" name="fotoEmergencia" #fileUploadRef (onSelect)="onFileSelect($event)"
+          <p-fileUpload [disabled]="readOnlyForm || emergencia?.id" name="fotoEmergencia" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"
                         accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
                         customUpload="true"></p-fileUpload>
-          <button *ngIf="imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
+          <button *ngIf="imagePreview" [disabled]="readOnlyForm || emergencia?.id" pButton pRipple icon="pi pi-trash"
                   class="p-button-danger p-button-icon-only"
                   (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
@@ -238,10 +238,10 @@
       </div>
 
       <div class="custom-button-container">
-        <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm" class="p-button-secondary"
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm || emergencia?.id" class="p-button-secondary"
                 style="width: 30%;"
                 (click)="hideDialog()"></button>
-        <button pButton pRipple label="Guardar" icon="pi pi-check" [disabled]="readOnlyForm" class="p-button-primary"
+        <button pButton pRipple label="Guardar" icon="pi pi-check" [disabled]="readOnlyForm || emergencia?.id" class="p-button-primary"
                 style="width: 30%;"
                 (click)="saveEmergencia()"></button>
       </div>

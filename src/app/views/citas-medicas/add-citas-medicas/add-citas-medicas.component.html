@@ -40,7 +40,7 @@
           [dropdown]="!citaMedica?.id && !originCaso"
           placeholder="Filtrar por Póliza"
           [disabled]="!selectedCliente?.id"
-          [readonly]="citaMedica?.id || originCaso">
+          [readonly]="citaMedica || originCaso">
         </p-autoComplete>
 
         <p-autoComplete
@@ -51,7 +51,7 @@
           [dropdown]="!citaMedica?.id && !originCaso"
           placeholder="Filtrar por Caso"
           [disabled]="!selectedClientePoliza?.id"
-          [readonly]="citaMedica?.id || originCaso">
+          [readonly]="citaMedica || originCaso">
         </p-autoComplete>
       </div>
     </p-panel>
@@ -62,14 +62,14 @@
       <div class="p-field">
         <label for="fechaTentativa">Fecha Tentativa *</label>
         <p-calendar [(ngModel)]="citaMedica.fechaTentativa" dateFormat="dd/mm/yy" [showIcon]="true"
-                    [disabled]="readOnlyForm"
+                    [disabled]="readOnlyForm || citaMedica?.id"
                     required></p-calendar>
         <small class="p-invalid" *ngIf="submitted && !citaMedica.fechaTentativa">Fecha tentativa es requerida.</small>
       </div>
       <div class="p-field">
         <label for="ciudadPreferencia">Ciudad de preferencias</label>
         <input type="text" pInputText id="ciudadPreferencia" [(ngModel)]="citaMedica.ciudadPreferencia"
-               [readonly]="readOnlyForm" required autofocus/>
+               [readonly]="readOnlyForm || citaMedica?.id" required autofocus/>
       </div>
       <div class="p-field" *ngIf="selectedClientePoliza?.id">
         <label for="aseguradora">Aseguradora</label>
@@ -87,8 +87,8 @@
           (completeMethod)="filterCentrosMedicos($event)"
           field="nombre"
           [minLength]="1"
-          [readonly]="readOnlyForm"
-          [dropdown]="!readOnlyForm"
+          [readonly]="readOnlyForm || citaMedica?.id"
+          [dropdown]="!readOnlyForm && !citaMedica?.id"
           [appendTo]="'body'">
         </p-autoComplete>
       </div>
@@ -103,21 +103,21 @@
           field="medico.nombreCompleto"
           [minLength]="1"
           [disabled]="!centroMedico?.id"
-          [readonly]="readOnlyForm"
-          [dropdown]="!readOnlyForm"
+          [readonly]="readOnlyForm || citaMedica?.id"
+          [dropdown]="!readOnlyForm && !citaMedica?.id"
           [appendTo]="'body'">
         </p-autoComplete>
       </div>
 
       <div class="p-field">
         <label for="padecimiento">Padecimiento *</label>
-        <textarea pInputTextarea id="padecimiento" [readonly]="readOnlyForm" [(ngModel)]="citaMedica.padecimiento"
+        <textarea pInputTextarea id="padecimiento" [readonly]="readOnlyForm || citaMedica?.id" [(ngModel)]="citaMedica.padecimiento"
                   required></textarea>
       </div>
 
       <div class="p-field">
         <label for="informacionAdicional">Información Adicional *</label>
-        <textarea pInputTextarea id="informacionAdicional" [readonly]="readOnlyForm"
+        <textarea pInputTextarea id="informacionAdicional" [readonly]="readOnlyForm || citaMedica?.id"
                   [(ngModel)]="citaMedica.informacionAdicional"
                   required></textarea>
       </div>
@@ -128,7 +128,7 @@
           <p-checkbox
             [(ngModel)]="requisitosAdicionales[requisito.key]"
             binary="true"
-            [readonly]="readOnlyForm"
+            [readonly]="readOnlyForm || citaMedica?.id"
             name="requisitosAdicionales"
             [label]="requisito.key"
           ></p-checkbox>
@@ -137,7 +137,7 @@
 
       <div class="p-field">
         <label for="otrosRequisitos">Otros Requisitos</label>
-        <textarea pInputTextarea id="otrosRequisitos" [readonly]="readOnlyForm" [(ngModel)]="citaMedica.otrosRequisitos"
+        <textarea pInputTextarea id="otrosRequisitos" [readonly]="readOnlyForm || citaMedica?.id" [(ngModel)]="citaMedica.otrosRequisitos"
                   required></textarea>
       </div>
 
@@ -145,11 +145,11 @@
       <div class="p-field">
         <label for="fotoCitaMedica">Foto Cita Médica</label>
         <div class="upload-container">
-          <p-fileUpload [disabled]="readOnlyForm" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)"
+          <p-fileUpload [disabled]="readOnlyForm || citaMedica?.id" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"
                         accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
                         customUpload="true"></p-fileUpload>
-          <button *ngIf="imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
+          <button *ngIf="imagePreview" [disabled]="readOnlyForm || citaMedica?.id" pButton pRipple icon="pi pi-trash"
                   class="p-button-danger p-button-icon-only"
                   (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
@@ -162,10 +162,10 @@
       </div>
 
       <div class="custom-button-container">
-        <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm" class="p-button-secondary"
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm || citaMedica?.id" class="p-button-secondary"
                 style="width: 30%;"
                 (click)="hideDialog()"></button>
-        <button pButton pRipple label="Guardar" icon="pi pi-check" [disabled]="readOnlyForm" class="p-button-primary"
+        <button pButton pRipple label="Guardar" icon="pi pi-check" [disabled]="readOnlyForm || citaMedica?.id" class="p-button-primary"
                 style="width: 30%;"
                 (click)="saveCitaMedica()"></button>
       </div>
