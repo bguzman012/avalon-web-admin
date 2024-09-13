@@ -49,6 +49,7 @@ import {ClientesMembresiasVencidComponent} from "./clientes-membresias-vencid/cl
 import {CitasMedicasReportesComponent} from "./citas-medicas-reportes/citas-medicas-reportes.component";
 import {CasosReportesComponent} from "./casos-reportes/casos-reportes.component";
 import {ReclamacionesReportesComponent} from "./reclamaciones-reportes/reclamaciones-reportes.component";
+import {CasosTrackReportesComponent} from "./casos-track-reportes/casos-track-reportes.component";
 
 
 @NgModule({
@@ -59,7 +60,8 @@ import {ReclamacionesReportesComponent} from "./reclamaciones-reportes/reclamaci
     ClientesMembresiasVencidComponent,
     CitasMedicasReportesComponent,
     CasosReportesComponent,
-    ReclamacionesReportesComponent
+    ReclamacionesReportesComponent,
+    CasosTrackReportesComponent
   ],
   imports: [
     CommonModule,

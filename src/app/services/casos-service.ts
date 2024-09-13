@@ -32,6 +32,17 @@ export class CasosService {
     });
   }
 
+  downloadTrackExcel(
+    busqueda: string): Observable<Blob> {
+
+    const headers = new HttpHeaders({'Accept': 'application/octet-stream'});
+
+    return this.http.get(`${this.apiUrl}/casosTrack/excel?busqueda=${busqueda}`, {
+      headers: headers,
+      responseType: 'blob'
+    });
+  }
+
   async obtenerCasos(
     page: number,
     size: number,
@@ -47,6 +58,21 @@ export class CasosService {
       console.log(order, sort)
 
       const casos = await this.http.get<any[]>(`${this.apiUrl}/casos?page=${page}&size=${size}&busqueda=${busqueda}${sort}&clientePolizaId=${clientePolizaId}`).toPromise();
+      console.log('Resultado de casos:', casos);
+      return casos;
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      throw error; // Puedes personalizar esto según tus necesidades
+    }
+  }
+
+  async obtenerCasosTrack(
+    page: number,
+    size: number,
+    busqueda: string
+  ): Promise<any> {
+    try {
+      const casos = await this.http.get<any[]>(`${this.apiUrl}/casosTrack?page=${page}&size=${size}&busqueda=${busqueda}`).toPromise();
       console.log('Resultado de casos:', casos);
       return casos;
     } catch (error) {

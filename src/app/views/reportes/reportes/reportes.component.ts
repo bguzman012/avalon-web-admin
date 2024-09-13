@@ -30,9 +30,9 @@ export class ReportesComponent implements OnInit {
     {desc: "Citas médicas gestionadas, por gestionar, cerrados", code: "CLI_MEDICAS"},
     {desc: "Casos", code: "CASOS"},
     {desc: "Reembolsos gestionados, por gestionar, cerrados", code: "REEMBOLSOS"},
-    {desc: "Atenciones por cliente (citas médicas, activación de casos, reembolsos)", code: "CITAS_REEMBOL_EMERGEN"},
-    {desc: "Casos y eventos por caso", code: "CASOS_CASO"},
-    {desc: "Casos por cliente", code: "CASOS_CLIENTE"}]
+    {desc: "Atenciones por cliente (citas médicas, activación de casos, reembolsos)", code: "CITAS_REEMBOL_EMERGEN"}]
+    // {desc: "Casos y eventos por caso", code: "CASOS_CASO"},
+    // {desc: "Casos por cliente", code: "CASOS_CLIENTE"}]
 
   opcion
 
@@ -40,7 +40,7 @@ export class ReportesComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.opcion = "CLI_ASEG"
+    this.opcion = "CITAS_REEMBOL_EMERGEN"
 
   }
 
