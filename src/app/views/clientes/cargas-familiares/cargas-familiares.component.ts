@@ -304,6 +304,8 @@ export class CargasFamiliaresComponent implements OnInit {
       this.cargaFamiliarDialog = false;
       this.cargaFamiliar = {};
       this.messageService.add({severity: 'success', summary: 'Enhorabuena!', detail: 'Operación ejecutada con éxito'});
+    } catch (error) {
+      this.messageService.add({severity: 'error', summary: 'Error', detail: error.error});
     } finally {
       this.loading = false; // Ocultar spinner
     }
