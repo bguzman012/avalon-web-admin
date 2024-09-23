@@ -294,7 +294,7 @@ export class CargasFamiliaresComponent implements OnInit {
         this.cargaFamiliar.codigoMembresia = this.numeroMembresia
 
         this.cargaFamiliar.rolId = this.ROL_CLIENTE_ID
-        this.cargaFamiliar.estado = 'P';
+        this.cargaFamiliar.estado = 'A';
         this.cargaFamiliar.clientePolizaTitularId = this.clientePolizaId;
 
         await this.cargasFamiliaresService.createCargaFamiliar(this.cargaFamiliar);

@@ -137,9 +137,8 @@
             <div class="p-col-12 p-md-6">
               <div class="p-field">
                 <label for="nombres">Nombre Dos</label>
-                <input type="text" pInputText id="nombresDos" [(ngModel)]="cargaFamiliar.nombresDos" required
+                <input type="text" pInputText id="nombresDos" [(ngModel)]="cargaFamiliar.nombresDos"
                        autofocus/>
-                <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.nombresDos">Nombre dos is required.</small>
               </div>
             </div>
           </div>
@@ -154,10 +153,8 @@
             <div class="p-col-12 p-md-6">
               <div class="p-field">
                 <label for="apellidosDos">Apellido Dos</label>
-                <input type="text" pInputText id="apellidosDos" [(ngModel)]="cargaFamiliar.apellidosDos" required
+                <input type="text" pInputText id="apellidosDos" [(ngModel)]="cargaFamiliar.apellidosDos"
                        autofocus/>
-                <small class="p-invalid" *ngIf="submitted && !cargaFamiliar.apellidosDos">Apellido dos is
-                  required.</small>
               </div>
             </div>
           </div>
@@ -207,7 +204,7 @@
             <input type="text" pInputText [(ngModel)]="cargaFamiliar.numeroTelefono"/>
           </div>
 
-          <div class="p-field">
+          <div class="p-field" *ngIf="cargaFamiliar?.id">
             <label class="p-mb-3">Nombre Usuario</label>
             <input type="text" pInputText [(ngModel)]="cargaFamiliar.nombreUsuario"/>
           </div>

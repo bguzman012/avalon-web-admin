@@ -192,6 +192,7 @@ export class AddCitasMedicasComponent implements OnInit {
     console.log(this.originCaso, " BOOLEAN")
 
     if (await this.getRouteParams('clientePolizaId'))
+    if (await this.getRouteParams('clientePolizaId'))
       this.clientePolizaId = +(await this.getRouteParams('clientePolizaId'));
 
     if (await this.getRouteParams('casoId'))
