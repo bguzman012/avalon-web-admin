@@ -219,21 +219,29 @@
       </div>
 
       <div class="p-field">
-        <label for="fotoEmergencia">Foto Emergencia</label>
+        <label for="fotoEmergencia">Documento Emergencia</label>
         <div class="upload-container">
           <p-fileUpload [disabled]="readOnlyForm || emergencia?.id" name="fotoEmergencia" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"
-                        accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
+                        accept=".pdf,image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
                         customUpload="true"></p-fileUpload>
-          <button *ngIf="imagePreview" [disabled]="readOnlyForm || emergencia?.id" pButton pRipple icon="pi pi-trash"
+          <button *ngIf="imagePreview || isPDF" [disabled]="readOnlyForm || emergencia?.id" pButton pRipple icon="pi pi-trash"
                   class="p-button-danger p-button-icon-only"
                   (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
-        <img *ngIf="(imagePreview && !emergencia.id) || (imagePreview && editImage)" [src]="imagePreview"
+        <img *ngIf="!isPDF && ((imagePreview && !emergencia.id) || (imagePreview && editImage))" [src]="imagePreview"
              alt="Vista Previa" class="image-preview" (click)="showDialogImage()" loading="lazy"/>
-        <img *ngIf="imagePreview && emergencia.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
+        <img *ngIf="!isPDF && imagePreview && emergencia.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
              alt="Vista Previa" class="image-preview" (click)="showDialogImage()" loading="lazy"/>
-
+        <div *ngIf="isPDF">
+          <br>
+          <p>
+            Descarga documento:
+            <a (click)="downloadFile()">
+              <img src="assets/img/avalon/icono-pdf2.png" alt="Descargar PDF" class="image-preview" style="cursor: pointer;">
+            </a>
+          </p>
+        </div>
         <br/>
       </div>
 

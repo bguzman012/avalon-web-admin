@@ -85,6 +85,8 @@ export class AddCitasMedicasComponent implements OnInit {
   editingCommentImageComplete: boolean = false;
 
   newCommentImagePreview: string | null = null;
+  isPDF
+  pdfPreview
 
   requisitosAdicionales: { [key in RequisitoAdicional]: boolean } = {
     [RequisitoAdicional.VIAJES]: false,
@@ -171,8 +173,13 @@ export class AddCitasMedicasComponent implements OnInit {
 
       if (citaMedica.imagenId) {
         let foto = await this.imagenService.getImagen(citaMedica.imagenId);
+        console.log(foto)
         this.imagen = foto.documento
         this.nombreDocumento = foto.nombreDocumento
+
+        if (foto.tipo == "PDF")
+          this.isPDF = true
+
       }
 
       if (this.imagen) {
@@ -192,8 +199,8 @@ export class AddCitasMedicasComponent implements OnInit {
     console.log(this.originCaso, " BOOLEAN")
 
     if (await this.getRouteParams('clientePolizaId'))
-    if (await this.getRouteParams('clientePolizaId'))
-      this.clientePolizaId = +(await this.getRouteParams('clientePolizaId'));
+      if (await this.getRouteParams('clientePolizaId'))
+        this.clientePolizaId = +(await this.getRouteParams('clientePolizaId'));
 
     if (await this.getRouteParams('casoId'))
       this.casoId = +(await this.getRouteParams('casoId'));
@@ -217,7 +224,7 @@ export class AddCitasMedicasComponent implements OnInit {
 
   }
 
-  async cargarImagenesComentarios(){
+  async cargarImagenesComentarios() {
     for (const comentario of this.comentarios) {
       if (comentario.imagenId) {
         let foto = await this.imagenService.getImagen(comentario.imagenId);
@@ -458,13 +465,113 @@ export class AddCitasMedicasComponent implements OnInit {
     this.imagen = file;
     this.nombreDocumento = this.imagen.name
 
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.imagePreview = e.target.result;
-    };
-    reader.readAsDataURL(file);
+    const fileType = file.type;
+
+    // Resetear variables de vista previa
+    this.imagePreview = null;
+    this.isPDF = false;
+
+    if (fileType.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else if (fileType === 'application/pdf') {
+      // Si es un PDF, simplemente muestra el nombre
+      this.isPDF = true;
+      this.messageService.add({
+        severity: 'info',
+        summary: 'PDF seleccionado',
+        detail: 'El archivo PDF se ha seleccionado.'
+      });
+    } else {
+      // Si no es ni imagen ni PDF, puedes manejar el error aquí
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Tipo de archivo no soportado',
+        detail: 'Por favor selecciona un archivo válido (imagen o PDF).'
+      });
+    }
 
     this.imagenCambiadaEdit = true
+  }
+
+//   downloadFile() {
+//     console.log(this.imagen)
+//     // Ejemplo de uso
+//     const filename = "archivo.pdf"; // nombre del archivo
+//     const file = this.base64ToFile(this.imagen, filename);
+//
+// // Ahora puedes usar el objeto `file` como un `File` normal
+//     console.log(file);
+//     // if (this.imagen instanceof Blob) {
+//     //   // Caso de archivo local (Blob)
+//     //   const fileURL = URL.createObjectURL(this.imagen);
+//     //   const a = document.createElement('a');
+//     //   a.href = fileURL;
+//     //   a.download = this.nombreDocumento;
+//     //   document.body.appendChild(a);
+//     //   a.click();
+//     //   document.body.removeChild(a);
+//     //   URL.revokeObjectURL(fileURL); // Limpiar URL temporal
+//     // } else if (typeof this.imagen === 'string') {
+//     //   // Caso de URL remota
+//     //   const a = document.createElement('a');
+//     //   a.href = this.imagen;
+//     //   a.download = this.nombreDocumento;
+//     //   document.body.appendChild(a);
+//     //   a.click();
+//     //   document.body.removeChild(a);
+//     // } else {
+//     //   console.error("El tipo de archivo no es compatible.");
+//     // }
+//   }
+
+  downloadFile() {
+    try {
+      let file
+      if (typeof this.imagen === 'string') {
+        const base64String = `data:application/pdf;base64,${this.imagen}`;
+        file = this.base64ToFile(base64String, this.nombreDocumento);
+      } else
+        file = this.imagen
+
+      console.log(file)
+      const fileURL = URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = fileURL;
+      a.download = this.nombreDocumento;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(fileURL);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  }
+
+
+  base64ToFile(base64String: string, fileName: string): File {
+    if (!base64String) {
+      throw new Error('Base64 string is null or empty');
+    }
+
+    const arr = base64String.split(',');
+    if (arr.length < 2) {
+      throw new Error('Invalid base64 string');
+    }
+
+    const mime = arr[0].match(/:(.*?);/)?.[1]; // Verifica que la coincidencia no sea null
+    const bstr = atob(arr[1]);
+    const n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    for (let i = 0; i < n; i++) {
+      u8arr[i] = bstr.charCodeAt(i);
+    }
+
+    return new File([u8arr], fileName, {type: mime});
   }
 
   clearImageSelection(fileUploadRef) {
@@ -474,6 +581,7 @@ export class AddCitasMedicasComponent implements OnInit {
     this.imagen = null;
     this.nombreDocumento = null
     this.imagePreview = null;
+    this.isPDF = false; // Restablece el indicador de PDF
     fileUploadRef.clear(); // Limpiar la selección de archivo en el componente de carga
   }
 
@@ -505,8 +613,8 @@ export class AddCitasMedicasComponent implements OnInit {
     this.editImageComment = true;
     this.editCommentImage = null;
 
-    this.comentarioEdit.nombreDocumento  = null;
-    this.comentarioEdit.imagePreview  = null;
+    this.comentarioEdit.nombreDocumento = null;
+    this.comentarioEdit.imagePreview = null;
     fileUploadRef.clear();
   }
 
@@ -580,32 +688,17 @@ export class AddCitasMedicasComponent implements OnInit {
       });
       return
     }
-    //
-    // if (!this.imagen) {
-    //   this.messageService.add({
-    //     severity: 'error',
-    //     summary: 'Error!',
-    //     detail: 'Imagen es requerido',
-    //     life: 3000,
-    //   });
-    //   return
-    // }
-
-    // if (!this.medicoCentroMedicoAseguradora?.id) {
-    //   this.messageService.add({
-    //     severity: 'error',
-    //     summary: 'Error!',
-    //     detail: 'Médico es requerido',
-    //     life: 3000,
-    //   });
-    //   return
-    // }
 
     this.loading = true; // Mostrar spinner
     const formData = new FormData();
     this.citaMedica.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora?.id
     this.citaMedica.clientePolizaId = this.selectedClientePoliza.id
     this.citaMedica.nombreDocumento = this.nombreDocumento
+    if (this.isPDF)
+      this.citaMedica.tipoDocumento = "PDF"
+    else
+      this.citaMedica.tipoDocumento = "IMAGEN"
+
     this.citaMedica.casoId = this.selectedCaso.id
     const requisitosAdicionalesBackend = {};
 

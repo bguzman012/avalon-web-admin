@@ -90,6 +90,7 @@ export class AddReclamacionesComponent implements OnInit {
   editingCommentImageComplete: boolean = false;
 
   newCommentImagePreview: string | null = null;
+  isPDF
 
   constructor(
     private messageService: MessageService,
@@ -153,6 +154,9 @@ export class AddReclamacionesComponent implements OnInit {
         let foto = await this.imagenService.getImagen(reclamacion.imagenId);
         this.imagen = foto.documento
         this.nombreDocumento = foto.nombreDocumento
+
+        if (foto.tipo == "PDF")
+          this.isPDF = true
       }
       // this.reclamacion.fotoReclamo = reclamacionFoto.fotoReclamo
 
@@ -449,15 +453,82 @@ export class AddReclamacionesComponent implements OnInit {
     const file = event.files[0];
     this.imagen = file;
     this.nombreDocumento = this.imagen.name
-    console.log('Nombre del archivo:', file.name);
 
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.imagePreview = e.target.result;
-    };
-    reader.readAsDataURL(file);
+    const fileType = file.type;
+
+    // Resetear variables de vista previa
+    this.imagePreview = null;
+    this.isPDF = false;
+
+    if (fileType.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else if (fileType === 'application/pdf') {
+      // Si es un PDF, simplemente muestra el nombre
+      this.isPDF = true;
+      this.messageService.add({
+        severity: 'info',
+        summary: 'PDF seleccionado',
+        detail: 'El archivo PDF se ha seleccionado.'
+      });
+    } else {
+      // Si no es ni imagen ni PDF, puedes manejar el error aquí
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Tipo de archivo no soportado',
+        detail: 'Por favor selecciona un archivo válido (imagen o PDF).'
+      });
+    }
 
     this.imagenCambiadaEdit = true
+  }
+
+  downloadFile() {
+    try {
+      let file
+      if (typeof this.imagen === 'string') {
+        const base64String = `data:application/pdf;base64,${this.imagen}`;
+        file = this.base64ToFile(base64String, this.nombreDocumento);
+      } else
+        file = this.imagen
+
+      console.log(file)
+      const fileURL = URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = fileURL;
+      a.download = this.nombreDocumento;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(fileURL);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  }
+
+  base64ToFile(base64String: string, fileName: string): File {
+    if (!base64String) {
+      throw new Error('Base64 string is null or empty');
+    }
+
+    const arr = base64String.split(',');
+    if (arr.length < 2) {
+      throw new Error('Invalid base64 string');
+    }
+
+    const mime = arr[0].match(/:(.*?);/)?.[1]; // Verifica que la coincidencia no sea null
+    const bstr = atob(arr[1]);
+    const n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    for (let i = 0; i < n; i++) {
+      u8arr[i] = bstr.charCodeAt(i);
+    }
+
+    return new File([u8arr], fileName, {type: mime});
   }
 
   clearImageSelection(fileUploadRef) {
@@ -467,6 +538,8 @@ export class AddReclamacionesComponent implements OnInit {
     this.imagen = null;
     this.nombreDocumento = null
     this.imagePreview = null;
+    this.isPDF = false; // Restablece el indicador de PDF
+
     fileUploadRef.clear(); // Limpiar la selección de archivo en el componente de carga
   }
 
@@ -609,6 +682,11 @@ export class AddReclamacionesComponent implements OnInit {
     this.reclamacion.tipoAdm = this.selectedTipoAdm
     this.reclamacion.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora?.id
     this.reclamacion.nombreDocumento = this.nombreDocumento
+    if (this.isPDF)
+      this.reclamacion.tipoDocumento = "PDF"
+    else
+      this.reclamacion.tipoDocumento = "IMAGEN"
+
     this.reclamacion.casoId = this.selectedCaso.id
 
     formData.append('reclamacion', new Blob([JSON.stringify(this.reclamacion)], {type: 'application/json'}));

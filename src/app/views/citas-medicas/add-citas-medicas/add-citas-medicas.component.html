@@ -143,21 +143,41 @@
 
 
       <div class="p-field">
-        <label for="fotoCitaMedica">Foto Cita Médica</label>
+        <label for="fotoCitaMedica">Documento Cita Médica</label>
         <div class="upload-container">
           <p-fileUpload [disabled]="readOnlyForm || citaMedica?.id" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"
-                        accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
+                        accept=".pdf,image/*"  [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
                         customUpload="true"></p-fileUpload>
-          <button *ngIf="imagePreview" [disabled]="readOnlyForm || citaMedica?.id" pButton pRipple icon="pi pi-trash"
+          <button *ngIf="imagePreview || isPDF" [disabled]="readOnlyForm || citaMedica?.id" pButton pRipple icon="pi pi-trash"
                   class="p-button-danger p-button-icon-only"
                   (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
-        <img *ngIf="(imagePreview && !citaMedica.id) || (imagePreview && editImage)" [src]="imagePreview"
+        <img *ngIf="!isPDF && ((imagePreview && !citaMedica.id) || (imagePreview && editImage))" [src]="imagePreview"
              alt="Vista Previa" class="image-preview" (click)="showDialogImage()" loading="lazy"/>
-        <img *ngIf="imagePreview && citaMedica.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
+        <img *ngIf="!isPDF && (imagePreview && citaMedica.id && !editImage)" [src]="'data:image/jpeg;base64,' + imagePreview"
              alt="Vista Previa" class="image-preview" (click)="showDialogImage()" loading="lazy"/>
 
+<!--        <iframe [src]="pdfPreview" width="100%" height="600px"></iframe>-->
+<!--        <div *ngIf="isPDF">-->
+<!--          <p>PDF seleccionado: {{ nombreDocumento }}</p>-->
+<!--        </div>-->
+<!--        <div *ngIf="isPDF">-->
+<!--          <p>-->
+<!--            PDF seleccionado:-->
+<!--            <a (click)="downloadFile()">Descargar {{ nombreDocumento }}</a>-->
+<!--          </p>-->
+<!--        </div>-->
+
+        <div *ngIf="isPDF">
+          <br>
+          <p>
+            Descarga documento:
+            <a (click)="downloadFile()">
+              <img src="assets/img/avalon/icono-pdf2.png" alt="Descargar PDF" class="image-preview" style="cursor: pointer;">
+            </a>
+          </p>
+        </div>
         <br/>
       </div>
 
