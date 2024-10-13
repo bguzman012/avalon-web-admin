@@ -24,7 +24,7 @@
           [(ngModel)]="selectedCliente"
           [suggestions]="filteredClientes"
           (completeMethod)="filterClientes($event)"
-          field="nombreUsuario"
+          field="displayName"
           [dropdown]="!emergencia?.id  && !originCaso"
           (ngModelChange)="loadPolizas()"
           [readonly]="emergencia || originCaso" placeholder="Filtrar por Cliente">

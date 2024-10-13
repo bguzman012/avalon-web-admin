@@ -120,7 +120,7 @@
     <div class="p-field">
       <label for="clienteId">Cliente</label>
       <p-autoComplete [(ngModel)]="cliente" [showEmptyMessage]="true" [suggestions]="filteredClientes"
-                      (completeMethod)="filterClientes($event)" field="nombreUsuario" [readonly]="clienteId"
+                      (completeMethod)="filterClientes($event)" field="displayName" [readonly]="clienteId"
                       [minLength]="1" [appendTo]="'body'"
                       required></p-autoComplete>
       <small class="p-invalid" *ngIf="submitted && !cliente">Cliente es requerido.</small>

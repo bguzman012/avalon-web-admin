@@ -23,7 +23,7 @@
           [(ngModel)]="selectedCliente"
           [suggestions]="filteredClientes"
           (completeMethod)="filterClientes
-          ($event)" field="nombreUsuario"
+          ($event)" field="displayName"
           [dropdown]="!reclamacion?.id  && !originCaso"
           (ngModelChange)="loadPolizas()"
           [readonly]="reclamacion  || originCaso"

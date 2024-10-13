@@ -23,7 +23,7 @@
     <div class="filter-container">
       <!-- Filtro por Cliente -->
       <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
-                      (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="true"
+                      (completeMethod)="filterClientes($event)" field="displayName" [dropdown]="true"
                       (ngModelChange)="loadPolizas()"
                       placeholder="Filtrar por Cliente" [size]="30" [minLength]="1" [disabled]="false"
                       [forceSelection]="true"

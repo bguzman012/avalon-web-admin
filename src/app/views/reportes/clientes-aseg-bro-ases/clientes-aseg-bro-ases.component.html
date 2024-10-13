@@ -53,7 +53,7 @@
   <ng-template pTemplate="body" let-clientePoliza>
     <tr>
       <td>{{ clientePoliza.numeroCertificado }}</td>
-      <td>{{ clientePoliza.cliente.nombreUsuario }}</td>
+      <td>{{ clientePoliza.cliente.displayName }}</td>
       <td>{{ clientePoliza.poliza.aseguradora.nombre }}</td>
       <td>{{ clientePoliza.poliza.nombre }}</td>
       <td>{{ clientePoliza?.empresa?.nombre }}</td>

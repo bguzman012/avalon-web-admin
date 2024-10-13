@@ -65,7 +65,7 @@
         <td>{{ cargaFamiliar.cliente.nombres }} {{ cargaFamiliar.cliente.nombresDos }}</td>
         <td>{{ cargaFamiliar.cliente.apellidos }} {{ cargaFamiliar.cliente.apellidosDos }}</td>
         <td>{{ cargaFamiliar.cliente.correoElectronico }}</td>
-        <td>{{ cargaFamiliar.cliente.nombreUsuario }}</td>
+        <td>{{ cargaFamiliar.cliente.displayName }}</td>
         <td>{{ cargaFamiliar.parentesco }}</td>
         <td style="text-align: right;">
           <button [disabled]="noMembresia" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
@@ -106,7 +106,7 @@
                 [(ngModel)]="selectedCliente"
                 [suggestions]="filteredClientes"
                 (completeMethod)="filterClientes($event)"
-                field="nombreUsuario"
+                field="displayName"
                 [dropdown]="true"
                 [appendTo]="'body'"
                 placeholder="Filtrar por Cliente">

@@ -24,7 +24,7 @@
           [(ngModel)]="selectedCliente"
           [suggestions]="filteredClientes"
           (completeMethod)="filterClientes($event)"
-          field="nombreUsuario"
+          field="displayName"
           [dropdown]="!citaMedica?.id && !originCaso"
           (ngModelChange)="loadPolizas()"
           [readonly]="citaMedica || originCaso"

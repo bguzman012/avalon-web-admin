@@ -18,7 +18,7 @@
     <div class="filter-container">
       <!-- Filtro por Cliente -->
       <p-autoComplete [(ngModel)]="selectedCliente" [suggestions]="filteredClientes"
-                      (completeMethod)="filterClientes($event)" field="nombreUsuario" [dropdown]="true"
+                      (completeMethod)="filterClientes($event)" field="displayName" [dropdown]="true"
                       (ngModelChange)="loadPolizas()"
                       placeholder="Filtrar por Cliente" [size]="30" [minLength]="1" [disabled]="false"
                       [forceSelection]="true"
@@ -104,7 +104,7 @@
       <tr>
         <td>{{ emergencia.caso.codigo }}</td>
         <td>{{ emergencia.codigo }}</td>
-        <td>{{ emergencia.clientePoliza.cliente.nombreUsuario }}</td>
+        <td>{{ emergencia.clientePoliza.cliente.displayName }}</td>
         <td>{{ emergencia.clientePoliza.displayName }}</td>
         <td>{{ emergencia?.medicoCentroMedicoAseguradora?.centroMedico.nombre }}</td>
         <td>{{ emergencia?.medicoCentroMedicoAseguradora?.medico.nombres }} {{ emergencia?.medicoCentroMedicoAseguradora?.medico.nombresDos }}</td>

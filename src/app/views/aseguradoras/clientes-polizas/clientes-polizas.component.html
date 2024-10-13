@@ -73,7 +73,7 @@
         <td>{{ clientePoliza.codigo }}</td>
         <td>{{ clientePoliza.numeroCertificado }}</td>
         <td>{{ clientePoliza?.empresa?.nombre }}</td>
-        <td>{{ clientePoliza.cliente.nombreUsuario }}</td>
+        <td>{{ clientePoliza.cliente.displayName }}</td>
         <td *ngIf="user?.rol.id == ROL_ADMINISTRADOR_ID">{{ clientePoliza.asesor.nombreUsuario }}</td>
         <td *ngIf="user?.rol.id == ROL_ADMINISTRADOR_ID">{{ clientePoliza.agente.nombreUsuario }}</td>
         <td>{{ clientePoliza.fechaInicio }}</td>
@@ -173,7 +173,7 @@
         [showEmptyMessage]="true"
         [suggestions]="filteredClientes"
         (completeMethod)="filterClientes($event)"
-        field="nombreUsuario"
+        field="displayName"
         [minLength]="1"
         dropdown="true"
         [appendTo]="'body'"
