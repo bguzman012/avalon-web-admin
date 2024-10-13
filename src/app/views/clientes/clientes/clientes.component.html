@@ -2,7 +2,7 @@
 
 <div class="card">
   <p-toolbar styleClass="p-mb-4">
-    <ng-template pTemplate="left"> </ng-template>
+    <ng-template pTemplate="left"></ng-template>
 
     <ng-template pTemplate="right">
       <button
@@ -46,39 +46,55 @@
       <tr>
 
         <th pSortableColumn="nombres">
-          Nombres <p-sortIcon field="nombres"></p-sortIcon>
+          Nombres
+          <p-sortIcon field="nombres"></p-sortIcon>
         </th>
         <th pSortableColumn="apellidos">
-          Apellidos <p-sortIcon field="apellidos"></p-sortIcon>
+          Apellidos
+          <p-sortIcon field="apellidos"></p-sortIcon>
         </th>
         <th pSortableColumn="correoElectronico">
-          Correo Electrónico <p-sortIcon field="correoElectronico"></p-sortIcon>
+          Correo Electrónico
+          <p-sortIcon field="correoElectronico"></p-sortIcon>
         </th>
-        <th pSortableColumn="numeroTelefono">
-          Número Teléfono <p-sortIcon field="numeroTelefono"></p-sortIcon>
-        </th>
+<!--        <th pSortableColumn="numeroTelefono">-->
+<!--          Número Teléfono-->
+<!--          <p-sortIcon field="numeroTelefono"></p-sortIcon>-->
+<!--        </th>-->
         <th pSortableColumn="nombreUsuario">
-          Nombre Usuario <p-sortIcon field="nombreUsuario"></p-sortIcon>
+          Nombre Usuario
+          <p-sortIcon field="nombreUsuario"></p-sortIcon>
         </th>
         <th pSortableColumn="estado">
-          Estado <p-sortIcon field="estado"></p-sortIcon>
+          Estado
+          <p-sortIcon field="estado"></p-sortIcon>
         </th>
 
-        <th style="width: 200px;"></th>
+        <th style="width: 290px;"></th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-usuario>
-      <tr (click)="redirectToMembresiasPage(usuario)">
+      <tr>
 
         <td>{{ usuario.nombres }} {{ usuario.nombresDos }}</td>
         <td>{{ usuario.apellidos }} {{ usuario.apellidosDos }}</td>
         <td>{{ usuario.correoElectronico }}</td>
-        <td>{{ usuario.numeroTelefono }}</td>
+<!--        <td>{{ usuario.numeroTelefono }}</td>-->
         <td>{{ usuario.nombreUsuario }}</td>
         <td>
           {{ getEstadoLabel(usuario.estado) }}
         </td>
         <td style="text-align: right">
+          <button
+            *ngIf="usuario.estado != 'P'"
+            pButton
+            class="p-button-rounded p-button-secondary p-mr-2 small-button"
+            (click)="
+              redirectToMembresiasPage(usuario); $event.stopPropagation()
+            "
+          >
+            Membresías
+          </button>
           <button
             *ngIf="usuario.estado != 'P'"
             pButton
@@ -122,97 +138,98 @@
           <p-progressSpinner></p-progressSpinner>
         </div>
       </p-blockUI>
-      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first" (onPageChange)="onPageChange($event)" ></p-paginator>
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="first"
+                   (onPageChange)="onPageChange($event)"></p-paginator>
       <div class="p-d-flex p-ai-center p-jc-between">
-        En total existen  {{totalRecords ? totalRecords : 0 }} registros.
+        En total existen  {{ totalRecords ? totalRecords : 0 }} registros.
       </div>
     </ng-template>
   </p-table>
 </div>
 
 <p-dialog [(visible)]="usuarioDialog" [style]="{width: '900px'}" header="Detalle de Cliente" [modal]="true"
-    styleClass="p-fluid">
-    <ng-template pTemplate="content">
-        <div class="p-grid p-fluid">
-            <div class="p-col-12 p-md-6">
-                <div class="p-field">
-                    <label for="nombres">Nombre Uno</label>
-                    <input type="text" pInputText id="nombres" [(ngModel)]="usuario.nombres" required autofocus />
-                    <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombre uno is required.</small>
-                </div>
-            </div>
-
-            <div class="p-col-12 p-md-6">
-                <div class="p-field">
-                    <label for="nombres">Nombre Dos</label>
-                    <input type="text" pInputText id="nombresDos" [(ngModel)]="usuario.nombresDos" required autofocus />
-                    <small class="p-invalid" *ngIf="submitted && !usuario.nombresDos">Nombre dos is required.</small>
-                </div>
-            </div>
-        </div>
-        <div class="p-grid p-fluid">
-            <div class="p-col-12 p-md-6">
-                <div class="p-field">
-                    <label for="apellidos">Apellido Uno</label>
-                    <input type="text" pInputText id="apellidos" [(ngModel)]="usuario.apellidos" required autofocus />
-                    <small class="p-invalid" *ngIf="submitted && !usuario.apellidos">Apellido uno is required.</small>
-                </div>
-            </div>
-            <div class="p-col-12 p-md-6">
-                <div class="p-field">
-                    <label for="apellidosDos">Apellido Dos</label>
-                    <input type="text" pInputText id="apellidosDos" [(ngModel)]="usuario.apellidosDos" required autofocus />
-                    <small class="p-invalid" *ngIf="submitted && !usuario.apellidosDos">Apellido dos is required.</small>
-                </div>
-            </div>
-        </div>
-      <div class="p-grid p-fluid">
-        <div class="p-col-12 p-md-6">
-          <div class="p-field">
-            <label for="tipoIdentificacion">Tipo de Identificación</label>
-            <p-dropdown
-              id="tipoIdentificacion"
-              [options]="tipoDocumentoIdentOptions"
-              [(ngModel)]="usuario.tipoIdentificacion"
-              optionLabel="value"
-              optionValue="label"
-              placeholder="Seleccione un tipo de identificación">
-            </p-dropdown>
-            <small class="p-invalid" *ngIf="submitted && !usuario.tipoIdentificacion">Tipo de identificación es
-              requerido.</small>
-          </div>
-        </div>
-        <div class="p-col-12 p-md-6">
-          <div class="p-field">
-            <label for="numeroIdentificacion">Número de Identificación</label>
-            <input type="text" pInputText id="numeroIdentificacion" [(ngModel)]="usuario.numeroIdentificacion"
-                   required/>
-            <small class="p-invalid" *ngIf="submitted && !usuario.numeroIdentificacion">Número de identificación es
-              requerido.</small>
-          </div>
+          styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <div class="p-grid p-fluid">
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="nombres">Nombre Uno</label>
+          <input type="text" pInputText id="nombres" [(ngModel)]="usuario.nombres" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !usuario.nombres">Nombre uno is required.</small>
         </div>
       </div>
+
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="nombres">Nombre Dos</label>
+          <input type="text" pInputText id="nombresDos" [(ngModel)]="usuario.nombresDos" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !usuario.nombresDos">Nombre dos is required.</small>
+        </div>
+      </div>
+    </div>
+    <div class="p-grid p-fluid">
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="apellidos">Apellido Uno</label>
+          <input type="text" pInputText id="apellidos" [(ngModel)]="usuario.apellidos" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !usuario.apellidos">Apellido uno is required.</small>
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="apellidosDos">Apellido Dos</label>
+          <input type="text" pInputText id="apellidosDos" [(ngModel)]="usuario.apellidosDos" required autofocus/>
+          <small class="p-invalid" *ngIf="submitted && !usuario.apellidosDos">Apellido dos is required.</small>
+        </div>
+      </div>
+    </div>
+    <div class="p-grid p-fluid">
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="tipoIdentificacion">Tipo de Identificación</label>
+          <p-dropdown
+            id="tipoIdentificacion"
+            [options]="tipoDocumentoIdentOptions"
+            [(ngModel)]="usuario.tipoIdentificacion"
+            optionLabel="value"
+            optionValue="label"
+            placeholder="Seleccione un tipo de identificación">
+          </p-dropdown>
+          <small class="p-invalid" *ngIf="submitted && !usuario.tipoIdentificacion">Tipo de identificación es
+            requerido.</small>
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="p-field">
+          <label for="numeroIdentificacion">Número de Identificación</label>
+          <input type="text" pInputText id="numeroIdentificacion" [(ngModel)]="usuario.numeroIdentificacion"
+                 required/>
+          <small class="p-invalid" *ngIf="submitted && !usuario.numeroIdentificacion">Número de identificación es
+            requerido.</small>
+        </div>
+      </div>
+    </div>
 
     <div class="p-field">
       <label class="p-mb-3">Correo Electrónico</label>
-      <input type="text" pInputText [(ngModel)]="usuario.correoElectronico" />
+      <input type="text" pInputText [(ngModel)]="usuario.correoElectronico"/>
     </div>
 
-      <div class="p-field">
-        <label for="fechaNacimiento">Fecha de Nacimiento</label>
-        <p-calendar [(ngModel)]="usuario.fechaNacimiento" dateFormat="dd/mm/yy"
-                    [showIcon]="true"></p-calendar>
-        <small class="p-invalid" *ngIf="submitted && !usuario.fechaNacimiento">Fecha de nacimiento es requerido.</small>
-      </div>
+    <div class="p-field">
+      <label for="fechaNacimiento">Fecha de Nacimiento</label>
+      <p-calendar [(ngModel)]="usuario.fechaNacimiento" dateFormat="dd/mm/yy"
+                  [showIcon]="true"></p-calendar>
+      <small class="p-invalid" *ngIf="submitted && !usuario.fechaNacimiento">Fecha de nacimiento es requerido.</small>
+    </div>
 
     <div class="p-field">
       <label class="p-mb-3">Número Teléfono</label>
-      <input type="text" pInputText [(ngModel)]="usuario.numeroTelefono" />
+      <input type="text" pInputText [(ngModel)]="usuario.numeroTelefono"/>
     </div>
 
     <div class="p-field" *ngIf="usuario?.id">
       <label class="p-mb-3">Nombre Usuario</label>
-      <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario" />
+      <input type="text" pInputText [(ngModel)]="usuario.nombreUsuario"/>
     </div>
 
     <div class="p-field">
@@ -226,7 +243,7 @@
         autofocus
       />
       <small class="p-invalid" *ngIf="submitted && !direccion.direccionUno"
-        >Dirección uno es required.</small
+      >Dirección uno es required.</small
       >
     </div>
 
@@ -241,7 +258,7 @@
         autofocus
       />
       <small class="p-invalid" *ngIf="submitted && !direccion.direccionDos"
-        >Dirección dos es required.</small
+      >Dirección dos es required.</small
       >
     </div>
 
@@ -260,7 +277,7 @@
         required
       ></p-autoComplete>
       <small class="p-invalid" *ngIf="submitted && !pais"
-        >País es requerido.</small
+      >País es requerido.</small
       >
     </div>
 
@@ -294,7 +311,7 @@
         autofocus
       />
       <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
-        >Ciudad es required.</small
+      >Ciudad es required.</small
       >
     </div>
 
@@ -309,7 +326,7 @@
         autofocus
       />
       <small class="p-invalid" *ngIf="submitted && !direccion.ciudad"
-        >Código Postal es required.</small
+      >Código Postal es required.</small
       >
     </div>
 
