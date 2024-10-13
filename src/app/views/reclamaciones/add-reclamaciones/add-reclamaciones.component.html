@@ -124,21 +124,30 @@
       </div>
 
       <div class="p-field">
-        <label for="fotoReclamo">Foto Reembolso</label>
+        <label for="fotoReclamo">Documento Reembolso</label>
         <div class="upload-container">
           <p-fileUpload [disabled]="readOnlyForm || reclamacion?.id" name="fotoCitaMedica" #fileUploadRef (onSelect)="onFileSelect($event)"
                         mode="basic" [auto]="false"
-                        accept="image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
+                        accept=".pdf,image/*" [chooseLabel]="nombreDocumento ? nombreDocumento : 'Seleccionar Archivo'"
                         customUpload="true"></p-fileUpload>
-          <button *ngIf="imagePreview" [disabled]="readOnlyForm || reclamacion?.id" pButton pRipple icon="pi pi-trash"
+          <button *ngIf="isPDF || imagePreview" [disabled]="readOnlyForm || reclamacion?.id" pButton pRipple icon="pi pi-trash"
                   class="p-button-danger p-button-icon-only"
                   (click)="clearImageSelection(fileUploadRef)"></button>
         </div>
-        <img *ngIf="(imagePreview && !reclamacion.id) || (imagePreview && editImage)" [src]="imagePreview"
+        <img *ngIf="!isPDF && ((imagePreview && !reclamacion.id) || (imagePreview && editImage))" [src]="imagePreview"
              alt="Vista Previa" class="image-preview" (click)="showDialogImage()" loading="lazy"/>
-        <img *ngIf="imagePreview && reclamacion.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
+        <img *ngIf="!isPDF && imagePreview && reclamacion.id && !editImage" [src]="'data:image/jpeg;base64,' + imagePreview"
              alt="Vista Previa" class="image-preview" (click)="showDialogImage()" loading="lazy"/>
 
+        <div *ngIf="isPDF">
+          <br>
+          <p>
+            Descarga documento:
+            <a (click)="downloadFile()">
+              <img src="assets/img/avalon/icono-pdf2.png" alt="Descargar PDF" class="image-preview" style="cursor: pointer;">
+            </a>
+          </p>
+        </div>
         <br/>
       </div>
 
@@ -178,12 +187,22 @@
       <textarea id="nuevoComentario" [(ngModel)]="comentario.contenido" rows="3" pInputTextarea readonly></textarea>
       <div style="display: flex; justify-content: space-between; margin-bottom: 5px" *ngIf="comentario.imagenId">
         <div *ngIf="!comentario.imagePreview">
-          <span style="color: #3B82F6"><b> Cargando Imágen... </b></span>
+          <span style="color: #3B82F6"><b> Cargando Documento... </b></span>
         </div>
-        <img *ngIf="comentario.imagePreview"
+        <img *ngIf="!comentario.isPDF && comentario.imagePreview"
              [src]="'data:image/jpeg;base64,' + comentario.imagePreview"
              alt="Vista Previa" class="image-preview" (click)="showDialogImageComments(comentario)" loading="lazy"/>
-        <!-- Fecha de creación -->
+
+        <div *ngIf="comentario.isPDF">
+          <br>
+          <p>
+            Descarga documento:
+            <a (click)="downloadFileCommentAll(comentario)">
+              <img src="assets/img/avalon/icono-pdf2.png" alt="Descargar PDF" class="image-preview" style="cursor: pointer;">
+            </a>
+          </p>
+        </div>
+
         <div style="text-align: right; font-size: small" >
           <span>{{ comentario.lastModifiedDate | date: 'short' }}</span>
         </div>
@@ -193,7 +212,6 @@
       </div>
 
       <hr class="comment-separator"/>
-
     </div>
 
     <div class="p-field">
@@ -205,16 +223,25 @@
         <p-fileUpload [disabled]="readOnlyForm" name="newCommentImage" #fileUploadRefNew
                       (onSelect)="onNewCommentImageSelect($event)"
                       mode="basic" [auto]="false"
-                      accept="image/*"
+                      accept=".pdf,image/*"
                       [chooseLabel]="nombreDocumentoComment ? nombreDocumentoComment : 'Seleccionar Archivo'"
                       customUpload="true"></p-fileUpload>
-        <button *ngIf="newCommentImagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
+        <button *ngIf="isPDFNewComment || newCommentImagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
                 class="p-button-danger p-button-icon-only"
                 (click)="removeNewCommentImage(fileUploadRefNew)"></button>
       </div>
 
-      <img *ngIf="newCommentImagePreview" [src]="newCommentImagePreview" (click)="showDialogNuevaImageComments()" alt="Vista Previa de Imagen"
+      <img *ngIf="!isPDFNewComment && newCommentImagePreview" [src]="newCommentImagePreview" (click)="showDialogNuevaImageComments()" alt="Vista Previa de Imagen"
            class="image-preview"/>
+      <div *ngIf="isPDFNewComment">
+        <br>
+        <p>
+          Descarga documento:
+          <a (click)="downloadNewFileComment()">
+            <img src="assets/img/avalon/icono-pdf2.png" alt="Descargar PDF" class="image-preview" style="cursor: pointer;">
+          </a>
+        </p>
+      </div>
     </div>
     <div class="custom-button-container">
       <button pButton pRipple label="Cerrar"
@@ -241,19 +268,29 @@
         <p-fileUpload [disabled]="readOnlyForm" name="newCommentImage" #fileUploadRef
                       (onSelect)="onEditCommentImageSelect($event)"
                       mode="basic" [auto]="false"
-                      accept="image/*"
+                      accept=".pdf,image/*"
                       [chooseLabel]="comentarioEdit.nombreDocumento ? comentarioEdit.nombreDocumento : 'Seleccionar Archivo'"
                       customUpload="true"></p-fileUpload>
-        <button *ngIf="comentarioEdit.imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
+        <button *ngIf="comentarioEdit.isPDF || comentarioEdit.imagePreview" [disabled]="readOnlyForm" pButton pRipple icon="pi pi-trash"
                 class="p-button-danger p-button-icon-only"
                 (click)="removeEditCommentImage(fileUploadRef)"></button>
       </div>
 
-      <img *ngIf="comentarioEdit.imagePreview && editImageComment" [src]="comentarioEdit.imagePreview"
+      <img *ngIf="!comentarioEdit.isPDF && comentarioEdit.imagePreview && editImageComment" [src]="comentarioEdit.imagePreview"
            alt="Vista Previa" class="image-preview" (click)="showDialogImageComments(comentarioEdit)" loading="lazy"/>
-      <img *ngIf="comentarioEdit.imagePreview && !editImageComment"
+      <img *ngIf="!comentarioEdit.isPDF && comentarioEdit.imagePreview && !editImageComment"
            [src]="'data:image/jpeg;base64,' + comentarioEdit.imagePreview"
            alt="Vista Previa" class="image-preview" (click)="showDialogImageComments(comentarioEdit)" loading="lazy"/>
+
+      <div *ngIf="comentarioEdit.isPDF">
+        <br>
+        <p>
+          Descarga documento:
+          <a (click)="downloadEditComment()">
+            <img src="assets/img/avalon/icono-pdf2.png" alt="Descargar PDF" class="image-preview" style="cursor: pointer;">
+          </a>
+        </p>
+      </div>
     </div>
     <div class="custom-button-container">
       <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-secondary" style="width: 30%;"

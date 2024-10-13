@@ -67,7 +67,7 @@ export class AddEmergenciasComponent implements OnInit {
   imagen
   nombreDocumento
   nombreDocumentoComplete
-  nombreDocumentoComment = "Seleccionar imagen"
+  nombreDocumentoComment = "Seleccionar documento"
 
   medicoCentroMedicoAseguradora: any;
 
@@ -101,7 +101,7 @@ export class AddEmergenciasComponent implements OnInit {
 
   newCommentImagePreview: string | null = null;
   isPDF
-  pdfPreview
+  isPDFNewComment
 
   constructor(
     private messageService: MessageService,
@@ -258,6 +258,11 @@ export class AddEmergenciasComponent implements OnInit {
       nombreDocumento: this.comentarioEdit.nombreDocumento
     };
 
+    if (this.comentarioEdit.isPDF)
+      comentarioToUpdate['tipoDocumento'] = "PDF"
+    else
+      comentarioToUpdate['tipoDocumento'] = "IMAGEN"
+
     const formData = new FormData();
     formData.append('comentarioEmergencia', new Blob([JSON.stringify(comentarioToUpdate)], {type: 'application/json'}));
 
@@ -300,6 +305,9 @@ export class AddEmergenciasComponent implements OnInit {
         let foto = await this.imagenService.getImagen(comentario.imagenId);
         comentario.imagen = foto.documento
         comentario.nombreDocumento = foto.nombreDocumento
+
+        if (foto.tipo == "PDF")
+          comentario.isPDF = true
       }
 
       if (comentario.imagen) {
@@ -331,6 +339,12 @@ export class AddEmergenciasComponent implements OnInit {
       estado: 'A', // Estado activo
       nombreDocumento: this.nombreDocumentoComment
     };
+
+    if (this.isPDFNewComment)
+      comentario['tipoDocumento'] = "PDF"
+    else
+      comentario['tipoDocumento'] = "IMAGEN"
+
     const formData = new FormData();
     formData.append('comentarioEmergencia', new Blob([JSON.stringify(comentario)], {type: 'application/json'}));
 
@@ -346,6 +360,7 @@ export class AddEmergenciasComponent implements OnInit {
       this.newCommentImage = null;
       this.newCommentImagePreview = null;
       this.nombreDocumentoComment = null
+      this.isPDFNewComment = false
 
       fileUploadRefNew.clear()
       await this.loadComentarios();
@@ -405,11 +420,31 @@ export class AddEmergenciasComponent implements OnInit {
     this.newCommentImage = event.files[0];
     this.nombreDocumentoComment = this.newCommentImage.name
 
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.newCommentImagePreview = e.target.result;
-    };
-    reader.readAsDataURL(this.newCommentImage);
+    const fileType = this.newCommentImage.type;
+    this.isPDFNewComment = false
+
+    if (fileType.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.newCommentImagePreview = e.target.result;
+      };
+      reader.readAsDataURL(this.newCommentImage);
+    } else if (fileType === 'application/pdf') {
+      // Si es un PDF, simplemente muestra el nombre
+      this.isPDFNewComment = true;
+      this.messageService.add({
+        severity: 'info',
+        summary: 'PDF seleccionado',
+        detail: 'El archivo PDF se ha seleccionado.'
+      });
+    } else {
+      // Si no es ni imagen ni PDF, puedes manejar el error aquí
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Tipo de archivo no soportado',
+        detail: 'Por favor selecciona un archivo válido (imagen o PDF).'
+      });
+    }
   }
 
   onEditCommentImageSelect(event: any): void {
@@ -417,11 +452,31 @@ export class AddEmergenciasComponent implements OnInit {
     this.editCommentImage = event.files[0];
     this.comentarioEdit.nombreDocumento = this.editCommentImage.name
 
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.comentarioEdit.imagePreview = e.target.result;
-    };
-    reader.readAsDataURL(this.editCommentImage);
+    const fileType = this.editCommentImage.type;
+    this.comentarioEdit.isPDF = false
+
+    if (fileType.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.comentarioEdit.imagePreview = e.target.result;
+      };
+      reader.readAsDataURL(this.editCommentImage);
+    } else if (fileType === 'application/pdf') {
+      // Si es un PDF, simplemente muestra el nombre
+      this.comentarioEdit.isPDF = true
+      this.messageService.add({
+        severity: 'info',
+        summary: 'PDF seleccionado',
+        detail: 'El archivo PDF se ha seleccionado.'
+      });
+    } else {
+      // Si no es ni imagen ni PDF, puedes manejar el error aquí
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Tipo de archivo no soportado',
+        detail: 'Por favor selecciona un archivo válido (imagen o PDF).'
+      });
+    }
   }
 
 
@@ -489,19 +544,36 @@ export class AddEmergenciasComponent implements OnInit {
   }
 
   downloadFile() {
+    this.downloadFileComment(this.imagen, this.nombreDocumento)
+  }
+
+  downloadFileCommentAll(comentario) {
+    this.downloadFileComment(comentario.imagePreview, comentario.nombreDocumento)
+  }
+
+  downloadNewFileComment() {
+    this.downloadFileComment(this.newCommentImage, this.nombreDocumentoComment)
+  }
+
+  downloadEditComment() {
+    console.log(this.editCommentImage)
+    console.log(this.comentarioEdit.nombreDocumento)
+    this.downloadFileComment(this.editCommentImage, this.comentarioEdit.nombreDocumento)
+  }
+
+  downloadFileComment(image, nombreDocumento) {
     try {
       let file
-      if (typeof this.imagen === 'string') {
-        const base64String = `data:application/pdf;base64,${this.imagen}`;
-        file = this.base64ToFile(base64String, this.nombreDocumento);
+      if (typeof image === 'string') {
+        const base64String = `data:application/pdf;base64,${image}`;
+        file = this.base64ToFile(base64String, nombreDocumento);
       } else
-        file = this.imagen
+        file = image
 
-      console.log(file)
       const fileURL = URL.createObjectURL(file);
       const a = document.createElement('a');
       a.href = fileURL;
-      a.download = this.nombreDocumento;
+      a.download = nombreDocumento;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -588,6 +660,7 @@ export class AddEmergenciasComponent implements OnInit {
     this.newCommentImage = null;
     this.newCommentImagePreview = null;
     this.nombreDocumentoComment = null
+    this.isPDFNewComment = false
     fileUploadRef.clear();
   }
 
@@ -595,8 +668,9 @@ export class AddEmergenciasComponent implements OnInit {
     this.editImageComment = true;
     this.editCommentImage = null;
 
-    this.comentarioEdit.nombreDocumento  = null;
-    this.comentarioEdit.imagePreview  = null;
+    this.comentarioEdit.nombreDocumento = null;
+    this.comentarioEdit.imagePreview = null;
+    this.comentarioEdit.isPDF = false;
     fileUploadRef.clear();
   }
 

@@ -65,7 +65,7 @@ export class AddCitasMedicasComponent implements OnInit {
   imagen
   nombreDocumento
   nombreDocumentoComplete
-  nombreDocumentoComment = "Seleccionar imagen"
+  nombreDocumentoComment = "Seleccionar documento"
 
   filteredCentrosMedicos
   filteredMedicoCentroMedicoAseguradoras
@@ -86,6 +86,8 @@ export class AddCitasMedicasComponent implements OnInit {
 
   newCommentImagePreview: string | null = null;
   isPDF
+  isPDFNewComment
+
   pdfPreview
 
   requisitosAdicionales: { [key in RequisitoAdicional]: boolean } = {
@@ -230,6 +232,9 @@ export class AddCitasMedicasComponent implements OnInit {
         let foto = await this.imagenService.getImagen(comentario.imagenId);
         comentario.imagen = foto.documento
         comentario.nombreDocumento = foto.nombreDocumento
+
+        if (foto.tipo == "PDF")
+          comentario.isPDF = true
       }
 
       if (comentario.imagen) {
@@ -282,6 +287,11 @@ export class AddCitasMedicasComponent implements OnInit {
       estado: 'A', // Estado activo
       nombreDocumento: this.comentarioEdit.nombreDocumento
     };
+
+    if (this.comentarioEdit.isPDF)
+      comentarioToUpdate['tipoDocumento'] = "PDF"
+    else
+      comentarioToUpdate['tipoDocumento'] = "IMAGEN"
 
     const formData = new FormData();
     formData.append('comentarioCitaMedica', new Blob([JSON.stringify(comentarioToUpdate)], {type: 'application/json'}));
@@ -338,6 +348,11 @@ export class AddCitasMedicasComponent implements OnInit {
       nombreDocumento: this.nombreDocumentoComment
     };
 
+    if (this.isPDFNewComment)
+      comentario['tipoDocumento'] = "PDF"
+    else
+      comentario['tipoDocumento'] = "IMAGEN"
+
     const formData = new FormData();
     formData.append('comentarioCitaMedica', new Blob([JSON.stringify(comentario)], {type: 'application/json'}));
 
@@ -353,6 +368,7 @@ export class AddCitasMedicasComponent implements OnInit {
       this.newCommentImage = null;
       this.newCommentImagePreview = null;
       this.nombreDocumentoComment = null
+      this.isPDFNewComment = false
 
       fileUploadRefNew.clear()
       await this.loadComentarios();
@@ -438,11 +454,31 @@ export class AddCitasMedicasComponent implements OnInit {
     this.newCommentImage = event.files[0];
     this.nombreDocumentoComment = this.newCommentImage.name
 
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.newCommentImagePreview = e.target.result;
-    };
-    reader.readAsDataURL(this.newCommentImage);
+    const fileType = this.newCommentImage.type;
+    this.isPDFNewComment = false
+
+    if (fileType.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.newCommentImagePreview = e.target.result;
+      };
+      reader.readAsDataURL(this.newCommentImage);
+    } else if (fileType === 'application/pdf') {
+      // Si es un PDF, simplemente muestra el nombre
+      this.isPDFNewComment = true;
+      this.messageService.add({
+        severity: 'info',
+        summary: 'PDF seleccionado',
+        detail: 'El archivo PDF se ha seleccionado.'
+      });
+    } else {
+      // Si no es ni imagen ni PDF, puedes manejar el error aquí
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Tipo de archivo no soportado',
+        detail: 'Por favor selecciona un archivo válido (imagen o PDF).'
+      });
+    }
   }
 
   onEditCommentImageSelect(event: any): void {
@@ -450,11 +486,31 @@ export class AddCitasMedicasComponent implements OnInit {
     this.editCommentImage = event.files[0];
     this.comentarioEdit.nombreDocumento = this.editCommentImage.name
 
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.comentarioEdit.imagePreview = e.target.result;
-    };
-    reader.readAsDataURL(this.editCommentImage);
+    const fileType = this.editCommentImage.type;
+    this.comentarioEdit.isPDF = false
+
+    if (fileType.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.comentarioEdit.imagePreview = e.target.result;
+      };
+      reader.readAsDataURL(this.editCommentImage);
+    } else if (fileType === 'application/pdf') {
+      // Si es un PDF, simplemente muestra el nombre
+      this.comentarioEdit.isPDF = true
+      this.messageService.add({
+        severity: 'info',
+        summary: 'PDF seleccionado',
+        detail: 'El archivo PDF se ha seleccionado.'
+      });
+    } else {
+      // Si no es ni imagen ni PDF, puedes manejar el error aquí
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Tipo de archivo no soportado',
+        detail: 'Por favor selecciona un archivo válido (imagen o PDF).'
+      });
+    }
   }
 
   onFileSelect(event) {
@@ -497,51 +553,37 @@ export class AddCitasMedicasComponent implements OnInit {
     this.imagenCambiadaEdit = true
   }
 
-//   downloadFile() {
-//     console.log(this.imagen)
-//     // Ejemplo de uso
-//     const filename = "archivo.pdf"; // nombre del archivo
-//     const file = this.base64ToFile(this.imagen, filename);
-//
-// // Ahora puedes usar el objeto `file` como un `File` normal
-//     console.log(file);
-//     // if (this.imagen instanceof Blob) {
-//     //   // Caso de archivo local (Blob)
-//     //   const fileURL = URL.createObjectURL(this.imagen);
-//     //   const a = document.createElement('a');
-//     //   a.href = fileURL;
-//     //   a.download = this.nombreDocumento;
-//     //   document.body.appendChild(a);
-//     //   a.click();
-//     //   document.body.removeChild(a);
-//     //   URL.revokeObjectURL(fileURL); // Limpiar URL temporal
-//     // } else if (typeof this.imagen === 'string') {
-//     //   // Caso de URL remota
-//     //   const a = document.createElement('a');
-//     //   a.href = this.imagen;
-//     //   a.download = this.nombreDocumento;
-//     //   document.body.appendChild(a);
-//     //   a.click();
-//     //   document.body.removeChild(a);
-//     // } else {
-//     //   console.error("El tipo de archivo no es compatible.");
-//     // }
-//   }
-
   downloadFile() {
+    this.downloadFileComment(this.imagen, this.nombreDocumento)
+  }
+
+  downloadFileCommentAll(comentario) {
+    this.downloadFileComment(comentario.imagePreview, comentario.nombreDocumento)
+  }
+
+  downloadNewFileComment() {
+    this.downloadFileComment(this.newCommentImage, this.nombreDocumentoComment)
+  }
+
+  downloadEditComment() {
+    console.log(this.editCommentImage)
+    console.log(this.comentarioEdit.nombreDocumento)
+    this.downloadFileComment(this.editCommentImage, this.comentarioEdit.nombreDocumento)
+  }
+
+  downloadFileComment(image, nombreDocumento) {
     try {
       let file
-      if (typeof this.imagen === 'string') {
-        const base64String = `data:application/pdf;base64,${this.imagen}`;
-        file = this.base64ToFile(base64String, this.nombreDocumento);
+      if (typeof image === 'string') {
+        const base64String = `data:application/pdf;base64,${image}`;
+        file = this.base64ToFile(base64String, nombreDocumento);
       } else
-        file = this.imagen
+        file = image
 
-      console.log(file)
       const fileURL = URL.createObjectURL(file);
       const a = document.createElement('a');
       a.href = fileURL;
-      a.download = this.nombreDocumento;
+      a.download = nombreDocumento;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -550,7 +592,6 @@ export class AddCitasMedicasComponent implements OnInit {
       console.error('Error downloading file:', error);
     }
   }
-
 
   base64ToFile(base64String: string, fileName: string): File {
     if (!base64String) {
@@ -606,6 +647,7 @@ export class AddCitasMedicasComponent implements OnInit {
     this.newCommentImage = null;
     this.newCommentImagePreview = null;
     this.nombreDocumentoComment = null
+    this.isPDFNewComment = false
     fileUploadRef.clear();
   }
 
@@ -615,6 +657,7 @@ export class AddCitasMedicasComponent implements OnInit {
 
     this.comentarioEdit.nombreDocumento = null;
     this.comentarioEdit.imagePreview = null;
+    this.comentarioEdit.isPDF = false;
     fileUploadRef.clear();
   }
 

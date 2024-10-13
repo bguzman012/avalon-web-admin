@@ -1,7 +1,7 @@
 <p-toast></p-toast>
 
 <div class="card">
-    
+
   <p-toolbar styleClass="p-mb-4">
     <ng-template pTemplate="left"> </ng-template>
 
@@ -45,9 +45,7 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
+
         <th pSortableColumn="nombre">
           Nombre <p-sortIcon field="nombre"></p-sortIcon>
         </th>
@@ -59,9 +57,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-broker>
       <tr (click)="redirectToAgentesPage(broker)">
-        <td>
-          <p-tableCheckbox [value]="broker"></p-tableCheckbox>
-        </td>
+
         <td>{{ broker.nombre }}</td>
         <td>{{ broker.correoElectronico }}</td>
         <td>
@@ -83,7 +79,7 @@
         </td>
       </tr>
     </ng-template>
-    
+
     <ng-template pTemplate="summary">
       <p-blockUI [blocked]="loading">
         <div class="p-field" *ngIf="loading">
@@ -95,7 +91,7 @@
         En total existen {{totalRecords ? totalRecords : 0  }} registros.
       </div>
     </ng-template>
-    
+
   </p-table>
 </div>
 

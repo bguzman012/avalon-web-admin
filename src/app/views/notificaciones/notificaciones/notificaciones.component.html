@@ -26,9 +26,7 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
+
         <th pSortableColumn="asunto">Asunto <p-sortIcon field="asunto"></p-sortIcon></th>
         <th pSortableColumn="mensaje">Mensaje <p-sortIcon field="mensaje"></p-sortIcon></th>
         <th pSortableColumn="usuarioEnvia">Usuario envía<p-sortIcon field="usuarioEnvia"></p-sortIcon></th>
@@ -40,9 +38,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-notificacion>
       <tr>
-        <td>
-          <p-tableCheckbox [value]="notificacion"></p-tableCheckbox>
-        </td>
+
         <td>{{notificacion.asunto}}</td>
         <td>{{notificacion.mensaje}}</td>
         <td>{{notificacion.usuarioEnvia}}</td>

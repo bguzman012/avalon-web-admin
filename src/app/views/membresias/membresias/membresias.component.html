@@ -44,9 +44,6 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
         <th pSortableColumn="nombres">
           Nombres <p-sortIcon field="nombres"></p-sortIcon>
         </th>
@@ -61,9 +58,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-membresia>
       <tr (click)="redirectToMembresiasPage(membresia)">
-        <td>
-          <p-tableCheckbox [value]="membresia"></p-tableCheckbox>
-        </td>
+
         <td>{{ membresia.nombres }}</td>
         <td>{{ membresia.detalle }}</td>
         <td>{{ membresia.vigenciaMeses }}</td>

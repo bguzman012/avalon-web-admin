@@ -73,9 +73,7 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
+
         <th pSortableColumn="codigo">
           Código <p-sortIcon field="codigo"></p-sortIcon>
         </th>
@@ -90,9 +88,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-caso>
       <tr>
-        <td>
-          <p-tableCheckbox [value]="caso"></p-tableCheckbox>
-        </td>
+
         <td>{{ caso.codigo }}</td>
         <td>{{ caso.clienteDisplayName }}</td>
         <td>{{ caso.clientePoliza.displayName }}</td>

@@ -33,9 +33,7 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
+
         <th pSortableColumn="numeroCertificado">
           Num. Cert.
           <p-sortIcon field="numeroCertificado"></p-sortIcon>
@@ -62,9 +60,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-cargaFamiliar>
       <tr>
-        <td>
-          <p-tableCheckbox [value]="cargaFamiliar"></p-tableCheckbox>
-        </td>
+
         <td>{{ cargaFamiliar.numeroCertificado }}</td>
         <td>{{ cargaFamiliar.cliente.nombres }} {{ cargaFamiliar.cliente.nombresDos }}</td>
         <td>{{ cargaFamiliar.cliente.apellidos }} {{ cargaFamiliar.cliente.apellidosDos }}</td>

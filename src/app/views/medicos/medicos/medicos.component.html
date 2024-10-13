@@ -29,9 +29,7 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
+
         <th pSortableColumn="nombres">Nombres
           <p-sortIcon field="nombres"></p-sortIcon>
         </th>
@@ -55,9 +53,7 @@
       <tr (click)="
               redirectToCentroMedicoAseguradorasPage(medico); $event.stopPropagation()
             ">
-        <td>
-          <p-tableCheckbox [value]="medico"></p-tableCheckbox>
-        </td>
+
         <td>{{ medico.nombres }} {{ medico.nombresDos }}</td>
         <td>{{ medico.apellidos }} {{ medico.apellidosDos }}</td>
         <td>{{ medico.correoElectronico }}</td>

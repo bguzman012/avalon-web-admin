@@ -44,9 +44,7 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
+
         <th pSortableColumn="contenido">
           Contenido <p-sortIcon field="contenido"></p-sortIcon>
         </th>
@@ -64,11 +62,8 @@
     </ng-template>
     <ng-template pTemplate="body" let-pregunta>
       <tr (click)="redirectToDetallesPage(pregunta)">
-        <td>
-          <p-tableCheckbox [value]="pregunta"></p-tableCheckbox>
-        </td>
         <td>{{ pregunta.contenido }}</td>
-        
+
         <td>{{ pregunta.nivel }}</td>
         <td>{{ pregunta.respuesta }}</td>
         <td>{{ pregunta.padre?.contenido }}</td>
@@ -91,7 +86,7 @@
         </td>
       </tr>
     </ng-template>
-    
+
     <ng-template pTemplate="summary">
       <div class="p-d-flex p-ai-center p-jc-between">
         En total existen {{ preguntas ? preguntas.length : 0 }} registros.
@@ -153,7 +148,7 @@
         [showEmptyMessage]="true"
         [suggestions]="filteredPreguntas"
         (completeMethod)="filterPreguntas($event)"
-        (ngModelChange)="loadPregunta()" 
+        (ngModelChange)="loadPregunta()"
         field="contenido"
         dropdown = "true"
         [minLength]="1"

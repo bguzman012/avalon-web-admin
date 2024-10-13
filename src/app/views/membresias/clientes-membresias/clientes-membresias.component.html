@@ -47,9 +47,7 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
+
         <th pSortableColumn="codigo">
           Membresía ID
           <p-sortIcon field="codigo"></p-sortIcon>
@@ -75,9 +73,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-clienteMembresia>
       <tr>
-        <td>
-          <p-tableCheckbox [value]="clienteMembresias"></p-tableCheckbox>
-        </td>
+
         <td>{{ clienteMembresia.codigo }}</td>
         <td>{{ clienteMembresia.cliente.nombreUsuario }}</td>
         <td>{{ clienteMembresia.asesor.nombreUsuario}}</td>
