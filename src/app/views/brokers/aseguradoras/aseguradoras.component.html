@@ -56,11 +56,20 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-broker>
-      <tr (click)="redirectToAgentesPage(broker)">
+      <tr>
 
         <td>{{ broker.nombre }}</td>
         <td>{{ broker.correoElectronico }}</td>
         <td>
+          <button
+            pButton
+            class="p-button-rounded p-button-primary p-mr-2 medium-button"
+            (click)="
+              redirectToAgentesPage(broker); $event.stopPropagation()
+            "
+          >
+            Agentes
+          </button>
           <button
             pButton
             pRipple

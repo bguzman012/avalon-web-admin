@@ -56,11 +56,20 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-aseguradora>
-      <tr (click)="redirectToMembresiasPage(aseguradora)">
+      <tr>
 
         <td>{{ aseguradora.nombre }}</td>
         <td>{{ aseguradora.correoElectronico }}</td>
         <td>
+          <button
+            pButton
+            class="p-button-rounded p-button-primary p-mr-2 medium-button"
+            (click)="
+              redirectToMembresiasPage(aseguradora); $event.stopPropagation()
+            "
+          >
+            Pólizas
+          </button>
           <button
             pButton
             pRipple

@@ -50,9 +50,7 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-medico>
-      <tr (click)="
-              redirectToCentroMedicoAseguradorasPage(medico); $event.stopPropagation()
-            ">
+      <tr>
 
         <td>{{ medico.nombres }} {{ medico.nombresDos }}</td>
         <td>{{ medico.apellidos }} {{ medico.apellidosDos }}</td>
@@ -60,6 +58,15 @@
         <td>{{ medico.numeroTelefono }}</td>
         <td>{{ medico.especialidad.nombre }}</td>
         <td style="text-align: right;">
+          <button
+            pButton
+            class="p-button-rounded p-button-primary p-mr-2 small-button"
+            (click)="
+              redirectToCentroMedicoAseguradorasPage(medico); $event.stopPropagation()
+            "
+          >
+            Centros Médicos
+          </button>
           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2 small-button"
                   (click)="editMedico(medico); $event.stopPropagation()"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning small-button"

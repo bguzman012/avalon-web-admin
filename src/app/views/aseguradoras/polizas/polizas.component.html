@@ -50,11 +50,11 @@
           Aseguradora
           <p-sortIcon field="aseguradora"></p-sortIcon>
         </th>
-        <th style="width: 200px;"></th>
+        <th style="width: 280px;"></th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-poliza>
-      <tr (click)="redirectToMembresiasPage(poliza)">
+      <tr>
 
         <td>{{ poliza.nombre }}</td>
         <td>{{ poliza.descripcion }}</td>
@@ -65,6 +65,13 @@
             pButton
             pRipple
             class="p-button-rounded p-button-primary p-mr-2 small-button"
+            (click)="redirectToMembresiasPage(poliza); $event.stopPropagation()"
+          >Clientes
+          </button>
+          <button
+            pButton
+            pRipple
+            class="p-button-rounded p-button-secondary p-mr-2 small-button"
             (click)="redirectToCoberturasPage(poliza); $event.stopPropagation()"
           >Coberturas
           </button>

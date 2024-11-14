@@ -22,19 +22,31 @@
                     #fileUploadRef
                     (onSelect)="onFileSelected($event)"
                     class="mr-2 inline-block"></p-fileUpload>
-      <button pButton pRipple icon="pi pi-trash"
-              class="p-button-danger p-button-icon-only"
-              (click)="clearImageSelection(fileUploadRef)"></button>
+<!--      <button pButton pRipple icon="pi pi-trash"-->
+<!--              class="p-button-danger p-button-icon-only"-->
+<!--              (click)="clearImageSelection(fileUploadRef)"></button>-->
 
-      <button style = "margin-left: 30px" pButton pRipple class="p-button-raised p-button-rounded p-button-success" (click)="sendDataToService(fileUploadRef)">Enviar</button>
+<!--      <button style = "margin-left: 30px" pButton pRipple class="p-button-raised p-button-rounded p-button-success" (click)="sendDataToService(fileUploadRef)">Enviar</button>-->
 
       <!-- Botón para descargar el archivo -->
 
     </div>
   </p-panel>
 
+  <br/>
   <!-- Tabla para mostrar los datos del Excel -->
   <p-table [value]="excelData.slice(1)" *ngIf="excelData.length">
+
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <h4 class="p-m-0">Previsualización archivo cargado</h4>
+        <span class="p-input-icon-left">
+      <button pButton pRipple class="p-button-raised p-button-rounded p-button-danger" (click)="clearImageSelection(fileUploadRef)">Descartar</button>
+      <button style = "margin-left: 5px" pButton pRipple class="p-button-raised p-button-rounded p-button-success" (click)="sendDataToService(fileUploadRef)">Subir</button>
+
+        </span>
+      </div>
+    </ng-template>
     <ng-template pTemplate="header">
       <tr>
         <th *ngFor="let header of excelData[0]">{{ header }}</th>

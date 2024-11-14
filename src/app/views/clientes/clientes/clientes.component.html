@@ -85,16 +85,7 @@
           {{ getEstadoLabel(usuario.estado) }}
         </td>
         <td style="text-align: right">
-          <button
-            *ngIf="usuario.estado != 'P'"
-            pButton
-            class="p-button-rounded p-button-secondary p-mr-2 small-button"
-            (click)="
-              redirectToMembresiasPage(usuario); $event.stopPropagation()
-            "
-          >
-            Membresías
-          </button>
+
           <button
             *ngIf="usuario.estado != 'P'"
             pButton
@@ -104,6 +95,16 @@
             "
           >
             Polizas
+          </button>
+          <button
+            *ngIf="usuario.estado != 'P'"
+            pButton
+            class="p-button-rounded p-button-secondary p-mr-2 small-button"
+            (click)="
+              redirectToMembresiasPage(usuario); $event.stopPropagation()
+            "
+          >
+            Membresías
           </button>
           <button
             *ngIf="validarEnable && usuario.estado == 'P'"

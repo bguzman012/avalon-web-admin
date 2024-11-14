@@ -40,7 +40,7 @@ export class ReportesComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.opcion = "CITAS_REEMBOL_EMERGEN"
+    this.opcion = "CLI_ASEG"
 
   }
 

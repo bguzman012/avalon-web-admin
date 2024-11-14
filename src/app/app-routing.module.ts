@@ -170,7 +170,7 @@ const routes: Routes = [
     path: 'restart-password',
     component: RestartPasswordComponent,
     data: {
-      title: 'Reinicio de contraseña'
+      title: 'Restablecer contraseña'
     }
   },
   {path: '**', redirectTo: 'dashboard'}
