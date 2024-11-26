@@ -74,6 +74,16 @@ export class RestartPasswordComponent {
         .subscribe(
           (response) => {
             this.loading = false;
+            console.log(response, "  7776677")
+
+            if (response.asunto == "CODIGO_ERROR")
+              return this.messageService.add({
+                severity: 'error',
+                summary: 'Error!',
+                detail: response.message,
+                life: 3000,
+              });
+
             this.confirmationService.confirm({
               message: "Su contraseña ha sido cambiada con éxito. ¿Desea continuar a la pantalla para iniciar sesión?",
               header: 'Contraseña cambiada',

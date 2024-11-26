@@ -60,6 +60,7 @@ export class LoginComponent {
             this.loading = false;
 
             if (response.asunto === this.ASUNTO_CAMBIO_CONTRASENIA) {
+              this.loginErrorMessage = ""
 
               // Mostrar ConfirmationService si se requiere un cambio de contraseña
               this.confirmationService.confirm({
@@ -72,6 +73,8 @@ export class LoginComponent {
               });
             }
             if (response.asunto === this.ASUNTO_LOGIN_EXITOSO_2FA) {
+              this.loginErrorMessage = ""
+
               // Lógica para un inicio de sesión exitoso normal
               // this.router.navigate(['/clientes']);
               this.dosFADialog = true
@@ -153,6 +156,7 @@ export class LoginComponent {
               life: 3000,
             });
             this.dosFADialog = false
+            this.verificationCodeMessage = ""
             localStorage.removeItem("VERIFICANDO_2FA")
             this.authService.setAutenticado2FA();
             this.router.navigate(['/clientes']);

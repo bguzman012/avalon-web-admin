@@ -69,6 +69,8 @@ export class ChangePasswordComponent {
         .subscribe(
           (response) => {
             this.loading = false;
+            console.log(response, "  7776677")
+
             this.confirmationService.confirm({
               message: "Su contraseña ha sido cambiada con éxito. ¿Desea continuar a la pantalla para iniciar sesión?",
               header: 'Contraseña cambiada',

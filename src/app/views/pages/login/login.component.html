@@ -18,13 +18,13 @@
                   <span cInputGroupText>
                     <svg cIcon name="cilUser"></svg>
                   </span>
-                  <input formControlName="username" autoComplete="username" cFormControl placeholder="Username"/>
+                  <input formControlName="username" autoComplete="username" cFormControl placeholder="Usuario o correo electrónico"/>
                 </c-input-group>
                 <c-input-group class="mb-4">
                   <span cInputGroupText>
                     <svg cIcon name="cilLockLocked"></svg>
                   </span>
-                  <input formControlName="password" autoComplete="current-password" cFormControl placeholder="Password"
+                  <input formControlName="password" autoComplete="current-password" cFormControl placeholder="Contraseña"
                          type="password"/>
                 </c-input-group>
                 <span *ngIf="loginError" class="text-danger">{{ loginErrorMessage }}</span>
