@@ -746,8 +746,8 @@ export class AddEmergenciasComponent implements OnInit {
 
     this.emergencia.casoId = this.selectedCaso.id
 
-    this.direccion.paisId = this.pais.id;
-    this.direccion.estadoId = this.estado.id;
+    this.direccion.paisId = this.pais?.id;
+    this.direccion.estadoId = this.estado?.id;
     this.emergencia.direccion = this.direccion;
 
     formData.append('emergencia', new Blob([JSON.stringify(this.emergencia)], {type: 'application/json'}));

@@ -60,16 +60,127 @@
   <div class="card" *ngIf="citaMedica">
     <p-panel styleClass="p-fluid" header="Detalles de Cita Médica">
       <div class="p-field">
-        <label for="fechaTentativa">Fecha Tentativa *</label>
+        <label for="tipoIdentificacion">Tipo de Cita Médica *</label>
+        <p-dropdown
+          id="tipoIdentificacion"
+          [options]="tipoCitaMedicaOptions"
+          [(ngModel)]="citaMedica.tipoCitaMedica"
+          optionLabel="value"
+          optionValue="label"
+          placeholder="Seleccione un tipo de cita médica">
+        </p-dropdown>
+        <small class="p-invalid" *ngIf="submitted && !citaMedica.tipoCitaMedica">Tipo de cita médica es
+          requerido.</small>
+      </div>
+      <div class="p-field">
+        <label for="fechaTentativa">Fecha Tentativa Desde *</label>
         <p-calendar [(ngModel)]="citaMedica.fechaTentativa" dateFormat="dd/mm/yy" [showIcon]="true"
                     [disabled]="readOnlyForm || citaMedica?.id"
                     required></p-calendar>
         <small class="p-invalid" *ngIf="submitted && !citaMedica.fechaTentativa">Fecha tentativa es requerida.</small>
       </div>
+
+      <div class="p-field">
+        <label for="fechaTentativaHasta">Fecha Tentativa Hasta</label>
+        <p-calendar [(ngModel)]="citaMedica.fechaTentativaHasta" dateFormat="dd/mm/yy" [showIcon]="true"
+                    [disabled]="readOnlyForm || citaMedica?.id"
+                    required></p-calendar>
+      </div>
       <div class="p-field">
         <label for="ciudadPreferencia">Ciudad de preferencias</label>
         <input type="text" pInputText id="ciudadPreferencia" [(ngModel)]="citaMedica.ciudadPreferencia"
-               [readonly]="readOnlyForm || citaMedica?.id" required autofocus/>
+               [readonly]="readOnlyForm || citaMedica?.id" autofocus/>
+      </div>
+
+      <p-divider align="left" type="dashed">
+        <b>Dirección</b>
+      </p-divider>
+
+      <div class="p-field">
+        <label for="direccionUno">Dirección</label>
+        <input
+          type="text"
+          pInputText
+          id="direccionUno"
+          [(ngModel)]="direccion.direccionUno"
+          required
+          [readonly]="readOnlyForm || citaMedica?.id"
+          autofocus
+        />
+
+      </div>
+
+      <div class="p-field">
+        <label for="direccionDos">Dirección (2)</label>
+        <input
+          type="text"
+          pInputText
+          [readonly]="readOnlyForm || citaMedica?.id"
+          id="direccionDos"
+          [(ngModel)]="direccion.direccionDos"
+          required
+          autofocus
+        />
+      </div>
+
+      <div class="p-field">
+        <label for="paisesId">País</label>
+        <p-autoComplete
+          [(ngModel)]="pais"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredPaises"
+          (completeMethod)="filterPaises($event)"
+          [readonly]="readOnlyForm || citaMedica?.id"
+          [dropdown]="!readOnlyForm && !citaMedica?.id"
+          field="nombre"
+          (ngModelChange)="loadEstados()"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required
+        ></p-autoComplete>
+      </div>
+      <div class="p-field">
+        <label for="asesoresId">Estado</label>
+        <p-autoComplete
+          [(ngModel)]="estado"
+          [showEmptyMessage]="true"
+          [suggestions]="filteredEstados"
+          (completeMethod)="filterEstados($event)"
+          [dropdown]="!readOnlyForm && !citaMedica?.id"
+          [readonly]="!pais || readOnlyForm || citaMedica?.id"
+          field="nombre"
+          [minLength]="1"
+          [appendTo]="'body'"
+          required
+        ></p-autoComplete>
+
+      </div>
+
+      <div class="p-field">
+        <label for="ciudad">Ciudad</label>
+        <input
+          type="text"
+          pInputText
+          id="ciudad"
+          [(ngModel)]="direccion.ciudad"
+          required
+          [readonly]="readOnlyForm || citaMedica?.id"
+          autofocus
+        />
+      </div>
+
+      <div class="p-field">
+        <label for="codigoPostal">Código Postal</label>
+        <input
+          type="text"
+          pInputText
+          id="codigoPostal"
+          [readonly]="readOnlyForm || citaMedica?.id"
+          [(ngModel)]="direccion.codigoPostal"
+          required
+          autofocus
+        />
+
       </div>
       <div class="p-field" *ngIf="selectedClientePoliza?.id">
         <label for="aseguradora">Aseguradora</label>

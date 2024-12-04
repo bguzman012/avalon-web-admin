@@ -165,8 +165,8 @@ export class CentrosMedicosComponent implements OnInit {
     this.submitted = true;
     this.loading = true; // Mostrar spinner
     try {
-      this.direccion.paisId = this.pais.id;
-      this.direccion.estadoId = this.estado.id;
+      this.direccion.paisId = this.pais?.id;
+      this.direccion.estadoId = this.estado?.id;
       this.centroMedico.direccion = this.direccion;
 
       if (this.centroMedico.id) {

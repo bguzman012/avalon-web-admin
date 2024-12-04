@@ -44,6 +44,7 @@ import {PanelModule} from 'primeng/panel';
 import {CitasMedicasComponent} from './citas-medicas/citas-medicas.component';
 import {AddCitasMedicasComponent} from './add-citas-medicas/add-citas-medicas.component';
 import {PaginatorModule} from "primeng/paginator";
+import {DividerModule} from "primeng/divider";
 
 // import { MedCentrosMedicosAseguradorasComponent } from './clientes-membresias/clientes-membresias.component';
 
@@ -97,6 +98,7 @@ import {PaginatorModule} from "primeng/paginator";
         ConfirmDialogModule,
         InputTextareaModule,
         PaginatorModule,
+        DividerModule,
     ]
 })
 export class CitasMedicasModule {

@@ -276,8 +276,8 @@ export class ClientesComponent implements OnInit {
     try {
       if (this.usuario.id) {
         this.usuario.rolId = this.usuario.rol.id;
-        this.direccion.paisId = this.pais.id;
-        this.direccion.estadoId = this.estado.id;
+        this.direccion.paisId = this.pais?.id;
+        this.direccion.estadoId = this.estado?.id;
         this.usuario.direccion = this.direccion;
         await this.usuariosService.actualizarUsuario(
           this.usuario.id,
@@ -287,8 +287,8 @@ export class ClientesComponent implements OnInit {
       } else {
         this.usuario.rolId = this.ROL_CLIENTE_ID;
         this.usuario.estado = 'P';
-        this.direccion.paisId = this.pais.id;
-        this.direccion.estadoId = this.estado.id;
+        this.direccion.paisId = this.pais?.id;
+        this.direccion.estadoId = this.estado?.id;
         this.usuario.direccion = this.direccion;
         console.log(this.usuario);
         let usuarioSaved = await this.usuariosService.guardarUsuario(

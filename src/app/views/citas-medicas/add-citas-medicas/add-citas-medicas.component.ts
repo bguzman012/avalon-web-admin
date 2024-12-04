@@ -16,6 +16,10 @@ import {CentrosMedicosService} from "../../../services/centros-medicos-service";
 import {MedicoCentroMedicoAseguradorasService} from "../../../services/med-centros-medicos-aseguradoras-service";
 import {RequisitoAdicional} from "../../../enums/requisito-adicional";
 import {CasosService} from "../../../services/casos-service";
+import {PaisesService} from "../../../services/paises-service";
+import {EstadosService} from "../../../services/estados-service";
+import {TipoIdentificacion} from "../../../enums/tipo-identificacion";
+import {TipoCitaMedica} from "../../../enums/tipo-cita-medica";
 
 @Component({
   selector: 'add-emergencias',
@@ -87,8 +91,21 @@ export class AddCitasMedicasComponent implements OnInit {
   newCommentImagePreview: string | null = null;
   isPDF
   isPDFNewComment
+  direccion: any;
+
+
+  paises: any[];
+  estados: any[];
+
+  pais: any;
+  estado: any;
+
+  filteredPaises: any[];
+  filteredEstados: any[];
 
   pdfPreview
+  tipoCitaMedicaOptions: { label: string, value: string }[];
+
 
   requisitosAdicionales: { [key in RequisitoAdicional]: boolean } = {
     [RequisitoAdicional.VIAJES]: false,
@@ -120,6 +137,8 @@ export class AddCitasMedicasComponent implements OnInit {
     private medicoCentroMedicoAseguradoraService: MedicoCentroMedicoAseguradorasService,
     private imagenService: ImagenesService,
     private confirmationService: ConfirmationService,
+    private paisesService: PaisesService,
+    private estadosService: EstadosService,
     private centrosMedicosService: CentrosMedicosService,
     private route: ActivatedRoute,
     private clientesPolizasService: ClientePolizaService,
@@ -151,10 +170,22 @@ export class AddCitasMedicasComponent implements OnInit {
 
       this.citaMedica.fechaTentativa = new Date(this.citaMedica.fechaTentativa + 'T23:59:00Z');
 
+      if (this.citaMedica.fechaTentativaHasta)
+        this.citaMedica.fechaTentativaHasta = new Date(this.citaMedica.fechaTentativaHasta + 'T23:59:00Z');
+
       this.initializeRequisitosAdicionales(this.citaMedica.requisitosAdicionales);
 
       this.codigoDocumento = "# " + this.citaMedica.codigo
       this.selectedCliente = this.citaMedica.clientePoliza.cliente
+
+      if (this.citaMedica.direccion) {
+        this.direccion = this.citaMedica.direccion;
+        this.pais = this.direccion.pais;
+      } else this.direccion = {};
+
+      if (this.pais) this.loadEstados();
+
+      if (this.direccion) this.estado = this.direccion.state;
 
       const clientePolizaParm = JSON.parse(localStorage.getItem("clientePoliza"))
       const casoParam = JSON.parse(localStorage.getItem("caso"))
@@ -253,6 +284,20 @@ export class AddCitasMedicasComponent implements OnInit {
     }
   }
 
+  filterPaises(event): void {
+    let query = event.query;
+    this.filteredPaises = this.paises.filter(
+      (pais) => pais.nombre.toLowerCase().indexOf(query.toLowerCase()) === 0
+    );
+  }
+
+  filterEstados(event): void {
+    let query = event.query;
+    this.filteredEstados = this.estados.filter(
+      (obj) => obj.nombre.toLowerCase().indexOf(query.toLowerCase()) === 0
+    );
+  }
+
   async iniciarEdicion(comentario: any) {
     if (comentario.usuarioComenta.nombreUsuario === this.user.nombreUsuario && !this.readOnlyForm) {
       comentario.enEdicion = true;
@@ -261,6 +306,13 @@ export class AddCitasMedicasComponent implements OnInit {
       this.habilitarEdicionComentario = true
       this.editImageComment = false
     }
+  }
+
+  async loadEstados() {
+    if (this.pais.id)
+      this.estados = await this.estadosService.obtenerEstadosByPais(
+        this.pais.id
+      );
   }
 
   getEstadoLabel(estado: string): string {
@@ -693,6 +745,10 @@ export class AddCitasMedicasComponent implements OnInit {
     );
 
     this.clientes = responseCliente.data
+    this.paises = await this.paisesService.obtenerPaises();
+    this.tipoCitaMedicaOptions = Object.keys(TipoCitaMedica).map(key => {
+      return { label: key, value: TipoCitaMedica[key] };
+    });
   }
 
   private getRouteParams(param: string): Promise<string> {
@@ -709,8 +765,9 @@ export class AddCitasMedicasComponent implements OnInit {
 
   openNew() {
     this.citaMedica = {};
-    this.centroMedico = null;
+    this.direccion = {};
 
+    this.centroMedico = null;
     this.submitted = false;
   }
 
@@ -732,6 +789,21 @@ export class AddCitasMedicasComponent implements OnInit {
       return
     }
 
+    if (!this.citaMedica.tipoCitaMedica || !this.citaMedica.padecimiento || !this.citaMedica.informacionAdicional) return
+
+    if (
+      this.citaMedica.fechaTentativaHasta &&
+      this.citaMedica.fechaTentativa >= this.citaMedica.fechaTentativaHasta
+    ) {
+      // Mostrar un mensaje de error al usuario
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error de validación',
+        detail: 'La fecha hasta debe ser mayor que la fecha desde.',
+      });
+      return; // Detener el guardado
+    }
+
     this.loading = true; // Mostrar spinner
     const formData = new FormData();
     this.citaMedica.medicoCentroMedicoAseguradoraId = this.medicoCentroMedicoAseguradora?.id
@@ -743,6 +815,11 @@ export class AddCitasMedicasComponent implements OnInit {
       this.citaMedica.tipoDocumento = "IMAGEN"
 
     this.citaMedica.casoId = this.selectedCaso.id
+
+    this.direccion.paisId = this.pais?.id;
+    this.direccion.estadoId = this.estado?.id;
+    this.citaMedica.direccion = this.direccion;
+
     const requisitosAdicionalesBackend = {};
 
     for (const [key, value] of Object.entries(this.requisitosAdicionales)) {

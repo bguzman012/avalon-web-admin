@@ -284,8 +284,8 @@ export class CargasFamiliaresComponent implements OnInit {
         await this.cargasFamiliaresService.updateCargaFamiliar(this.cargaFamiliar.id, this.cargaFamiliar);
       } else {
         if (!this.selectedCliente?.id) {
-          this.direccion.paisId = this.pais.id;
-          this.direccion.estadoId = this.estado.id;
+          this.direccion.paisId = this.pais?.id;
+          this.direccion.estadoId = this.estado?.id;
           this.cargaFamiliar.direccion = this.direccion;
         } else
           this.cargaFamiliar.clienteId = this.selectedCliente.id

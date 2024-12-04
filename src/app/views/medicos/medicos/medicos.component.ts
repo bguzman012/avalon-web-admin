@@ -185,8 +185,8 @@ export class MedicosComponent implements OnInit {
     this.loading = true; // Mostrar spinner
     try {
       this.medico.especialidadId = this.especialidad.id
-      this.direccion.paisId = this.pais.id;
-      this.direccion.estadoId = this.estado.id;
+      this.direccion.paisId = this.pais?.id;
+      this.direccion.estadoId = this.estado?.id;
       this.medico.direccion = this.direccion;
       console.log(this.medico)
 
