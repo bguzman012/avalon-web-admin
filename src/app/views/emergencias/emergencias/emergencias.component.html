@@ -82,10 +82,14 @@
           Cliente
           <p-sortIcon field="clientePoliza.cliente"></p-sortIcon>
         </th>
-        <th pSortableColumn="clientePoliza">
-          Poliza
-          <p-sortIcon field="clientePoliza"></p-sortIcon>
+        <th pSortableColumn="sintomas">
+          Síntomas
+          <p-sortIcon field="sintomas"></p-sortIcon>
         </th>
+<!--        <th pSortableColumn="clientePoliza">-->
+<!--          Poliza-->
+<!--          <p-sortIcon field="clientePoliza"></p-sortIcon>-->
+<!--        </th>-->
         <th pSortableColumn="medicoCentroMedicoAseguradora.centroMedico">
           Centro Médico
           <p-sortIcon field="medicoCentroMedicoAseguradora.centroMedico"></p-sortIcon>
@@ -105,7 +109,8 @@
         <td>{{ emergencia.caso.codigo }}</td>
         <td>{{ emergencia.codigo }}</td>
         <td>{{ emergencia.clientePoliza.cliente.displayName }}</td>
-        <td>{{ emergencia.clientePoliza.displayName }}</td>
+<!--        <td>{{ emergencia.clientePoliza.displayName }}</td>-->
+        <td>{{ emergencia.sintomas }}</td>
         <td>{{ emergencia?.medicoCentroMedicoAseguradora?.centroMedico.nombre }}</td>
         <td>{{ emergencia?.medicoCentroMedicoAseguradora?.medico.nombres }} {{ emergencia?.medicoCentroMedicoAseguradora?.medico.nombresDos }}</td>
         <td>

@@ -38,8 +38,9 @@
         </p-autoComplete>
       </div>
       <div class="p-field">
-        <label for="observaciones">Observaciones </label>
+        <label for="observaciones">Observaciones *</label>
         <textarea pInputTextarea id="observaciones" [(ngModel)]="caso.observaciones" required></textarea>
+        <small class="p-invalid" *ngIf="submitted && !caso.observaciones">Observaciones es requerido.</small>
       </div>
       <div class="custom-button-container">
         <button pButton pRipple label="Cancelar" icon="pi pi-times" [disabled]="readOnlyForm" class="p-button-secondary" style="width: 30%;"

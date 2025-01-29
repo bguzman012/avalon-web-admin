@@ -122,6 +122,11 @@ export class AddCasosComponent implements OnInit {
   async saveCitaMedica() {
     this.submitted = true;
 
+    if (!this.caso.observaciones){
+      this.loading = false;
+      return
+    }
+
     this.loading = true; // Mostrar spinner
     this.caso.clientePolizaId = this.selectedClientePoliza.id
 

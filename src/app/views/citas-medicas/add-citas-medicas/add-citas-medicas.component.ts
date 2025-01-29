@@ -789,7 +789,7 @@ export class AddCitasMedicasComponent implements OnInit {
       return
     }
 
-    if (!this.citaMedica.tipoCitaMedica || !this.citaMedica.padecimiento || !this.citaMedica.informacionAdicional) return
+    if (!this.citaMedica.tipoCitaMedica || !this.citaMedica.padecimiento) return
 
     if (
       this.citaMedica.fechaTentativaHasta &&
