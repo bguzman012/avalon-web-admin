@@ -58,7 +58,7 @@
   <div class="card"  *ngIf="reclamacion">
     <p-panel styleClass="p-fluid" header="Detalles de Reembolso">
       <div class="p-field">
-        <label>Fecha Tentativa *</label>
+        <label>Fecha *</label>
         <p-calendar [(ngModel)]="reclamacion.fechaServicio" dateFormat="dd/mm/yy" [disabled]="readOnlyForm || reclamacion?.id" [showIcon]="true"
                     required></p-calendar>
         <small class="p-invalid" *ngIf="submitted && !reclamacion.fechaServicio">Fecha servicio es requerida.</small>
@@ -112,15 +112,14 @@
       </div>
 
       <div class="p-field">
-        <label>Padecimiento/diagnóstico *</label>
+        <label>Padecimiento/Diagnóstico *</label>
         <textarea pInputTextarea [(ngModel)]="reclamacion.padecimientoDiagnostico" [readonly]="readOnlyForm || reclamacion?.id" required></textarea>
         <small class="p-invalid" *ngIf="submitted && !reclamacion.padecimientoDiagnostico">Padecimiento/diagnóstico es requerido.</small>
       </div>
 
       <div class="p-field">
-        <label>Información Adicional  *</label>
+        <label>Información Adicional</label>
         <textarea pInputTextarea [(ngModel)]="reclamacion.infoAdicional" [readonly]="readOnlyForm || reclamacion?.id" required></textarea>
-        <small class="p-invalid" *ngIf="submitted && !reclamacion.infoAdicional">Información adicional es requerida.</small>
       </div>
 
       <div class="p-field">

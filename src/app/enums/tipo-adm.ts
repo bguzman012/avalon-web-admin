@@ -1,4 +1,4 @@
 export enum TipoAdm {
-  EMERGENCIA = "Emergencia",
-  PROGRAMADA = "Programada"
+  NO_PROGRAMADA = "Evento programado",
+  PROGRAMADA = "Evento No programado"
 }
